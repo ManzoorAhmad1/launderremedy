@@ -33,6 +33,11 @@ export default function Header() {
 
   const { isLogin, user } = useSelector((state: RootState) => state.user)
 
+  // Auto-close menu when route changes
+  useEffect(() => {
+    closeMenu()
+  }, [pathname]) // This will run whenever the pathname changes
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
@@ -70,7 +75,7 @@ export default function Header() {
               alt='Launder Remedy Logo'
               width={120}
               height={40}
-              className="object-contain"
+              className="object-contain w-28 h-auto sm:w-32 md:w-36 dark:brightness-0 dark:invert"
             />
           </Link>
 
@@ -86,6 +91,7 @@ export default function Header() {
                     ? 'text-primary'
                     : 'text-neutral-600 hover:text-primary'
                     }`}
+                  onClick={closeMenu} // Add onClick here too for consistency
                 >
                   {item.title}
                   <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full ${pathname === item.path ? 'w-full' : ''
@@ -113,7 +119,7 @@ export default function Header() {
             {/* User Actions */}
             {isLogin ? (
               <>
-                <Link href="/dashboard">
+                <Link href="/dashboard" onClick={closeMenu}>
                   <Button variant="ghost" size="icon" className="rounded-full">
                     <User className="h-5 w-5" />
                   </Button>
@@ -127,7 +133,7 @@ export default function Header() {
                 </Button>
               </>
             ) : (
-              <Link href="/login">
+              <Link href="/login" onClick={closeMenu}>
                 <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
                   Log In
                 </Button>
@@ -135,7 +141,7 @@ export default function Header() {
             )}
 
             {/* Place Order Button */}
-            <Link href="/place-order">
+            <Link href="/place-order" onClick={closeMenu}>
               <Button className="bg-primary hover:bg-primary-700 shadow-lg hover:shadow-xl transition-all text-white">
                 <ShoppingBag className="mr-2 h-4 w-4" />
                 Place Order
@@ -144,7 +150,6 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-
           <Button
             variant="ghost"
             size="icon"
@@ -152,7 +157,7 @@ export default function Header() {
             onClick={toggleMenu}
           >
             {isMenuOpen ? (
-              <div className="flex items-center ">
+              <div className="flex items-center">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -166,11 +171,9 @@ export default function Header() {
                   )}
                 </Button>
                 <X className="h-6 w-6" />
-
               </div>
             ) : (
-              <div className="flex items-center ">
-
+              <div className="flex items-center">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -185,7 +188,6 @@ export default function Header() {
                 </Button>
                 <Menu className="h-6 w-6" />
               </div>
-
             )}
           </Button>
         </div>
@@ -204,7 +206,7 @@ export default function Header() {
                       ? 'bg-primary/10 text-primary'
                       : 'text-neutral-600 hover:bg-neutral-100 hover:text-primary'
                       }`}
-                    onClick={closeMenu}
+                    onClick={closeMenu} // This will close the menu when clicked
                   >
                     {item.title}
                   </Link>

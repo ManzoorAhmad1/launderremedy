@@ -229,3 +229,11 @@
     scrollbar-width: none;  /* Firefox */
   }
 }
+/* In your global.css or component */
+.logo-white-in-dark {
+  filter: brightness(0) invert(1);
+}
+
+.dark .logo-white-in-dark {
+  filter: none;
+}

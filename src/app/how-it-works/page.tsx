@@ -1,0 +1,486 @@
+"use client"
+
+import React, { useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import { 
+  Calendar, 
+  Package, 
+  Clock, 
+  Truck, 
+  Smartphone, 
+  Bell, 
+  Shield, 
+  RefreshCw,
+  Star,
+  ChevronRight,
+  CheckCircle,
+  MapPin,
+  Phone,
+  Mail,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Apple,
+  Play
+} from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const steps = [
+  {
+    number: "1",
+    title: "Plan Your Pick-Up",
+    subtitle: "FLEXIBLE",
+    icon: Calendar,
+    color: "from-blue-500 to-blue-600",
+    description: "Streamline your day effortlessly. Pick a collection and delivery time that suits your schedule.",
+    features: [
+      {
+        icon: CheckCircle,
+        text: "Book online or with our mobile app"
+      },
+      {
+        icon: CheckCircle,
+        text: "Weekend and evening slots available"
+      }
+    ],
+    imageAlt: "Schedule pickup on app"
+  },
+  {
+    number: "2",
+    title: "Pack your Laundry",
+    subtitle: "QUICK & EASY",
+    icon: Package,
+    color: "from-green-500 to-green-600",
+    description: "Use one bag per order. Our driver swaps it for a cool Launder Remedy bag – yours to keep for next time!",
+    features: [
+      {
+        icon: CheckCircle,
+        text: "Pack one bag per service"
+      },
+      {
+        icon: CheckCircle,
+        text: "No need to count or weigh your items"
+      }
+    ],
+    imageAlt: "Laundry bag swapping"
+  },
+  {
+    number: "3",
+    title: "Wait for our driver",
+    subtitle: "TRANSPARENT",
+    icon: Truck,
+    color: "from-purple-500 to-purple-600",
+    description: "You'll receive a notification when our driver is nearby. They will collect your bags and take them to your local cleaning facility.",
+    features: [
+      {
+        icon: CheckCircle,
+        text: "Book online or with our mobile app"
+      },
+      {
+        icon: CheckCircle,
+        text: "Live driver tracking"
+      }
+    ],
+    imageAlt: "Driver notification and tracking"
+  },
+  {
+    number: "4",
+    title: "Relax While We Take Care of Your Laundry",
+    subtitle: "CONVENIENT",
+    icon: Shield,
+    color: "from-amber-500 to-amber-600",
+    description: "Your local partner facility will clean your items with utmost care. Our driver will then deliver them back to you whenever you like.",
+    features: [
+      {
+        icon: CheckCircle,
+        text: "Real-time order updates"
+      },
+      {
+        icon: CheckCircle,
+        text: "Dedicated 24/7 support"
+      },
+      {
+        icon: CheckCircle,
+        text: "Easy to reschedule"
+      }
+    ],
+    note: "You're in full control of your delivery and can always reschedule if not at home.",
+    imageAlt: "Professional laundry cleaning process"
+  }
+]
+
+const testimonials = [
+  {
+    name: "Joe Smith",
+    rating: 5,
+    text: "Exceptional service! I've been using their laundry and ironing services for months now, and I'm always impressed by the quality of their work. My clothes come back fresh, clean, and perfectly pressed every time. Highly recommend!",
+    avatar: "JS",
+    color: "bg-blue-100 dark:bg-blue-900/30"
+  },
+  {
+    name: "Michael Patel",
+    rating: 5,
+    text: "I can't say enough good things about this laundry service. They're reliable, efficient, and always go the extra mile to ensure customer satisfaction. Plus, their ironing service leaves my clothes looking like they just came from the store. So happy I found them!",
+    avatar: "MP",
+    color: "bg-green-100 dark:bg-green-900/30"
+  },
+  {
+    name: "Sarah Thompson",
+    rating: 5,
+    text: "I've tried several laundry services in the past, but none compare to this one. Their attention to detail is unmatched, and they handle my delicate fabrics with care. The convenience of having my laundry picked up and delivered back to my doorstep is a game-changer. Definitely my go-to laundry service from now on!",
+    avatar: "ST",
+    color: "bg-purple-100 dark:bg-purple-900/30"
+  }
+]
+
+export default function HowItWorksPage() {
+  const [activeStep, setActiveStep] = useState(0)
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800" />
+        
+        {/* Animated Background Elements */}
+        <div className="absolute top-10 left-10 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" />
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float animation-delay-2000" />
+
+        <div className="container relative mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-8"
+            >
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                <span className="block text-neutral-900 dark:text-white">SPEEDYWASH</span>
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 mt-2">
+                  WHERE TIME MEETS CLEAN
+                </span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-neutral-600 dark:text-neutral-300 mb-8">
+                YOUR LAUNDRY DELIVERED IN 24H
+              </p>
+              
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-8 py-6 text-lg rounded-xl shadow-xl hover:shadow-2xl transition-all"
+                asChild
+              >
+                <Link href="/place-order">
+                  Schedule your pickup
+                  <ChevronRight className="ml-2 w-5 h-5" />
+                </Link>
+              </Button>
+            </motion.div>
+
+            {/* Stats Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12"
+            >
+              {[
+                { value: "24h", label: "Delivery Time" },
+                { value: "5000+", label: "Happy Customers" },
+                { value: "100%", label: "Satisfaction" }
+              ].map((stat, index) => (
+                <div key={index} className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stat.value}</div>
+                  <div className="text-neutral-600 dark:text-neutral-400">{stat.label}</div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Steps */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            {/* Steps Navigation */}
+            <div className="flex justify-center mb-12">
+              <div className="inline-flex flex-wrap justify-center gap-2">
+                {steps.map((step, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveStep(index)}
+                    className={`px-6 py-3 rounded-full font-medium transition-all ${
+                      activeStep === index
+                        ? 'bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg'
+                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                    }`}
+                  >
+                    Step {step.number}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Steps Content */}
+            <div className="space-y-16">
+              {steps.map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className={`grid lg:grid-cols-2 gap-8 items-center ${
+                    index % 2 === 1 ? 'lg:grid-flow-dense' : ''
+                  }`}
+                >
+                  {/* Left Column - Content */}
+                  <div className={`${index % 2 === 1 ? 'lg:col-start-2' : ''}`}>
+                    <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-green-100 dark:from-blue-900/30 dark:to-green-900/30 text-blue-700 dark:text-blue-300 mb-4">
+                      <span className="font-bold mr-2">Step {step.number}</span>
+                      <span className="font-medium">{step.subtitle}</span>
+                    </div>
+                    
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                      {step.title}
+                    </h2>
+                    
+                    <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-6">
+                      {step.description}
+                    </p>
+                    
+                    <div className="space-y-3 mb-6">
+                      {step.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center">
+                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                          <span className="text-neutral-700 dark:text-neutral-300">{feature.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {step.note && (
+                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+                        <p className="text-blue-700 dark:text-blue-300 italic">{step.note}</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Right Column - Visual */}
+                  <div className={`${index % 2 === 1 ? 'lg:col-start-1' : ''}`}>
+                    <div className="relative">
+                      {/* Main Image/Visual */}
+                      <div className={`bg-gradient-to-br ${step.color} rounded-2xl p-8 aspect-video flex items-center justify-center shadow-xl`}>
+                        <div className="text-white text-center">
+                          <step.icon className="w-16 h-16 mx-auto mb-4" />
+                          <h3 className="text-2xl font-bold mb-2">Step {step.number}</h3>
+                          <p className="opacity-90">{step.title}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Decorative Elements */}
+                      <div className="absolute -top-4 -right-4 w-24 h-24 bg-white/10 dark:bg-neutral-800/10 backdrop-blur-sm rounded-xl rotate-12 animate-float" />
+                      <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white/10 dark:bg-neutral-800/10 backdrop-blur-sm rounded-xl -rotate-12 animate-float animation-delay-1000" />
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-gradient-to-b from-neutral-50 to-white dark:from-neutral-950 dark:to-neutral-900">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-green-600 text-white mb-4">
+              <Star className="w-4 h-4 mr-2 fill-white" />
+              Rated excellent ★★★★ by 5,000+ users
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Happy Customers</h2>
+            <p className="text-lg text-neutral-600 dark:text-neutral-400">
+              Don't just take our word for it - hear what our customers have to say
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+                className={`${testimonial.color} rounded-2xl p-6 shadow-lg`}
+              >
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 rounded-full bg-white dark:bg-neutral-800 flex items-center justify-center font-bold text-lg mr-4">
+                    {testimonial.avatar}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">{testimonial.name}</h4>
+                    <div className="flex items-center mt-1">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                <p className="text-neutral-700 dark:text-neutral-300 italic">
+                  "{testimonial.text}"
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-green-600 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+            backgroundSize: '40px 40px',
+          }} />
+        </div>
+        
+        <div className="container relative mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto text-center"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              BOOK TODAY, WEAR HAPPINESS EVERYDAY.
+            </h2>
+            
+            <p className="text-xl text-blue-100 mb-8">
+              Experience the convenience of professional laundry service delivered to your doorstep.
+            </p>
+            
+            <Button
+              size="lg"
+              className="bg-white text-blue-700 hover:bg-blue-50 text-lg px-8 py-6 rounded-xl shadow-2xl hover:shadow-3xl transition-all group"
+              asChild
+            >
+              <Link href="/place-order">
+                Schedule your pickup
+                <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-2 transition-transform" />
+              </Link>
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer Section */}
+      <footer className="bg-neutral-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center space-x-2 mb-6">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                  <span className="text-blue-700 font-bold text-xl">LR</span>
+                </div>
+                <span className="text-xl font-bold text-white">LaunderRemedy</span>
+              </div>
+              <p className="text-neutral-400 text-sm">
+                Revolutionizing laundry services with speed, quality, and convenience.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                <li><Link href="/how-it-works" className="text-neutral-400 hover:text-white transition-colors">How It Works</Link></li>
+                <li><Link href="/pricing" className="text-neutral-400 hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link href="/about-us" className="text-neutral-400 hover:text-white transition-colors">About Us</Link></li>
+                <li><Link href="/faq" className="text-neutral-400 hover:text-white transition-colors">FAQ</Link></li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+              <ul className="space-y-3">
+                <li className="flex items-center text-neutral-400">
+                  <Phone className="w-4 h-4 mr-2" />
+                  <span>+44 20 7123 4567</span>
+                </li>
+                <li className="flex items-center text-neutral-400">
+                  <Mail className="w-4 h-4 mr-2" />
+                  <span>support@launderremedy.com</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Apps & Social */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Download App</h4>
+              <div className="space-y-3 mb-6">
+                <button className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-neutral-800 text-white py-2 px-4 rounded-lg transition-colors">
+                  <Apple className="w-5 h-5" />
+                  <span>App Store</span>
+                </button>
+                <button className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-neutral-800 text-white py-2 px-4 rounded-lg transition-colors">
+                  <Play className="w-5 h-5" />
+                  <span>Google Play</span>
+                </button>
+              </div>
+              
+              <h4 className="text-lg font-semibold mb-4">Follow Us</h4>
+              <div className="flex space-x-4">
+                {[Facebook, Twitter, Instagram, Linkedin].map((Icon, index) => (
+                  <a
+                    key={index}
+                    href="#"
+                    className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                  >
+                    <Icon className="w-5 h-5" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-neutral-800 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-neutral-500 text-sm mb-4 md:mb-0">
+                All rights reserved. © LaunderRemedy 2023.
+              </p>
+              
+              <div className="flex items-center space-x-6">
+                <Link href="/privacy" className="text-sm text-neutral-500 hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link href="/terms" className="text-sm text-neutral-500 hover:text-white transition-colors">
+                  Terms & Conditions
+                </Link>
+              </div>
+            </div>
+            
+            <p className="text-center text-neutral-600 text-sm mt-4">
+              By visiting this page you agree to our privacy policy and terms and conditions.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}

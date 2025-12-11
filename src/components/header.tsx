@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '@/lib/features/userSlice'
 import { clearData } from '@/lib/features/orderSlice'
 import { RootState } from '@/lib/store'
+import Image from 'next/image'
+import logo from '../../public/logo-02.png'
 
 const NavData = [
   { id: 1, title: "Home", path: "/", live: true },
@@ -28,7 +30,7 @@ export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const dispatch = useDispatch()
-  
+
   const { isLogin, user } = useSelector((state: RootState) => state.user)
 
   useEffect(() => {
@@ -51,28 +53,25 @@ export default function Header() {
   const closeMenu = () => setIsMenuOpen(false)
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled 
-        ? 'bg-background/80 backdrop-blur-md shadow-lg' 
-        : 'bg-background'
-    }`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+      ? 'bg-background/80 backdrop-blur-md shadow-lg'
+      : 'bg-background'
+      }`}>
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="flex items-center space-x-2 group"
             onClick={closeMenu}
           >
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span className="text-white font-bold text-xl">LR</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
-                Launder Remedy
-              </span>
-              <span className="text-xs text-neutral-500">Fresh & Clean</span>
-            </div>
+            <Image
+              src={logo}
+              alt='Launder Remedy Logo'
+              width={120}
+              height={40}
+              className="object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -83,16 +82,14 @@ export default function Header() {
                 <Link
                   key={item.id}
                   href={item.path}
-                  className={`text-sm font-medium transition-colors relative group ${
-                    pathname === item.path 
-                      ? 'text-primary' 
-                      : 'text-neutral-600 hover:text-primary'
-                  }`}
+                  className={`text-sm font-medium transition-colors relative group ${pathname === item.path
+                    ? 'text-primary'
+                    : 'text-neutral-600 hover:text-primary'
+                    }`}
                 >
                   {item.title}
-                  <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full ${
-                    pathname === item.path ? 'w-full' : ''
-                  }`} />
+                  <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full ${pathname === item.path ? 'w-full' : ''
+                    }`} />
                 </Link>
               ))}
           </nav>
@@ -121,8 +118,8 @@ export default function Header() {
                     <User className="h-5 w-5" />
                   </Button>
                 </Link>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={handleLogout}
                   className="border-primary text-primary hover:bg-primary/10"
                 >
@@ -139,7 +136,7 @@ export default function Header() {
 
             {/* Place Order Button */}
             <Link href="/place-order">
-              <Button className="bg-primary hover:bg-primary-700 shadow-lg hover:shadow-xl transition-all">
+              <Button className="bg-primary hover:bg-primary-700 shadow-lg hover:shadow-xl transition-all text-white">
                 <ShoppingBag className="mr-2 h-4 w-4" />
                 Place Order
               </Button>
@@ -147,6 +144,7 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu Button */}
+
           <Button
             variant="ghost"
             size="icon"
@@ -154,9 +152,40 @@ export default function Header() {
             onClick={toggleMenu}
           >
             {isMenuOpen ? (
-              <X className="h-6 w-6" />
+              <div className="flex items-center ">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  className="rounded-full"
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )}
+                </Button>
+                <X className="h-6 w-6" />
+
+              </div>
             ) : (
-              <Menu className="h-6 w-6" />
+              <div className="flex items-center ">
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  className="rounded-full"
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )}
+                </Button>
+                <Menu className="h-6 w-6" />
+              </div>
+
             )}
           </Button>
         </div>
@@ -171,29 +200,17 @@ export default function Header() {
                   <Link
                     key={item.id}
                     href={item.path}
-                    className={`text-sm font-medium py-2 px-4 rounded-lg transition-colors ${
-                      pathname === item.path 
-                        ? 'bg-primary/10 text-primary' 
-                        : 'text-neutral-600 hover:bg-neutral-100 hover:text-primary'
-                    }`}
+                    className={`text-sm font-medium py-2 px-4 rounded-lg transition-colors ${pathname === item.path
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-neutral-600 hover:bg-neutral-100 hover:text-primary'
+                      }`}
                     onClick={closeMenu}
                   >
                     {item.title}
                   </Link>
                 ))}
-              
+
               <div className="pt-4 border-t border-neutral-200 flex flex-col space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-neutral-600">Theme</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  >
-                    {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                  </Button>
-                </div>
-                
                 {isLogin ? (
                   <>
                     <Link href="/dashboard" onClick={closeMenu}>
@@ -201,8 +218,8 @@ export default function Header() {
                         Dashboard
                       </Button>
                     </Link>
-                    <Button 
-                      variant="destructive" 
+                    <Button
+                      variant="destructive"
                       onClick={() => {
                         handleLogout()
                         closeMenu()
@@ -219,9 +236,9 @@ export default function Header() {
                     </Button>
                   </Link>
                 )}
-                
+
                 <Link href="/place-order" onClick={closeMenu}>
-                  <Button className="w-full bg-primary hover:bg-primary-700">
+                  <Button className="w-full bg-primary hover:bg-primary-700 text-white">
                     Place Order
                   </Button>
                 </Link>

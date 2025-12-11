@@ -4,18 +4,30 @@
 
 @layer base {
   :root {
-    /* Primary Colors - Laundry theme */
-    --primary-50: 210 100% 98%;
-    --primary-100: 210 100% 96%;
-    --primary-200: 210 96% 90%;
-    --primary-300: 210 94% 82%;
-    --primary-400: 210 91% 70%;
-    --primary-500: 210 89% 60%;
-    --primary-600: 210 79% 52%;
-    --primary-700: 210 75% 45%;
-    --primary-800: 210 70% 38%;
-    --primary-900: 210 65% 32%;
-    --primary-950: 210 80% 20%;
+    /* Primary Colors - Purple theme based on #41154c */
+    --primary-50: 291 67% 98%;
+    --primary-100: 291 67% 95%;
+    --primary-200: 291 67% 89%;
+    --primary-300: 291 67% 80%;
+    --primary-400: 291 67% 68%;
+    --primary-500: 291 54% 46%; /* Base color: #41154c */
+    --primary-600: 291 54% 40%;
+    --primary-700: 291 54% 34%;
+    --primary-800: 291 54% 28%;
+    --primary-900: 291 54% 22%;
+    --primary-950: 291 70% 15%;
+
+    /* Secondary Colors - Lighter purple accents */
+    --secondary-50: 282 100% 98%;
+    --secondary-100: 282 100% 95%;
+    --secondary-200: 282 100% 89%;
+    --secondary-300: 282 100% 80%;
+    --secondary-400: 282 100% 68%;
+    --secondary-500: 282 84% 56%;
+    --secondary-600: 282 84% 48%;
+    --secondary-700: 282 84% 40%;
+    --secondary-800: 282 84% 32%;
+    --secondary-900: 282 84% 24%;
 
     /* Neutral Colors */
     --neutral-50: 0 0% 98%;
@@ -31,10 +43,10 @@
     --neutral-950: 0 0% 4%;
 
     /* Accent Colors */
-    --accent-blue: 210 100% 50%;
+    --accent-pink: 330 81% 60%;
     --accent-green: 160 84% 45%;
     --accent-yellow: 45 93% 58%;
-    --accent-red: 0 84% 60%;
+    --accent-teal: 180 84% 45%;
 
     /* Background & Surface */
     --background: 0 0% 100%;
@@ -43,34 +55,60 @@
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --muted: 291 30% 96%;
+    --muted-foreground: 291 15% 45%;
+    --border: 291 15% 89%;
+    --input: 291 15% 89%;
+    --ring: 291 54% 46%;
 
     /* Border Radius */
     --radius: 0.5rem;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-sm: 0 1px 2px 0 rgba(65, 21, 76, 0.05);
+    --shadow: 0 1px 3px 0 rgba(65, 21, 76, 0.1), 0 1px 2px -1px rgba(65, 21, 76, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(65, 21, 76, 0.1), 0 2px 4px -2px rgba(65, 21, 76, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(65, 21, 76, 0.1), 0 4px 6px -4px rgba(65, 21, 76, 0.1);
   }
 
   .dark {
-    --background: 0 0% 3.9%;
+    /* Primary Colors for Dark Mode */
+    --primary-50: 291 67% 10%;
+    --primary-100: 291 67% 15%;
+    --primary-200: 291 67% 20%;
+    --primary-300: 291 67% 25%;
+    --primary-400: 291 67% 35%;
+    --primary-500: 291 54% 46%;
+    --primary-600: 291 54% 55%;
+    --primary-700: 291 54% 65%;
+    --primary-800: 291 54% 75%;
+    --primary-900: 291 54% 85%;
+    --primary-950: 291 70% 90%;
+
+    /* Secondary Colors for Dark Mode */
+    --secondary-50: 282 100% 10%;
+    --secondary-100: 282 100% 15%;
+    --secondary-200: 282 100% 20%;
+    --secondary-300: 282 100% 25%;
+    --secondary-400: 282 100% 35%;
+    --secondary-500: 282 84% 56%;
+    --secondary-600: 282 84% 65%;
+    --secondary-700: 282 84% 75%;
+    --secondary-800: 282 84% 85%;
+    --secondary-900: 282 84% 90%;
+
+    /* Dark Mode Variables */
+    --background: 291 70% 5%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
+    --card: 291 70% 7%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+    --popover: 291 70% 7%;
     --popover-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --muted: 291 30% 15%;
+    --muted-foreground: 291 15% 70%;
+    --border: 291 30% 20%;
+    --input: 291 30% 20%;
+    --ring: 282 84% 56%;
   }
 }
 
@@ -82,16 +120,112 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-100 dark:bg-neutral-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-500/30 hover:bg-primary-500/50 rounded-full transition-colors;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-600 hover:bg-secondary-700 text-white transition-colors;
+  }
+  
+  .btn-outline-primary {
+    @apply border border-primary-600 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors;
+  }
+  
+  /* Card styles */
+  .card {
+    @apply bg-white dark:bg-neutral-800 rounded-lg shadow-md p-6;
+  }
+  
+  /* Gradient backgrounds */
+  .bg-gradient-purple {
+    @apply bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600;
+  }
+  
+  .bg-gradient-light {
+    @apply bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-primary-950 dark:via-neutral-900 dark:to-primary-900;
+  }
+  
+  /* Text gradients */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent;
+  }
 }
 
 @layer utilities {
+  /* Animation delays */
   .animation-delay-2000 {
     animation-delay: 2s;
   }
   .animation-delay-4000 {
     animation-delay: 4s;
   }
+  
+  /* Text utilities */
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Custom animations */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  /* Shadow utilities */
+  .shadow-primary {
+    box-shadow: 0 4px 20px rgba(65, 21, 76, 0.15);
+  }
+  
+  .shadow-primary-lg {
+    box-shadow: 0 10px 40px rgba(65, 21, 76, 0.2);
+  }
+  
+  /* Glass morphism */
+  .glass {
+    @apply backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 dark:border-white/10;
+  }
+  
+  /* Custom borders */
+  .border-primary {
+    @apply border-primary-500/20;
+  }
+  
+  /* Custom gradients */
+  .bg-primary-gradient {
+    @apply bg-gradient-to-r from-primary-500 via-primary-600 to-secondary-600;
+  }
+  
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
   }
 }

@@ -36,7 +36,7 @@ export default function Header() {
   // Auto-close menu when route changes
   useEffect(() => {
     closeMenu()
-  }, [pathname]) // This will run whenever the pathname changes
+  }, [pathname])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,6 +56,12 @@ export default function Header() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
   const closeMenu = () => setIsMenuOpen(false)
+
+  // Handle theme toggle on mobile - prevent menu toggle
+  const handleMobileThemeToggle = (e: React.MouseEvent) => {
+    e.stopPropagation() // Stop event from bubbling to parent
+    setTheme(theme === 'dark' ? 'light' : 'dark')
+  }
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
@@ -91,7 +97,7 @@ export default function Header() {
                     ? 'text-primary'
                     : 'text-neutral-600 hover:text-primary'
                     }`}
-                  onClick={closeMenu} // Add onClick here too for consistency
+                  onClick={closeMenu}
                 >
                   {item.title}
                   <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full ${pathname === item.path ? 'w-full' : ''
@@ -100,7 +106,7 @@ export default function Header() {
               ))}
           </nav>
 
-          {/* Actions */}
+          {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-4">
             {/* Theme Toggle */}
             <Button
@@ -149,47 +155,35 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            onClick={toggleMenu}
-          >
-            {isMenuOpen ? (
-              <div className="flex items-center">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="rounded-full"
-                >
-                  {theme === 'dark' ? (
-                    <Sun className="h-5 w-5" />
-                  ) : (
-                    <Moon className="h-5 w-5" />
-                  )}
-                </Button>
+          {/* Mobile Actions */}
+          <div className="flex lg:hidden items-center space-x-2">
+            {/* Mobile Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleMobileThemeToggle}
+              className="rounded-full"
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+
+            {/* Mobile Menu Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMenu}
+            >
+              {isMenuOpen ? (
                 <X className="h-6 w-6" />
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="rounded-full"
-                >
-                  {theme === 'dark' ? (
-                    <Sun className="h-5 w-5" />
-                  ) : (
-                    <Moon className="h-5 w-5" />
-                  )}
-                </Button>
+              ) : (
                 <Menu className="h-6 w-6" />
-              </div>
-            )}
-          </Button>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -206,7 +200,7 @@ export default function Header() {
                       ? 'bg-primary/10 text-primary'
                       : 'text-neutral-600 hover:bg-neutral-100 hover:text-primary'
                       }`}
-                    onClick={closeMenu} // This will close the menu when clicked
+                    onClick={closeMenu}
                   >
                     {item.title}
                   </Link>

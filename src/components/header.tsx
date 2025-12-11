@@ -13,7 +13,7 @@ import { RootState } from '@/lib/store'
 
 const NavData = [
   { id: 1, title: "Home", path: "/", live: true },
-  { id: 2, title: "How it works", path: "/how-it-works", live: true },
+  { id: 2, title: "How it works", path: "/how-it", live: true },
   { id: 3, title: "Pricing", path: "/pricing", live: true },
   { id: 4, title: "About us", path: "/about-us", live: true },
   { id: 5, title: "FAQ", path: "/faq", live: true },

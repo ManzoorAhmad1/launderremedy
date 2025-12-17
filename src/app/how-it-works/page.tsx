@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -23,10 +23,10 @@ import {
   Twitter,
   Instagram,
   Linkedin,
-  Apple,
-  Play
+  Download,
+  Sparkles
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 const steps = [
   {
@@ -34,7 +34,7 @@ const steps = [
     title: "Plan Your Pick-Up",
     subtitle: "FLEXIBLE",
     icon: Calendar,
-    color: "from-blue-500 to-blue-600",
+    color: "from-primary-500 to-primary-600",
     description: "Streamline your day effortlessly. Pick a collection and delivery time that suits your schedule.",
     features: [
       {
@@ -53,7 +53,7 @@ const steps = [
     title: "Pack your Laundry",
     subtitle: "QUICK & EASY",
     icon: Package,
-    color: "from-green-500 to-green-600",
+    color: "from-accent-green to-green-600",
     description: "Use one bag per order. Our driver swaps it for a cool Launder Remedy bag – yours to keep for next time!",
     features: [
       {
@@ -72,7 +72,7 @@ const steps = [
     title: "Wait for our driver",
     subtitle: "TRANSPARENT",
     icon: Truck,
-    color: "from-purple-500 to-purple-600",
+    color: "from-secondary-500 to-secondary-600",
     description: "You'll receive a notification when our driver is nearby. They will collect your bags and take them to your local cleaning facility.",
     features: [
       {
@@ -91,7 +91,7 @@ const steps = [
     title: "Relax While We Take Care of Your Laundry",
     subtitle: "CONVENIENT",
     icon: Shield,
-    color: "from-amber-500 to-amber-600",
+    color: "from-accent-yellow to-amber-600",
     description: "Your local partner facility will clean your items with utmost care. Our driver will then deliver them back to you whenever you like.",
     features: [
       {
@@ -118,37 +118,68 @@ const testimonials = [
     rating: 5,
     text: "Exceptional service! I've been using their laundry and ironing services for months now, and I'm always impressed by the quality of their work. My clothes come back fresh, clean, and perfectly pressed every time. Highly recommend!",
     avatar: "JS",
-    color: "bg-blue-100 dark:bg-blue-900/30"
+    color: "bg-primary-50 dark:bg-primary-900/30"
   },
   {
     name: "Michael Patel",
     rating: 5,
     text: "I can't say enough good things about this laundry service. They're reliable, efficient, and always go the extra mile to ensure customer satisfaction. Plus, their ironing service leaves my clothes looking like they just came from the store. So happy I found them!",
     avatar: "MP",
-    color: "bg-green-100 dark:bg-green-900/30"
+    color: "bg-accent-green/10 dark:bg-accent-green/20"
   },
   {
     name: "Sarah Thompson",
     rating: 5,
     text: "I've tried several laundry services in the past, but none compare to this one. Their attention to detail is unmatched, and they handle my delicate fabrics with care. The convenience of having my laundry picked up and delivered back to my doorstep is a game-changer. Definitely my go-to laundry service from now on!",
     avatar: "ST",
-    color: "bg-purple-100 dark:bg-purple-900/30"
+    color: "bg-secondary-50 dark:bg-secondary-900/30"
   }
 ]
 
 export default function HowItWorksPage() {
   const [activeStep, setActiveStep] = useState(0)
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  // Scroll to step function
+  const scrollToStep = (index: number) => {
+    setActiveStep(index)
+    if (stepRefs.current[index]) {
+      stepRefs.current[index]?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start'
+      })
+    }
+  }
+
+  const appStores = [
+    {
+      name: "App Store",
+      icon: "􀄨",
+      description: "Download on the",
+      action: "App Store",
+      color: "bg-white text-primary-600 hover:bg-neutral-100 dark:bg-white dark:text-primary-600 dark:hover:bg-neutral-100",
+      iconColor: "text-primary-600"
+    },
+    {
+      name: "Google Play",
+      icon: "▶",
+      description: "Get it on",
+      action: "Google Play",
+      color: "bg-neutral-900 text-white hover:bg-black dark:bg-neutral-900 dark:text-white dark:hover:bg-black",
+      iconColor: "text-white"
+    },
+  ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800">
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
         {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800" />
         
         {/* Animated Background Elements */}
-        <div className="absolute top-10 left-10 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" />
-        <div className="absolute bottom-10 right-10 w-64 h-64 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float animation-delay-2000" />
+        <div className="absolute top-10 left-10 w-64 h-64 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" />
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-secondary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float animation-delay-2000" />
 
         <div className="container relative mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -158,9 +189,14 @@ export default function HowItWorksPage() {
               transition={{ duration: 0.6 }}
               className="mb-8"
             >
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 text-sm font-medium mb-6">
+                <Sparkles className="w-4 h-4 mr-2" />
+                HOW IT WORKS
+              </div>
+
               <h1 className="text-4xl md:text-6xl font-bold mb-4">
                 <span className="block text-neutral-900 dark:text-white">SPEEDYWASH</span>
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 mt-2">
+                <span className="text-gradient block">
                   WHERE TIME MEETS CLEAN
                 </span>
               </h1>
@@ -171,10 +207,10 @@ export default function HowItWorksPage() {
               
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-8 py-6 text-lg rounded-xl shadow-xl hover:shadow-2xl transition-all"
+                className="btn-primary px-8 py-6 text-lg rounded-xl shadow-xl hover:shadow-2xl transition-all"
                 asChild
               >
-                <Link href="/place-order">
+                <Link href="/place-order" className='flex items-center'>
                   Schedule your pickup
                   <ChevronRight className="ml-2 w-5 h-5" />
                 </Link>
@@ -193,8 +229,8 @@ export default function HowItWorksPage() {
                 { value: "5000+", label: "Happy Customers" },
                 { value: "100%", label: "Satisfaction" }
               ].map((stat, index) => (
-                <div key={index} className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stat.value}</div>
+                <div key={index} className="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+                  <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">{stat.value}</div>
                   <div className="text-neutral-600 dark:text-neutral-400">{stat.label}</div>
                 </div>
               ))}
@@ -207,16 +243,16 @@ export default function HowItWorksPage() {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            {/* Steps Navigation */}
+            {/* Steps Navigation - Clean buttons */}
             <div className="flex justify-center mb-12">
               <div className="inline-flex flex-wrap justify-center gap-2">
                 {steps.map((step, index) => (
                   <button
                     key={index}
-                    onClick={() => setActiveStep(index)}
+                    onClick={() => scrollToStep(index)}
                     className={`px-6 py-3 rounded-full font-medium transition-all ${
                       activeStep === index
-                        ? 'bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg'
+                        ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-lg'
                         : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                     }`}
                   >
@@ -226,11 +262,14 @@ export default function HowItWorksPage() {
               </div>
             </div>
 
-            {/* Steps Content */}
+            {/* Steps Content - Good alternating layout */}
             <div className="space-y-16">
               {steps.map((step, index) => (
                 <motion.div
                   key={index}
+                  ref={(el) => {
+                    stepRefs.current[index] = el
+                  }}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -241,12 +280,12 @@ export default function HowItWorksPage() {
                 >
                   {/* Left Column - Content */}
                   <div className={`${index % 2 === 1 ? 'lg:col-start-2' : ''}`}>
-                    <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-green-100 dark:from-blue-900/30 dark:to-green-900/30 text-blue-700 dark:text-blue-300 mb-4">
+                    <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 text-primary-700 dark:text-primary-300 mb-4">
                       <span className="font-bold mr-2">Step {step.number}</span>
                       <span className="font-medium">{step.subtitle}</span>
                     </div>
                     
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4 text-neutral-900 dark:text-white">
                       {step.title}
                     </h2>
                     
@@ -257,15 +296,15 @@ export default function HowItWorksPage() {
                     <div className="space-y-3 mb-6">
                       {step.features.map((feature, idx) => (
                         <div key={idx} className="flex items-center">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-accent-green mr-3 flex-shrink-0" />
                           <span className="text-neutral-700 dark:text-neutral-300">{feature.text}</span>
                         </div>
                       ))}
                     </div>
                     
                     {step.note && (
-                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-                        <p className="text-blue-700 dark:text-blue-300 italic">{step.note}</p>
+                      <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl p-4">
+                        <p className="text-primary-700 dark:text-primary-300 italic">{step.note}</p>
                       </div>
                     )}
                   </div>
@@ -274,7 +313,7 @@ export default function HowItWorksPage() {
                   <div className={`${index % 2 === 1 ? 'lg:col-start-1' : ''}`}>
                     <div className="relative">
                       {/* Main Image/Visual */}
-                      <div className={`bg-gradient-to-br ${step.color} rounded-2xl p-8 aspect-video flex items-center justify-center shadow-xl`}>
+                      <div className={`bg-gradient-to-br ${step.color} rounded-2xl p-8 aspect-video flex items-center justify-center shadow-xl border border-white/20`}>
                         <div className="text-white text-center">
                           <step.icon className="w-16 h-16 mx-auto mb-4" />
                           <h3 className="text-2xl font-bold mb-2">Step {step.number}</h3>
@@ -303,11 +342,11 @@ export default function HowItWorksPage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-green-600 text-white mb-4">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white mb-4">
               <Star className="w-4 h-4 mr-2 fill-white" />
               Rated excellent ★★★★ by 5,000+ users
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Happy Customers</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-neutral-900 dark:text-white">Our Happy Customers</h2>
             <p className="text-lg text-neutral-600 dark:text-neutral-400">
               Don't just take our word for it - hear what our customers have to say
             </p>
@@ -322,14 +361,14 @@ export default function HowItWorksPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
-                className={`${testimonial.color} rounded-2xl p-6 shadow-lg`}
+                className={`${testimonial.color} rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700`}
               >
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-white dark:bg-neutral-800 flex items-center justify-center font-bold text-lg mr-4">
+                  <div className="w-12 h-12 rounded-full bg-white dark:bg-neutral-800 flex items-center justify-center font-bold text-lg mr-4 border border-neutral-200 dark:border-neutral-700">
                     {testimonial.avatar}
                   </div>
                   <div>
-                    <h4 className="font-semibold">{testimonial.name}</h4>
+                    <h4 className="font-semibold text-neutral-900 dark:text-white">{testimonial.name}</h4>
                     <div className="flex items-center mt-1">
                       {[...Array(testimonial.rating)].map((_, i) => (
                         <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -347,8 +386,68 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      {/* App Download Section - FULL WIDTH */}
+      <section className="py-20 bg-gradient-to-br from-primary-500 to-secondary-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto"
+          >
+            <div className="flex flex-col items-center mb-8">
+              <div className="p-4 rounded-2xl bg-white/10 mb-6">
+                <Smartphone className="w-12 h-12" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Download our mobile app
+              </h2>
+              <p className="text-xl opacity-90 mb-8 max-w-2xl">
+                Available on the App Store and Google Play. Manage orders, track deliveries, and get exclusive offers.
+              </p>
+            </div>
+            
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+            >
+              {appStores.map((store) => (
+                <motion.button
+                  key={store.name}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`${store.color} px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-3 transition-colors group border border-white/20 dark:border-white/10`}
+                >
+                  <div className={`text-2xl ${store.iconColor}`}>{store.icon}</div>
+                  <div className="text-left">
+                    <div className="text-xs">{store.description}</div>
+                    <div className="text-lg">{store.action}</div>
+                  </div>
+                  <Download className={`w-5 h-5 ${store.iconColor} group-hover:translate-y-1 transition-transform`} />
+                </motion.button>
+              ))}
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+              className="mt-12 pt-8 border-t border-white/20"
+            >
+              <p className="text-sm opacity-90">
+                Follow us on social media for cleaning tips and exclusive promotions
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-green-600 relative overflow-hidden">
+      <section className="py-20 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -364,17 +463,17 @@ export default function HowItWorksPage() {
             viewport={{ once: true }}
             className="max-w-3xl mx-auto text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-6">
               BOOK TODAY, WEAR HAPPINESS EVERYDAY.
             </h2>
             
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-neutral-600 dark:text-neutral-300 mb-8">
               Experience the convenience of professional laundry service delivered to your doorstep.
             </p>
             
             <Button
               size="lg"
-              className="bg-white text-blue-700 hover:bg-blue-50 text-lg px-8 py-6 rounded-xl shadow-2xl hover:shadow-3xl transition-all group"
+              className="btn-primary text-lg px-8 py-6 rounded-xl shadow-2xl hover:shadow-3xl transition-all group"
               asChild
             >
               <Link href="/place-order">
@@ -394,7 +493,7 @@ export default function HowItWorksPage() {
             <div>
               <div className="flex items-center space-x-2 mb-6">
                 <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                  <span className="text-blue-700 font-bold text-xl">LR</span>
+                  <span className="text-primary-600 font-bold text-xl">LR</span>
                 </div>
                 <span className="text-xl font-bold text-white">LaunderRemedy</span>
               </div>
@@ -407,10 +506,11 @@ export default function HowItWorksPage() {
             <div>
               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2">
-                <li><Link href="/how-it-works" className="text-neutral-400 hover:text-white transition-colors">How It Works</Link></li>
-                <li><Link href="/pricing" className="text-neutral-400 hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="/about-us" className="text-neutral-400 hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/faq" className="text-neutral-400 hover:text-white transition-colors">FAQ</Link></li>
+                <li><Link href="/how-it-works" className="text-neutral-400 hover:text-primary-400 transition-colors">How It Works</Link></li>
+                <li><Link href="/pricing" className="text-neutral-400 hover:text-primary-400 transition-colors">Pricing</Link></li>
+                <li><Link href="/about-us" className="text-neutral-400 hover:text-primary-400 transition-colors">About Us</Link></li>
+                <li><Link href="/faq" className="text-neutral-400 hover:text-primary-400 transition-colors">FAQ</Link></li>
+                <li><Link href="/contact-us" className="text-neutral-400 hover:text-primary-400 transition-colors">Contact Us</Link></li>
               </ul>
             </div>
 
@@ -420,36 +520,24 @@ export default function HowItWorksPage() {
               <ul className="space-y-3">
                 <li className="flex items-center text-neutral-400">
                   <Phone className="w-4 h-4 mr-2" />
-                  <span>+44 20 7123 4567</span>
+                  <span>+44 7442 716396</span>
                 </li>
                 <li className="flex items-center text-neutral-400">
                   <Mail className="w-4 h-4 mr-2" />
-                  <span>support@launderremedy.com</span>
+                  <span>launderremedy@gmail.com</span>
                 </li>
               </ul>
             </div>
 
-            {/* Apps & Social */}
+            {/* Social */}
             <div>
-              <h4 className="text-lg font-semibold mb-4">Download App</h4>
-              <div className="space-y-3 mb-6">
-                <button className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-neutral-800 text-white py-2 px-4 rounded-lg transition-colors">
-                  <Apple className="w-5 h-5" />
-                  <span>App Store</span>
-                </button>
-                <button className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-neutral-800 text-white py-2 px-4 rounded-lg transition-colors">
-                  <Play className="w-5 h-5" />
-                  <span>Google Play</span>
-                </button>
-              </div>
-              
               <h4 className="text-lg font-semibold mb-4">Follow Us</h4>
               <div className="flex space-x-4">
                 {[Facebook, Twitter, Instagram, Linkedin].map((Icon, index) => (
                   <a
                     key={index}
                     href="#"
-                    className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                    className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary-600 transition-colors"
                   >
                     <Icon className="w-5 h-5" />
                   </a>
@@ -462,14 +550,14 @@ export default function HowItWorksPage() {
           <div className="border-t border-neutral-800 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <p className="text-neutral-500 text-sm mb-4 md:mb-0">
-                All rights reserved. © LaunderRemedy 2023.
+                All rights reserved. © LaunderRemedy {new Date().getFullYear()}.
               </p>
               
               <div className="flex items-center space-x-6">
-                <Link href="/privacy" className="text-sm text-neutral-500 hover:text-white transition-colors">
+                <Link href="/privacy" className="text-sm text-neutral-500 hover:text-primary-400 transition-colors">
                   Privacy Policy
                 </Link>
-                <Link href="/terms" className="text-sm text-neutral-500 hover:text-white transition-colors">
+                <Link href="/terms" className="text-sm text-neutral-500 hover:text-primary-400 transition-colors">
                   Terms & Conditions
                 </Link>
               </div>

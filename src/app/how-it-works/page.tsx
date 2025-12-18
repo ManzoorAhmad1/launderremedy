@@ -511,7 +511,7 @@ export default function HowItWorksPage() {
               onClick={() => router.push('/place-order')}
 
             >
-              <p>
+              <p className='flex items-center'>
                 Schedule your pickup
                 <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-2 transition-transform" />
               </p>

@@ -10,8 +10,6 @@ import {
   Navigation,
   ExternalLink,
   CheckCircle,
-  Map,
-  Target
 } from "lucide-react";
 
 

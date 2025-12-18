@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X, Sun, Moon, User, ShoppingBag } from 'lucide-react'
-import { Button } from './ui/button'
 import { useTheme } from 'next-themes'
 import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '@/lib/features/userSlice'
@@ -12,14 +11,15 @@ import { clearData } from '@/lib/features/orderSlice'
 import { RootState } from '@/lib/store'
 import Image from 'next/image'
 import logo from '../../public/logo-02.png'
+import {Button} from './ui/button'
 
 const NavData = [
   { id: 1, title: "Home", path: "/", live: true },
   { id: 2, title: "How it works", path: "/how-it-works", live: true },
   { id: 3, title: "Pricing", path: "/pricing", live: true },
-  { id: 4, title: "About us", path: "/about-us", live: true },
-  { id: 5, title: "FAQ", path: "/faq", live: true },
-  { id: 6, title: "Contact Us", path: "/contact", live: true },
+  { id: 4, title: "About us", path: "#", live: true },
+  { id: 5, title: "FAQ", path: "/#", live: true },
+  { id: 6, title: "Contact Us", path: "/#", live: true },
   { id: 7, title: "Dashboard", path: "/dashboard", live: true, protected: true },
 ]
 
@@ -233,7 +233,8 @@ export default function Header() {
                   </Link>
                 )}
 
-                <Link href="/place-order" onClick={closeMenu}>
+                <Link href="#" onClick={closeMenu}>
+                {/* <Link href="/place-order" onClick={closeMenu}> */}
                   <Button className="w-full bg-primary hover:bg-primary-700 text-white">
                     Place Order
                   </Button>

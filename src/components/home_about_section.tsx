@@ -115,12 +115,12 @@ export default function HomeAboutSection() {
 
                         {/* CTA */}
                         <div className="pt-4">
-                            <Button size="lg" className="group" asChild>
-                                <Link href="/about" className="flex items-center gap-2 text-white">
+                            <Link className="group" href="/about"   >
+                                <p className="flex items-center gap-2 text-white">
                                     Learn Our Full Story
                                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                            </Button>
+                                </p>
+                            </Link>
                             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-3">
                                 Discover our mission, values, and what makes us different
                             </p>

@@ -83,7 +83,7 @@ export default function HowItWorks() {
     const handleResize = () => {
       setWindowWidth(window.innerWidth)
     }
-    
+
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
@@ -93,7 +93,7 @@ export default function HowItWorks() {
   const isTablet = windowWidth >= 768 && windowWidth < 1024
 
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-950 overflow-hidden">
+    <div className="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-950 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -131,7 +131,7 @@ export default function HowItWorks() {
                   transition={{ delay: index * 0.1 }}
                   className="relative"
                 >
-                  <div 
+                  <div
                     className="flex items-start space-x-3 md:space-x-4 group cursor-pointer"
                     onClick={() => setActiveStep(index)}
                   >
@@ -143,11 +143,10 @@ export default function HowItWorks() {
                     </div>
 
                     {/* Content */}
-                    <div className={`flex-1 p-4 md:p-6 rounded-xl md:rounded-2xl transition-all duration-300 ${
-                      activeStep === index
+                    <div className={`flex-1 p-4 md:p-6 rounded-xl md:rounded-2xl transition-all duration-300 ${activeStep === index
                         ? 'bg-white dark:bg-neutral-800 shadow-lg md:shadow-xl border-2 border-primary/20'
                         : 'bg-white/50 dark:bg-neutral-800/50 hover:bg-white dark:hover:bg-neutral-800'
-                    }`}>
+                      }`}>
                       <div className="flex items-center mb-2 md:mb-3">
                         <step.icon className={`w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3 ${step.color.replace('bg-', 'text-')}`} />
                         <h3 className="text-lg md:text-xl font-semibold">{step.title}</h3>
@@ -232,9 +231,8 @@ export default function HowItWorks() {
                   <div className="absolute inset-0 bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-lg md:rounded-2xl shadow-lg md:shadow-2xl">
 
                     {/* Door */}
-                    <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${
-                      isMobile ? 'w-20 h-20' : isTablet ? 'w-24 h-24' : 'w-32 h-32'
-                    } rounded-full border-3 md:border-4 border-gray-400 dark:border-gray-600`}>
+                    <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${isMobile ? 'w-20 h-20' : isTablet ? 'w-24 h-24' : 'w-32 h-32'
+                      } rounded-full border-3 md:border-4 border-gray-400 dark:border-gray-600`}>
 
                       {/* Door Glass with Clothes Animation */}
                       <motion.div
@@ -246,9 +244,8 @@ export default function HowItWorks() {
                           repeat: isPlaying ? Infinity : 0,
                           ease: "linear",
                         }}
-                        className={`absolute ${
-                          isMobile ? 'inset-2' : isTablet ? 'inset-3' : 'inset-4'
-                        } rounded-full bg-gradient-to-br from-blue-100/50 to-blue-200/30 dark:from-blue-900/40 dark:to-blue-800/30`}
+                        className={`absolute ${isMobile ? 'inset-2' : isTablet ? 'inset-3' : 'inset-4'
+                          } rounded-full bg-gradient-to-br from-blue-100/50 to-blue-200/30 dark:from-blue-900/40 dark:to-blue-800/30`}
                       >
                         {/* Animated Clothes Inside */}
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -289,9 +286,8 @@ export default function HowItWorks() {
                     </div>
 
                     {/* Control Panel */}
-                    <div className={`absolute bottom-2 md:bottom-4 left-1/2 -translate-x-1/2 ${
-                      isMobile ? 'w-32 h-8' : isTablet ? 'w-36 h-10' : 'w-40 h-12'
-                    } bg-gray-300 dark:bg-gray-700 rounded md:rounded-lg flex items-center justify-center shadow-inner`}>
+                    <div className={`absolute bottom-2 md:bottom-4 left-1/2 -translate-x-1/2 ${isMobile ? 'w-32 h-8' : isTablet ? 'w-36 h-10' : 'w-40 h-12'
+                      } bg-gray-300 dark:bg-gray-700 rounded md:rounded-lg flex items-center justify-center shadow-inner`}>
                       <div className="flex items-center space-x-1 md:space-x-2">
                         <Zap className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-yellow-500 animate-pulse`} />
                         <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-800 dark:text-gray-200`}>
@@ -304,9 +300,8 @@ export default function HowItWorks() {
 
                 {/* Process Steps Indicator - Simplified on mobile */}
                 <div className="absolute top-2 md:top-4 left-1/2 -translate-x-1/2">
-                  <div className={`flex items-center ${
-                    isMobile ? 'space-x-1 px-3 py-2' : 'space-x-2 md:space-x-4 px-4 md:px-6 py-2 md:py-3'
-                  } bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg`}>
+                  <div className={`flex items-center ${isMobile ? 'space-x-1 px-3 py-2' : 'space-x-2 md:space-x-4 px-4 md:px-6 py-2 md:py-3'
+                    } bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg`}>
                     {['Wash', 'Rinse', 'Spin', 'Dry'].map((step, i) => (
                       <motion.div
                         key={step}
@@ -319,11 +314,10 @@ export default function HowItWorks() {
                         }}
                         className="flex items-center"
                       >
-                        <div className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} rounded-full ${
-                          i === Math.floor((Date.now() / 1500) % 4) && isPlaying 
-                            ? 'bg-primary animate-pulse' 
+                        <div className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} rounded-full ${i === Math.floor((Date.now() / 1500) % 4) && isPlaying
+                            ? 'bg-primary animate-pulse'
                             : 'bg-gray-400'
-                        }`} />
+                          }`} />
                         {!isMobile && (
                           <>
                             <span className={`ml-1 md:ml-2 ${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>
@@ -372,9 +366,8 @@ export default function HowItWorks() {
                   <Button
                     onClick={() => setIsPlaying(!isPlaying)}
                     size={isMobile ? "icon" : "lg"}
-                    className={`rounded-full ${
-                      isMobile ? 'w-10 h-10' : 'w-12 h-12 md:w-14 md:h-14'
-                    } text-white shadow-lg hover:scale-105 transition-transform`}
+                    className={`rounded-full ${isMobile ? 'w-10 h-10' : 'w-12 h-12 md:w-14 md:h-14'
+                      } text-white shadow-lg hover:scale-105 transition-transform`}
                   >
                     {isPlaying ? (
                       <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>⏸️</span>
@@ -427,9 +420,8 @@ export default function HowItWorks() {
                   whileHover={{ y: isMobile ? 0 : -5 }}
                   className="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-3 md:p-4 text-center shadow-md hover:shadow-lg transition-all border border-neutral-200 dark:border-neutral-700"
                 >
-                  <div className={`inline-flex items-center justify-center ${
-                    isMobile ? 'w-10 h-10' : 'w-12 h-12'
-                  } rounded-lg md:rounded-xl bg-primary/10 mb-2 md:mb-3`}>
+                  <div className={`inline-flex items-center justify-center ${isMobile ? 'w-10 h-10' : 'w-12 h-12'
+                    } rounded-lg md:rounded-xl bg-primary/10 mb-2 md:mb-3`}>
                     <benefit.icon className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'} text-primary`} />
                   </div>
                   <h4 className="text-sm md:text-base font-semibold mb-1">{benefit.title}</h4>
@@ -476,20 +468,18 @@ export default function HowItWorks() {
                 ))}
               </div>
 
-              <Button
-                variant="link"
+              <a
                 className="w-full mt-3 md:mt-4 text-primary group text-sm md:text-base"
-                asChild
               >
                 <a href="/faq" className="flex items-center justify-center">
                   View all FAQs
                   <span className="ml-1 md:ml-2 group-hover:translate-x-1 transition-transform">→</span>
                 </a>
-              </Button>
+              </a>
             </motion.div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   )
 }

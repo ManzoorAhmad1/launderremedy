@@ -1,6 +1,5 @@
 "use client"
 
-import React from 'react'
 import { Home, Search, RefreshCw, Shirt, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -99,14 +98,14 @@ export default function NotFound() {
               transition={{ delay: 0.4 }}
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-md mx-auto lg:mx-0"
             >
-              <Button asChild size="lg" className="group text-sm sm:text-base h-11 sm:h-12">
+              <Button  size="lg" className="group text-sm sm:text-base h-11 sm:h-12">
                 <Link href="/" className="flex items-center justify-center text-white">
                   <Home className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform text-white" />
                   Back to Home
                 </Link>
               </Button>
 
-              <Button asChild variant="outline" size="lg" className="group text-sm sm:text-base h-11 sm:h-12">
+              <Button  variant="outline" size="lg" className="group text-sm sm:text-base h-11 sm:h-12">
                 <Link href="/services" className="flex items-center justify-center">
                   <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:rotate-180 transition-transform duration-500" />
                   View Services

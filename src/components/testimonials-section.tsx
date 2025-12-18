@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Star, Quote, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from './ui/button'
+import Link from 'next/link'
 
 const testimonials = [
   {
@@ -182,7 +183,7 @@ export default function TestimonialsSection() {
           >
             <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
           </button>
-          
+
           <button
             onClick={nextSlide}
             className="absolute right-0 sm:-right-4 lg:-right-6 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-white dark:bg-neutral-800 shadow-lg sm:shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 border border-neutral-200 dark:border-neutral-700"
@@ -210,7 +211,7 @@ export default function TestimonialsSection() {
                     className={`${testimonial.color} rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg relative overflow-hidden group transition-all duration-300 h-full`}
                   >
                     <Quote className="absolute top-2 right-2 sm:top-4 sm:right-4 w-6 h-6 sm:w-8 sm:h-8 text-primary/20 group-hover:text-primary/30 transition-colors" />
-                    
+
                     <div className="flex items-center mb-3 sm:mb-4">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-neutral-800 flex items-center justify-center font-bold text-base sm:text-lg mr-3 sm:mr-4 flex-shrink-0">
                         {testimonial.avatar}
@@ -222,20 +223,20 @@ export default function TestimonialsSection() {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex mb-3 sm:mb-4">
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400 mr-0.5 sm:mr-1" 
+                        <Star
+                          key={i}
+                          className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400 mr-0.5 sm:mr-1"
                         />
                       ))}
                     </div>
-                    
+
                     <p className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300 italic mb-3 sm:mb-4 line-clamp-4 sm:line-clamp-5">
                       "{testimonial.content}"
                     </p>
-                    
+
                     <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-neutral-200 dark:border-neutral-700">
                       <div className="flex justify-between items-center">
                         <div className="text-xs sm:text-sm min-w-0">
@@ -261,11 +262,10 @@ export default function TestimonialsSection() {
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`flex-shrink-0 rounded-full transition-all ${
-                  index === currentIndex 
-                    ? 'bg-primary w-6 sm:w-8 h-2 sm:h-2' 
+                className={`flex-shrink-0 rounded-full transition-all ${index === currentIndex
+                    ? 'bg-primary w-6 sm:w-8 h-2 sm:h-2'
                     : 'bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400 w-2 h-2 sm:w-2 sm:h-2'
-                }`}
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
@@ -296,16 +296,13 @@ export default function TestimonialsSection() {
         )}
 
         {/* View All Button for Mobile */}
-        <div className="mt-6 sm:mt-8 text-center lg:hidden">
-          <Button
-            variant="outline"
+        <div className="mt-6 sm:mt-8 text-center lg:hidden" >
+          <Link
             className="border-primary text-primary hover:bg-primary/10 text-sm sm:text-base"
-            asChild
+            href="/testimonials"
           >
-            <a href="/testimonials">
-              View All Testimonials
-            </a>
-          </Button>
+            View All Testimonials
+          </Link>
         </div>
       </div>
     </section>

@@ -11,7 +11,7 @@ import {
   setStepByValue,
 } from "@/redux/features/orderSlice";
 import orderService from "@/services/order.service";
-import { useReactToPrint } from "react-to-print";
+import { useReactToPrint, UseReactToPrintOptions } from "react-to-print";
 
 // Import your images
 import img1 from "../../../public/men-shirt-icon.png";
@@ -27,9 +27,9 @@ import img11 from "../../../public/boots.png";
 
 const CategoryList = ({ state, setState }: any) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
-  const handlePrint:any = useReactToPrint({
-    content: () => componentRef.current,
-  });
+const handlePrint = useReactToPrint({
+  content: () => componentRef.current,
+} as UseReactToPrintOptions);
 
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [searchValue, setSearchValue] = useState("");
@@ -94,7 +94,7 @@ const CategoryList = ({ state, setState }: any) => {
     setFilteredCategories(filtered);
   };
 
-  const handleSubcategoryClick = (subcategory: any) => {
+  const handleSubcategoryClick:any = (subcategory: any) => {
     dispatch(setStepByValue(3));
     dispatch(setSelectedServicesList({ data: subcategory, type: "+" }));
   };

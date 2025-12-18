@@ -18,7 +18,7 @@ const NavData = [
   { id: 2, title: "How it works", path: "/how-it-works", live: true },
   { id: 3, title: "Pricing", path: "/pricing", live: true },
   { id: 4, title: "About us", path: "#", live: true },
-  { id: 5, title: "FAQ", path: "/#", live: true },
+  { id: 5, title: "FAQ", path: "/faq", live: true },
   { id: 6, title: "Contact Us", path: "/#", live: true },
   { id: 7, title: "Dashboard", path: "/dashboard", live: true, protected: true },
 ]

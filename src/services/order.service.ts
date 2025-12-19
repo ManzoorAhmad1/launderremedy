@@ -61,11 +61,12 @@ const orderService = {
   async getCategoriesList() {
     try {
       const res = await Fetch.get(`${this._PREFIX2}/get-all-services`);
-      if (res.success) {
+      if (res.code === 200) {
         return res;
       }
       throw new Error(res.message ?? 'Failed to get categories');
     } catch (error: any) {
+      console.log(error,'error')
       throw new Error(error.message ?? 'Something went wrong');
     }
   },

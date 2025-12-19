@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Filter, Plus, Check, Printer, Grid3x3, List } from "lucide-react";
+import { Search, X, Plus, Check, Printer, Grid3x3, List, ChevronRight, Tag } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -36,45 +36,51 @@ const handlePrint = useReactToPrint({
   const [categories, setCategories] = useState<any[]>([]);
   const [filteredCategories, setFilteredCategories] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  
+  const [loading, setLoading] = useState(true);
+
   const dispatch = useDispatch();
   const selectedServicesList = useSelector((state: any) => state.order.selectedServicesList);
 
+  // Map title to image
   const getImageForTitle = (title: string) => {
-    switch (title) {
-      case "Laundry Services": return img9;
-      case "Shirts and Tops Care": return img1;
-      case "Elegant Suits Care": return img2;
-      case "Trousers Care": return img3;
-      case "Outdoor Clothing": return img6;
-      case "Alterations": return img10;
-      case "Shoe Repair": return img11;
-      case "Home Textile Services": return img8;
-      case "Ironing Services": return img5;
-      case "Dresses and Skirts Care": return img7;
-      default: return null;
-    }
+    const imageMap: Record<string, any> = {
+      "Laundry Services": img9,
+      "Shirts and Tops Care": img1,
+      "Elegant Suits Care": img2,
+      "Trousers Care": img3,
+      "Outdoor Clothing": img6,
+      "Alterations": img10,
+      "Shoe Repair": img11,
+      "Home Textile Services": img8,
+      "Ironing Services": img5,
+      "Dresses and Skirts Care": img7,
+    };
+    return imageMap[title] || null;
   };
 
+  // Fetch categories from API
   useEffect(() => {
     getAllServicesApi();
   }, []);
 
   const getAllServicesApi = async () => {
-    orderService
-      .getCategoriesList()
-      .then((res) => {
-        const modifiedList = res?.data?.map((item: any) => ({
+    setLoading(true);
+    try {
+      const response = await orderService.getCategoriesList();
+      if (response?.data) {
+        const modifiedList = response.data.map((item: any) => ({
           ...item,
-          imageUrl: getImageForTitle(item?.title),
+          customImageUrl: getImageForTitle(item?.title),
         }));
         setCategories(modifiedList);
         setFilteredCategories(modifiedList);
         setSelectedCategory(modifiedList[0]);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSearch = (value: string) => {
@@ -85,29 +91,65 @@ const handlePrint = useReactToPrint({
     }
 
     const searchTerm = value.toLowerCase();
-    const filtered = categories.filter(category => 
+    const filtered = categories.filter(category =>
       category.title.toLowerCase().includes(searchTerm) ||
-      category.subcategories?.some((sub: any) => 
-        sub.title.toLowerCase().includes(searchTerm)
+      category.subcategories?.some((sub: any) =>
+        sub.title.toLowerCase().includes(searchTerm) ||
+        sub.description?.toLowerCase().includes(searchTerm)
       )
     );
     setFilteredCategories(filtered);
   };
 
-  const handleSubcategoryClick:any = (subcategory: any) => {
+  const handleSubcategoryClick = (subcategory: any, operation = "+") => {
     dispatch(setStepByValue(3));
-    dispatch(setSelectedServicesList({ data: subcategory, type: "+" }));
+    
+    const serviceData = {
+      ...subcategory,
+      id: subcategory._id,
+      quantity: operation === "+" ? 1 : 0,
+      price: parseFloat(subcategory.price),
+      categoryTitle: selectedCategory?.title
+    };
+    
+    dispatch(setSelectedServicesList({ 
+      data: serviceData, 
+      type: operation 
+    }));
   };
 
   const isServiceSelected = (subcategoryId: string) => {
-    return selectedServicesList?.some((service: any) => service.id === subcategoryId);
+    return selectedServicesList?.some((service: any) => service._id === subcategoryId);
   };
+
+  const getSelectedServiceQuantity = (subcategoryId: string) => {
+    const service = selectedServicesList?.find((service: any) => service._id === subcategoryId);
+    return service?.quantity || 0;
+  };
+
+  const getTotalPrice = () => {
+    return selectedServicesList.reduce((total: number, service: any) => {
+      return total + (service.price * service.quantity);
+    }, 0);
+  };
+
+  // Loading State
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-neutral-600 dark:text-neutral-400">Loading services...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-8"
+      className="space-y-8 p-4 md:p-6"
     >
       {/* Header */}
       <div className="text-center mb-8">
@@ -125,7 +167,6 @@ const handlePrint = useReactToPrint({
 
       {/* Search and Controls */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        {/* Search Bar */}
         <div className="relative flex-1 w-full">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
@@ -133,7 +174,7 @@ const handlePrint = useReactToPrint({
               type="text"
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Search services by name..."
+              placeholder="Search services by name or description..."
               className="w-full pl-12 pr-12 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
             {searchValue && (
@@ -152,7 +193,6 @@ const handlePrint = useReactToPrint({
           )}
         </div>
 
-        {/* View Controls */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => setViewMode("grid")}
@@ -177,234 +217,393 @@ const handlePrint = useReactToPrint({
       </div>
 
       {/* Categories Grid */}
-      <div className={`${viewMode === "grid" ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5' : 'space-y-3'} gap-4`}>
-        {filteredCategories.map((category) => (
-          <motion.button
-            key={category.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.05, y: -5 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setSelectedCategory(category)}
-            className={`
-              flex ${viewMode === "grid" ? 'flex-col items-center' : 'items-center gap-3'} 
-              p-4 rounded-2xl transition-all duration-300
-              ${selectedCategory?.id === category.id
-                ? 'bg-primary-600 shadow-primary-lg text-white'
-                : 'bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:shadow-md'
-              }
-            `}
-          >
-            {category.imageUrl && (
-              <div className={`
-                ${viewMode === "grid" ? 'p-3 rounded-xl mb-3' : 'p-2 rounded-lg'}
-                transition-colors
-                ${selectedCategory?.id === category.id
-                  ? 'bg-white/20'
-                  : 'bg-primary-50 dark:bg-primary-900/20'
-                }
-              `}>
-                <Image
-                  src={category.imageUrl}
-                  alt={category.title}
-                  width={viewMode === "grid" ? 40 : 32}
-                  height={viewMode === "grid" ? 40 : 32}
-                  className="object-contain"
-                />
-              </div>
-            )}
-            <span className={`
-              ${viewMode === "grid" ? 'text-sm font-medium text-center line-clamp-2' : 'font-medium flex-1 text-left'}
-              ${selectedCategory?.id === category.id ? 'text-white' : 'text-neutral-900 dark:text-white'}
-            `}>
-              {category.title}
-            </span>
-          </motion.button>
-        ))}
-      </div>
+      {categories.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-neutral-600 dark:text-neutral-400">No services available at the moment.</p>
+        </div>
+      ) : (
+        <>
+          <div className={`${viewMode === "grid" ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5' : 'space-y-3'} gap-4`}>
+            {filteredCategories.map((category) => (
+              <motion.button
+                key={category._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedCategory(category)}
+                className={`
+                  flex ${viewMode === "grid" ? 'flex-col items-center' : 'items-center gap-3'} 
+                  p-4 rounded-2xl transition-all duration-300 border-2
+                  ${selectedCategory?._id === category._id
+                    ? 'border-primary-600 bg-primary-600 shadow-primary-lg text-white'
+                    : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:shadow-md hover:border-primary-400'
+                  }
+                `}
+              >
+                {category.customImageUrl && (
+                  <div className={`
+                    ${viewMode === "grid" ? 'p-3 rounded-xl mb-3' : 'p-2 rounded-lg'}
+                    transition-colors
+                    ${selectedCategory?._id === category._id
+                      ? 'bg-white/20'
+                      : 'bg-primary-50 dark:bg-primary-900/20'
+                    }
+                  `}>
+                    <Image
+                      src={category.customImageUrl}
+                      alt={category.title}
+                      width={viewMode === "grid" ? 40 : 32}
+                      height={viewMode === "grid" ? 40 : 32}
+                      className="object-contain"
+                    />
+                  </div>
+                )}
+                <span className={`
+                  ${viewMode === "grid" ? 'text-sm font-medium text-center line-clamp-2' : 'font-medium flex-1 text-left'}
+                  ${selectedCategory?._id === category._id ? 'text-white' : 'text-neutral-900 dark:text-white'}
+                `}>
+                  {category.title}
+                </span>
+                {viewMode === "list" && (
+                  <ChevronRight className={`w-4 h-4 ${selectedCategory?._id === category._id ? 'text-white' : 'text-neutral-400'}`} />
+                )}
+              </motion.button>
+            ))}
+          </div>
 
-      {/* Selected Category Services */}
-      <AnimatePresence mode="wait">
-        {selectedCategory && (
-          <motion.div
-            key={selectedCategory.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="mt-8"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">
-                  {selectedCategory.title}
-                </h3>
-                <p className="text-neutral-600 dark:text-neutral-400">
-                  Select services from this category
-                </p>
-              </div>
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-sm">
-                {selectedCategory.subcategories?.length} services available
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              {selectedCategory.subcategories?.map((subcategory: any) => {
-                const isSelected = isServiceSelected(subcategory.id);
-                
-                return (
-                  <motion.div
-                    key={subcategory.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ y: -5 }}
-                    className={`
-                      p-4 rounded-xl border transition-all duration-300 cursor-pointer
-                      ${isSelected
-                        ? 'border-accent-green bg-accent-green/5'
-                        : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:shadow-md'
-                      }
-                    `}
-                    onClick={() => handleSubcategoryClick(subcategory)}
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-neutral-900 dark:text-white">
-                            {subcategory.title}
-                          </h4>
-                          {isSelected && (
-                            <div className="p-1 rounded-full bg-accent-green/20">
-                              <Check className="w-3 h-3 text-accent-green" />
-                            </div>
-                          )}
-                        </div>
-                        {subcategory.description && (
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                            {subcategory.description}
-                          </p>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center gap-2 ml-4">
-                        <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
-                          £{parseFloat(subcategory.price).toFixed(2)}
+          {/* Selected Category Services */}
+          <AnimatePresence mode="wait">
+            {selectedCategory && (
+              <motion.div
+                key={selectedCategory._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="mt-12"
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-xl ${selectedCategory.customImageUrl ? 'bg-primary-50 dark:bg-primary-900/20' : ''}`}>
+                      {selectedCategory.customImageUrl && (
+                        <Image
+                          src={selectedCategory.customImageUrl}
+                          alt={selectedCategory.title}
+                          width={48}
+                          height={48}
+                          className="object-contain"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                        {selectedCategory.title}
+                        <span className="text-sm font-normal text-primary-600 dark:text-primary-400">
+                          ({selectedCategory.subcategories?.length || 0} services)
                         </span>
-                        <div className={`
-                          p-2 rounded-lg transition-colors
-                          ${isSelected
-                            ? 'bg-accent-green/20 text-accent-green'
-                            : 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                          }
-                        `}>
-                          {isSelected ? (
-                            <Check className="w-4 h-4" />
-                          ) : (
-                            <Plus className="w-4 h-4" />
-                          )}
-                        </div>
+                      </h3>
+                      <p className="text-neutral-600 dark:text-neutral-400 mt-1">
+                        Browse and select from available services in this category
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        const allServices = selectedCategory.subcategories?.map((sub: any) => ({
+                          ...sub,
+                          id: sub._id,
+                          quantity: 1,
+                          price: parseFloat(sub.price),
+                          categoryTitle: selectedCategory.title
+                        }));
+                        allServices?.forEach((service: any) => {
+                          dispatch(setSelectedServicesList({ 
+                            data: service, 
+                            type: "+" 
+                          }));
+                        });
+                      }}
+                      className="px-4 py-2 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors text-sm font-medium"
+                    >
+                      Add All
+                    </button>
+                  </div>
+                </div>
+
+                {selectedCategory.subcategories?.length === 0 ? (
+                  <div className="text-center py-12 border border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl">
+                    <p className="text-neutral-600 dark:text-neutral-400">No services available in this category.</p>
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {selectedCategory.subcategories?.map((subcategory: any) => {
+                      const isSelected = isServiceSelected(subcategory._id);
+                      const quantity = getSelectedServiceQuantity(subcategory._id);
+
+                      return (
+                        <motion.div
+                          key={subcategory._id}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          whileHover={{ y: -5 }}
+                          className={`
+                            p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer
+                            ${isSelected
+                              ? 'border-green-500 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'
+                              : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:shadow-xl hover:border-primary-300'
+                            }
+                          `}
+                          onClick={() => handleSubcategoryClick(subcategory)}
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-3">
+                                <h4 className="font-bold text-lg text-neutral-900 dark:text-white">
+                                  {subcategory.title}
+                                </h4>
+                                {isSelected && (
+                                  <div className="flex items-center gap-2">
+                                    <div className="p-1.5 rounded-full bg-green-100 dark:bg-green-900/30">
+                                      <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                                    </div>
+                                    <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                                      {quantity} selected
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              {subcategory.description && (
+                                <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-3">
+                                  {subcategory.description}
+                                </p>
+                              )}
+                              
+                              {/* Badges */}
+                              <div className="flex flex-wrap gap-2 mt-3">
+                                {subcategory.bundleQuantity && (
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium">
+                                    <Tag className="w-3 h-3" />
+                                    Bundle: {subcategory.bundleQuantity} items
+                                  </span>
+                                )}
+                                {subcategory.prepaidTotalItems && (
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs font-medium">
+                                    <Tag className="w-3 h-3" />
+                                    Prepaid: {subcategory.prepaidTotalItems}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col items-end ml-4">
+                              <div className="text-right mb-2">
+                                <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                                  £{parseFloat(subcategory.price).toFixed(2)}
+                                </span>
+                                {subcategory.perItemPrice && (
+                                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                                    £{parseFloat(subcategory.perItemPrice).toFixed(2)} per item
+                                  </p>
+                                )}
+                              </div>
+                              <div className={`
+                                p-3 rounded-xl transition-colors
+                                ${isSelected
+                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                                  : 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30'
+                                }
+                              `}>
+                                {isSelected ? (
+                                  <div className="flex items-center gap-2">
+                                    <Check className="w-5 h-5" />
+                                    <span className="text-sm font-medium">Added</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    <Plus className="w-5 h-5" />
+                                    <span className="text-sm font-medium">Add</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Selected Services Summary */}
+          {selectedServicesList?.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-12 p-8 rounded-3xl bg-gradient-to-r from-primary-500/5 via-secondary-600/5 to-primary-500/5 border border-primary-200 dark:border-primary-900/30 shadow-lg"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-3">
+                    <span className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+                      <Check className="w-6 h-6" />
+                    </span>
+                    Your Selected Services
+                  </h3>
+                  <p className="text-neutral-600 dark:text-neutral-400 mt-2">
+                    Review and manage your selected services
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                    £{getTotalPrice().toFixed(2)}
+                  </div>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                    Total for {selectedServicesList.length} items
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                {selectedServicesList.map((service: any, index: number) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h4 className="font-semibold text-neutral-900 dark:text-white">
+                          {service.title}
+                        </h4>
+                        <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400">
+                          {service.categoryTitle}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+                        <span>£{service.price.toFixed(2)} × {service.quantity}</span>
+                        {service.bundleQuantity && (
+                          <span className="flex items-center gap-1">
+                            <Tag className="w-3 h-3" />
+                            Bundle: {service.bundleQuantity}
+                          </span>
+                        )}
                       </div>
                     </div>
                     
-                    {subcategory.bundleQuantity && (
-                      <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-sm">
-                        Bundle of {subcategory.bundleQuantity}
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (service.quantity > 1) {
+                              handleSubcategoryClick(service, "-");
+                            }
+                          }}
+                          disabled={service.quantity <= 1}
+                          className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${
+                            service.quantity > 1 
+                              ? 'bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600' 
+                              : 'bg-neutral-50 dark:bg-neutral-800 opacity-50 cursor-not-allowed'
+                          }`}
+                        >
+                          <Plus className="w-4 h-4 rotate-45" />
+                        </button>
+                        <div className="flex flex-col items-center">
+                          <span className="w-12 text-center font-bold text-lg text-neutral-900 dark:text-white">
+                            {service.quantity}
+                          </span>
+                          <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                            items
+                          </span>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSubcategoryClick(service, "+");
+                          }}
+                          className="w-9 h-9 flex items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
                       </div>
-                    )}
+                      <div className="text-right">
+                        <div className="font-bold text-xl text-primary-600 dark:text-primary-400">
+                          £{(service.price * service.quantity).toFixed(2)}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSubcategoryClick(service, "-");
+                          }}
+                          className="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors mt-1"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
                   </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                ))}
+              </div>
 
-      {/* Selected Services Summary */}
-      {selectedServicesList?.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-12 p-6 rounded-2xl bg-gradient-to-r from-primary-500/5 to-secondary-600/5 border border-primary-200 dark:border-primary-900/30"
-        >
-          <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-4">
-            Your Selected Services
-          </h3>
-          <div className="space-y-3">
-            {selectedServicesList.map((service: any, index: number) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700"
-              >
-                <div>
-                  <p className="font-medium text-neutral-900 dark:text-white">
-                    {service.title}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-sm text-neutral-600 dark:text-neutral-400">
-                      £{service.price.toFixed(2)} × {service.quantity}
-                    </span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
-                      {service.bundleQuantity ? `Bundle: ${service.bundleQuantity}` : 'Individual'}
-                    </span>
+              <div className="pt-6 mt-6 border-t border-neutral-200 dark:border-neutral-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-lg font-medium text-neutral-900 dark:text-white">
+                      Ready to proceed?
+                    </p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                      Review your selections before continuing
+                    </p>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleSubcategoryClick(service, "-")}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
-                    >
-                      <Plus className="w-4 h-4 rotate-45" />
-                    </button>
-                    <span className="w-8 text-center font-medium text-neutral-900 dark:text-white">
-                      {service.quantity}
-                    </span>
-                    <button
-                      onClick={() => handleSubcategoryClick(service, "+")}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <span className="font-bold text-primary-600 dark:text-primary-400 text-lg">
-                    £{(service.price * service.quantity).toFixed(2)}
-                  </span>
+                  <button
+                    onClick={() => dispatch(setStepByValue(4))}
+                    className="px-8 py-3 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-semibold hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300 transform hover:-translate-y-0.5"
+                  >
+                    Proceed to Checkout
+                  </button>
                 </div>
               </div>
-            ))}
-            
-            <div className="pt-4 border-t border-neutral-200 dark:border-neutral-700">
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-neutral-900 dark:text-white">
-                  Total
-                </span>
-                <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  £{selectedServicesList.reduce((total: number, service: any) => 
-                    total + (service.price * service.quantity), 0).toFixed(2)}
-                </span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+            </motion.div>
+          )}
+        </>
       )}
 
       {/* Hidden content for printing */}
-      <div ref={componentRef as any} className="hidden">
+      <div ref={componentRef} className="hidden">
         <div className="p-8">
-          <h1 className="text-3xl font-bold mb-6">Service Price List</h1>
+          <h1 className="text-3xl font-bold mb-2">Service Price List</h1>
+          <p className="text-neutral-600 mb-6">Generated on {new Date().toLocaleDateString()}</p>
+          
           {categories.map((category) => (
-            <div key={category.id} className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">{category.title}</h2>
-              <div className="space-y-4">
+            <div key={category._id} className="mb-8 page-break">
+              <h2 className="text-2xl font-bold mb-4 text-primary-600 border-b pb-2">{category.title}</h2>
+              <div className="space-y-3">
                 {category.subcategories?.map((sub: any) => (
-                  <div key={sub.id} className="flex justify-between items-center py-2 border-b">
-                    <div>
-                      <p className="font-medium">{sub.title}</p>
+                  <div key={sub._id} className="flex justify-between items-center py-3 border-b">
+                    <div className="flex-1">
+                      <p className="font-semibold text-lg">{sub.title}</p>
                       {sub.description && (
-                        <p className="text-sm text-gray-600">{sub.description}</p>
+                        <p className="text-sm text-gray-600 mt-1">{sub.description}</p>
                       )}
+                      <div className="flex gap-2 mt-2">
+                        {sub.bundleQuantity && (
+                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                            Bundle: {sub.bundleQuantity}
+                          </span>
+                        )}
+                        {sub.prepaidTotalItems && (
+                          <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
+                            Prepaid: {sub.prepaidTotalItems}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <span className="font-bold">£{parseFloat(sub.price).toFixed(2)}</span>
+                    <span className="font-bold text-xl ml-4">£{parseFloat(sub.price).toFixed(2)}</span>
                   </div>
                 ))}
               </div>

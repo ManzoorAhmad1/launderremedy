@@ -1,74 +1,49 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { Fetch } from '@/utils/fetchWrapper';
+import authService from './auth.service';
 
 const userService = {
-  // Update user profile
-  updateProfile: async (userData: any) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put(`${API_URL}/users/profile`, userData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  _PREFIX: '/user/v1',
+
+  // Update user profile (uses auth service)
+  updateProfile: async (userData: {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    phone_number?: string;
+    bundles?: any[];
+  }) => {
+    return await authService.updateProfile(userData);
   },
 
   // Get user profile
-  getProfile: async () => {
+  getProfile: async (userId: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/users/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Update user password
-  updatePassword: async (passwordData: {
-    currentPassword: string;
-    newPassword: string;
-  }) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put(`${API_URL}/users/password`, passwordData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get user orders
-  getUserOrders: async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/users/orders`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
+      const res = await Fetch.get(`${userService._PREFIX}/get-user/${userId}`);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to get profile');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 
   // Get user bundles
-  getUserBundles: async () => {
+  getUserBundles: async (userId: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/users/bundles`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
+      const res = await Fetch.get(`${userService._PREFIX}/get-bundles/${userId}`);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to get bundles');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
+  },
+
+  // Delete account (uses auth service)
+  deleteAccount: async (userId: string) => {
+    return await authService.deleteAccount(userId);
   },
 };
 

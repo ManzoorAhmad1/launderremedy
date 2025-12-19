@@ -20,7 +20,7 @@ import {
   setOrderData,
   setSelectedServicesList,
   setStepByValue,
-} from "@/redux/features/orderSlice";
+} from "@/lib/features/orderSlice";
 import CheckboxWithTerms from "../ui/acceptTerms";
 import { Button } from "../ui/button";
 

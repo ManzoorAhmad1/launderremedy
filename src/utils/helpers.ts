@@ -1,180 +1,176 @@
-interface LatLng {
-  lat: number;
-  lng: number;
-}
+export const setCookie = (
+  name: string,
+  value: string,
+  days?: number
+): boolean => {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = `; expires=${date.toUTCString()}`;
+  }
+  document.cookie = `${name}=${value || ""}${expires}; path=/`;
+  return true;
+};
+
+export const getCookie = (name: string): string | null => {
+  const nameEQ = `${name}=`;
+  const ca = document.cookie.split(";");
+
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === " ") c = c.substring(1);
+    if (c.indexOf(nameEQ) === 0) {
+      return c.substring(nameEQ.length);
+    }
+  }
+  return null;
+};
+
+export const clearCookie = (name: string): boolean => {
+  document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+  return true;
+};
+
+/* ===================== String ===================== */
+
+export const capitalize = (str: string = ""): string => {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+/* ===================== Date & Time ===================== */
+
+const changeTimezone = (date: Date, ianatz: string): Date => {
+  const invdate = new Date(
+    date.toLocaleString("en-US", { timeZone: ianatz })
+  );
+
+  const diff = date.getTime() - invdate.getTime();
+  return new Date(date.getTime() - diff);
+};
+
+export const getDateObject = (e: string | number | Date): Date =>
+  changeTimezone(new Date(e), "Europe/London");
+
+/* ===================== Google Maps ===================== */
+
+export const GeoCoder: google.maps.Geocoder | null =
+  typeof window !== "undefined" && window.google
+    ? new window.google.maps.Geocoder()
+    : null;
 
 interface GeoCodeResult {
-  latlng: LatLng;
-  formatted_address: string;
   place_id: string;
+  formatted_address: string;
+  latlng: {
+    lat: number;
+    lng: number;
+  };
+  [key: string]: any;
 }
+
+export const GeoCode = async (value: string): Promise<GeoCodeResult> => {
+  if (!GeoCoder) {
+    throw new Error("Google Geocoder not initialized");
+  }
+
+  const { results } = await GeoCoder.geocode({ address: value });
+  const { address_components, geometry, place_id, formatted_address } =
+    results[0];
+
+  const address: Record<string, string> = {};
+
+  address_components?.forEach(({ short_name, types }) => {
+    if (types.includes("administrative_area_level_1")) {
+      address.state = short_name;
+    } else if (types.includes("administrative_area_level_2")) {
+      address.county = short_name;
+    } else if (types.includes("locality")) {
+      address.city = short_name;
+    } else {
+      address[types[0]] = short_name;
+    }
+  });
+
+  return {
+    ...address,
+    place_id,
+    formatted_address,
+    latlng: {
+      lat: geometry.location.lat(),
+      lng: geometry.location.lng(),
+    },
+  };
+};
+
+/* ===================== Utils ===================== */
+
+export const convertToCents = (amountInDollars: number): number | null => {
+  if (typeof amountInDollars !== "number") return null;
+  return Math.round(amountInDollars * 100);
+};
+
+/* ===================== Time Slots ===================== */
 
 interface TimeRange {
   start: string;
   end: string;
 }
 
-interface TimeSlot {
-  day: string;
-  range: TimeRange[];
+interface DaySlot {
+  label: string;
+  range?: TimeRange[];
 }
 
-// Get time list for a specific day
-export const getTimeListOfDay = (selectedDay: any, timeSlots: TimeSlot[]) => {
-  if (!selectedDay || !timeSlots.length) return [];
+interface Option {
+  label: string;
+  value: string;
+}
 
-  const selectedSlot = timeSlots.find(slot => slot.day === selectedDay.value);
-  if (!selectedSlot) return [];
+export const getTimeListOfDay = (
+  date: Option,
+  array: DaySlot[],
+  type?: string
+): Option[] => {
+  if (!date || !array || array.length === 0) {
+    return [];
+  }
 
-  return selectedSlot.range.map(range => ({
-    value: `${range.start}-${range.end}`,
-    label: `${range.start}-${range.end}`,
+  const target = array.find(ele => ele.label === date.label);
+
+  if (!target || !target.range) {
+    return [];
+  }
+
+  return target.range.map(ele => ({
+    label: `${ele.start}-${ele.end}`,
+    value: `${ele.start}-${ele.end}`,
   }));
 };
 
-// Format currency
-export const formatCurrency = (amount: number, currency = 'GBP') => {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency,
-  }).format(amount);
-};
+/* ===================== Cloudinary ===================== */
 
-// Format date
-export const formatDate = (date: string | Date, format = 'dd/MM/yyyy') => {
-  const d = new Date(date);
-  const day = d.getDate().toString().padStart(2, '0');
-  const month = (d.getMonth() + 1).toString().padStart(2, '0');
-  const year = d.getFullYear();
+export const uploadImageToCloudnairy = async (
+  file: File
+): Promise<any> => {
+  const upload_preset = "uce4elli";
+  const cloud_name = "ddj6l5iyu";
 
-  switch (format) {
-    case 'dd/MM/yyyy':
-      return `${day}/${month}/${year}`;
-    case 'MM/dd/yyyy':
-      return `${month}/${day}/${year}`;
-    case 'yyyy-MM-dd':
-      return `${year}-${month}-${day}`;
-    default:
-      return d.toLocaleDateString();
-  }
-};
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", upload_preset);
 
-// Format time
-export const formatTime = (time: string) => {
-  const [hours, minutes] = time.split(':');
-  const hour = parseInt(hours);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const formattedHour = hour % 12 || 12;
-  return `${formattedHour}:${minutes} ${ampm}`;
-};
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
 
-// Validate email
-export const validateEmail = (email: string): boolean => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-};
-
-// Validate phone number (UK format)
-export const validatePhone = (phone: string): boolean => {
-  const re = /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/;
-  return re.test(phone);
-};
-
-// Validate postcode (UK format)
-export const validatePostcode = (postcode: string): boolean => {
-  const re = /^[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}$/;
-  return re.test(postcode.toUpperCase());
-};
-
-// Calculate total price
-export const calculateTotal = (items: any[]): number => {
-  return items.reduce((total, item) => {
-    const price = parseFloat(item.price) || 0;
-    const quantity = parseInt(item.quantity) || 0;
-    return total + (price * quantity);
-  }, 0);
-};
-
-// Google Maps Geocode
-export const GeoCode = async ({ placeId }: { placeId: string }): Promise<GeoCodeResult> => {
-  if (!window.google) {
-    throw new Error('Google Maps API not loaded');
-  }
-
-  const geocoder = new window.google.maps.Geocoder();
-
-  return new Promise((resolve, reject) => {
-    geocoder.geocode({ placeId }, (results, status) => {
-      if (status === 'OK' && results?.[0]) {
-        const location = results[0].geometry.location;
-        resolve({
-          latlng: {
-            lat: location.lat(),
-            lng: location.lng(),
-          },
-          formatted_address: results[0].formatted_address,
-          place_id: placeId,
-        });
-      } else {
-        reject(new Error('Geocode was not successful: ' + status));
-      }
-    });
-  });
-};
-
-// Debounce function
-export const debounce = <T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
-
-// Generate unique ID
-export const generateId = (): string => {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
-};
-
-// Deep clone object
-export const deepClone = <T>(obj: T): T => {
-  return JSON.parse(JSON.stringify(obj));
-};
-
-// Check if object is empty
-export const isEmpty = (obj: any): boolean => {
-  return Object.keys(obj).length === 0;
-};
-
-// Get initials from name
-export const getInitials = (name: string): string => {
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-};
-
-// Get file extension
-export const getFileExtension = (filename: string): string => {
-  return filename.split('.').pop()?.toLowerCase() || '';
-};
-
-// Convert file to base64
-export const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
-};
-
-// Sleep function
-export const sleep = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return response.json();
 };

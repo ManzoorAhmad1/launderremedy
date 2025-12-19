@@ -1,79 +1,130 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { Fetch } from '@/utils/fetchWrapper';
 
 const orderService = {
-  // Get available collection times
-  getCollectionTimes: async (date: string) => {
-    try {
-      const response = await axios.get(`${API_URL}/orders/collection-times`, {
-        params: { date },
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get available delivery times
-  getDeliveryTimes: async (date: string) => {
-    try {
-      const response = await axios.get(`${API_URL}/orders/delivery-times`, {
-        params: { date },
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get categories list
-  getCategoriesList: async () => {
-    try {
-      const response = await axios.get(`${API_URL}/services/categories`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
+  _PREFIX: '/order/v1',
+  _PREFIX2: '/service/v1',
 
   // Create new order
-  createOrder: async (orderData: any) => {
+  async createOrder(payload: any) {
     try {
-      const response = await axios.post(`${API_URL}/orders`, orderData);
-      return response.data;
-    } catch (error) {
-      throw error;
+      const res = await Fetch.post(`${this._PREFIX}/create-order`, payload);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Order creation failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 
   // Update existing order
-  updateOrder: async (orderData: any) => {
+  async updateOrder(payload: any) {
     try {
-      const response = await axios.put(`${API_URL}/orders/${orderData.order_id}`, orderData);
-      return response.data;
-    } catch (error) {
-      throw error;
+      const res = await Fetch.post(`${this._PREFIX}/update-order`, payload);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Order update failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 
-  // Get user orders
-  getUserOrders: async (userId: string) => {
+  // Delete/Cancel order
+  async deleteOrder(id: string, type: 'cancel' | 'complete') {
     try {
-      const response = await axios.get(`${API_URL}/orders/user/${userId}`);
-      return response.data;
-    } catch (error) {
-      throw error;
+      const endpoint = type === 'cancel' ? '/cancel-order/' : '/complete-order/';
+      const res = await Fetch.put(`${this._PREFIX}${endpoint}${id}`);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Operation failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 
-  // Cancel order
-  cancelOrder: async (orderId: string) => {
+  // Get orders count
+  async getOrdersCount() {
     try {
-      const response = await axios.put(`${API_URL}/orders/${orderId}/cancel`);
-      return response.data;
-    } catch (error) {
-      throw error;
+      const res = await Fetch.get(`${this._PREFIX}/get-orders-count`);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to get orders count');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
+
+  // Get all services/categories
+  async getCategoriesList() {
+    try {
+      const res = await Fetch.get(`${this._PREFIX2}/get-all-services`);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to get categories');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
+
+  // Get all orders of user with pagination and filters
+  async getAllOrdersOfUser({
+    page = 1,
+    pageSize = 10,
+    status = '',
+    searchText = '',
+  }: {
+    page?: number;
+    pageSize?: number;
+    status?: string;
+    searchText?: string;
+  }) {
+    try {
+      const res = await Fetch.post(
+        `${this._PREFIX}/get-all-orders?itemPerPage=${pageSize}&page=${page}&status=${status}&searchText=${searchText}`
+      );
+      if (res.success) {
+        return {
+          orders: res.data.items,
+          totalItems: res.data.totalItems,
+        };
+      }
+      throw new Error(res.message ?? 'Failed to get orders');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
+
+  // Get collection time slots
+  async getSelectionDetails(date: string) {
+    try {
+      const res = await Fetch.get(
+        `${this._PREFIX}/get-collection-slots?date=${date}`
+      );
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to get collection slots');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
+
+  // Get delivery time slots
+  async getDeliveryDetails(date: string) {
+    try {
+      const res = await Fetch.get(
+        `${this._PREFIX}/get-delivery-slots?date=${date}`
+      );
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to get delivery slots');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 };

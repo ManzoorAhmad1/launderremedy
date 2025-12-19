@@ -10,24 +10,108 @@ import {
   Navigation,
   ExternalLink,
   CheckCircle,
+  Search,
 } from "lucide-react";
-
-
-import { GeoCode } from "@/utils/helpers";
+import axios from "axios";
 import Toast from "../ui/Toast";
-import PlacesAutoComplete from "../ui/PlacesAutoComplete";
-import GoogleMap from "../ui/GoogleMap";
+import dynamic from "next/dynamic";
+import "leaflet/dist/leaflet.css";
+
+// Dynamically import the map component to avoid SSR issues
+const MapContainer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.MapContainer),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] rounded-2xl bg-neutral-100 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-2"></div>
+          <p className="text-neutral-500 dark:text-neutral-400">Loading map...</p>
+        </div>
+      </div>
+    )
+  }
+);
+const TileLayer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+const Marker = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Marker),
+  { ssr: false }
+);
+
+// Fix leaflet default markers
+if (typeof window !== 'undefined') {
+  import('leaflet').then((L) => {
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    });
+  });
+}
 
 interface FindAddressProps {
   state: any;
   setState: React.Dispatch<React.SetStateAction<any>>;
 }
 
+// Create wrapper components for hooks
+const MapUpdater = ({ center, zoom }: { center: [number, number]; zoom: number }) => {
+  if (typeof window === 'undefined') return null;
+  
+  const { useMap } = require('react-leaflet');
+  const map = useMap();
+  
+  useEffect(() => {
+    if (map) {
+      map.setView(center, zoom);
+    }
+  }, [center, zoom, map]);
+  
+  return null;
+};
+
+const MapClickHandler = ({ onClick }: { onClick: (latlng: [number, number]) => void }) => {
+  if (typeof window === 'undefined') return null;
+  
+  const { useMapEvents } = require('react-leaflet');
+  
+  useMapEvents({
+    click(e: any) {
+      onClick([e.latlng.lat, e.latlng.lng]);
+    },
+  });
+  return null;
+};
+
 const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
   const [addressType, setAddressType] = useState<"home" | "office" | "hotel">("home");
-  const [marker, setMarker] = useState<any>(null);
+  const [marker, setMarker] = useState<[number, number] | null>(null);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([51.5074, -0.1278]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const mapRef = useRef<any>(null);
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
+
+  // Set client flag on mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Handle leaflet CSS loading
+  useEffect(() => {
+    if (isClient) {
+      const timer = setTimeout(() => {
+        setMapLoaded(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isClient]);
 
   const addressTypes = [
     {
@@ -53,36 +137,115 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
     }
   ];
 
-  const handleMapLoad = useCallback((map: any) => {
-    mapRef.current = map;
-    setIsMapLoaded(true);
-  }, []);
-
-  const handleMapClick = useCallback(async ({ placeId }: { placeId: string }) => {
-    if (!placeId) {
-      Toast({
-        type: "warning",
-        message: "Please select a valid location on the map",
-      });
+  const searchAddress = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSuggestions([]);
       return;
     }
 
+    setIsSearching(true);
     try {
-      const res = await GeoCode({ placeId });
-      setMarker(res.latlng);
-      setState((prev: any) => ({ 
-        ...prev, 
-        address: res,
-        addressType 
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/search`,
+        {
+          params: {
+            q: query,
+            format: "json",
+            countrycodes: "gb",
+            limit: 5,
+            "accept-language": "en",
+          },
+        }
+      );
+
+      const results = response.data.map((item: any) => ({
+        display_name: item.display_name,
+        lat: parseFloat(item.lat),
+        lon: parseFloat(item.lon),
       }));
-      
-      if (mapRef.current) {
-        mapRef.current.panTo(res.latlng);
-      }
+
+      setSuggestions(results);
     } catch (error) {
       Toast({
         type: "error",
-        message: "Failed to get location details. Please try again.",
+        message: "Failed to search address",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchAddress(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchAddress]);
+
+  const handleSelectAddress = useCallback((suggestion: any) => {
+    const latlng: [number, number] = [suggestion.lat, suggestion.lon];
+    
+    setMarker(latlng);
+    setMapCenter(latlng);
+    setSearchQuery(suggestion.display_name);
+    setSuggestions([]);
+    
+    setState((prev: any) => ({ 
+      ...prev, 
+      address: {
+        formatted_address: suggestion.display_name,
+        latlng: { lat: suggestion.lat, lng: suggestion.lon },
+        value: suggestion.display_name
+      },
+      addressType 
+    }));
+    
+    Toast({
+      type: "success",
+      message: "Address selected successfully",
+    });
+  }, [setState, addressType]);
+
+  const handleMapClick = useCallback(async (latlng: [number, number]) => {
+    setMarker(latlng);
+    setMapCenter(latlng);
+    
+    try {
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse`,
+        {
+          params: {
+            lat: latlng[0],
+            lon: latlng[1],
+            format: "json",
+            "accept-language": "en",
+          },
+        }
+      );
+      
+      const address = response.data.display_name;
+      
+      setState((prev: any) => ({ 
+        ...prev, 
+        address: {
+          formatted_address: address,
+          latlng: { lat: latlng[0], lng: latlng[1] },
+          value: address
+        },
+        addressType 
+      }));
+      
+      setSearchQuery(address);
+      
+      Toast({
+        type: "success",
+        message: "Location selected!",
+      });
+    } catch (error) {
+      Toast({
+        type: "warning",
+        message: "Could not get address details",
       });
     }
   }, [setState, addressType]);
@@ -97,7 +260,6 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
       animate={{ opacity: 1 }}
       className="space-y-8"
     >
-      {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 text-sm font-medium mb-4">
           <MapPin className="w-4 h-4 mr-2" />
@@ -112,26 +274,51 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
       </div>
 
       <div className="space-y-6">
-        {/* Address Search */}
         <div>
           <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
             Search Address
           </label>
           <div className="relative">
-            <PlacesAutoComplete
-              placeholder="Enter your full address or postcode"
-              search={state?.address?.formatted_address}
-              value={state?.address}
-              className="w-full px-4 py-3 pl-12 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Enter your full address or postcode"
+                className="w-full px-4 py-3 pl-12 pr-10 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+              {isSearching && (
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-500"></div>
+                </div>
+              )}
+            </div>
+            
+            {suggestions.length > 0 && (
+              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-lg max-h-60 overflow-y-auto">
+                {suggestions.map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleSelectAddress(item)}
+                    className="px-4 py-3 hover:bg-primary-50 dark:hover:bg-primary-900/20 cursor-pointer border-b border-neutral-100 dark:border-neutral-700 last:border-b-0"
+                  >
+                    <div className="font-medium text-neutral-900 dark:text-white">
+                      {item.display_name.split(",")[0]}
+                    </div>
+                    <div className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                      {item.display_name.split(",").slice(1).join(",").trim()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
             Start typing your address and select from suggestions
           </p>
         </div>
 
-        {/* Address Type Selection */}
         <div>
           <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">
             Address Type
@@ -175,7 +362,6 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
           </div>
         </div>
 
-        {/* Additional Details */}
         {(state?.address?.formatted_address || state?.address?.value) && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -216,7 +402,6 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
               </div>
             )}
 
-            {/* Map Section */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
@@ -240,62 +425,32 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                   </div>
                 </div>
                 
-                <GoogleMap
-                  marker={marker || state?.address?.latlng}
-                  center={
-                    marker?.lat
-                      ? marker
-                      : state?.address?.latlng
-                        ? state?.address?.latlng
-                        : { lat: 51.5074, lng: -0.1278 }
-                  }
-                  onClick={handleMapClick}
-                  onLoad={handleMapLoad}
-                  options={{
-                    componentRestrictions: {
-                      country: "uk",
-                    },
-                    streetViewControl: false,
-                    clickableIcons: true,
-                    restriction: {
-                      latLngBounds: {
-                        north: 60.854645,
-                        south: 49.823809,
-                        west: -8.649357,
-                        east: 1.762524,
-                      },
-                      strictBounds: true,
-                    },
-                    styles: [
-                      {
-                        featureType: "poi",
-                        elementType: "labels",
-                        stylers: [
-                          {
-                            visibility: "on",
-                          },
-                        ],
-                      },
-                      {
-                        featureType: "transit",
-                        elementType: "labels",
-                        stylers: [
-                          {
-                            visibility: "off",
-                          },
-                        ],
-                      },
-                    ],
-                  }}
-                  style={{
-                    width: "100%",
-                    height: "400px",
-                    borderRadius: "12px",
-                  }}
-                />
+                {isClient && mapLoaded ? (
+                  <MapContainer
+                    center={mapCenter}
+                    zoom={15}
+                    style={{ width: "100%", height: "400px", borderRadius: "12px" }}
+                    ref={mapRef}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    
+                    {marker && <Marker position={marker} />}
+                    
+                    <MapUpdater center={mapCenter} zoom={15} />
+                    <MapClickHandler onClick={handleMapClick} />
+                  </MapContainer>
+                ) : (
+                  <div className="h-[400px] rounded-2xl bg-neutral-100 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-2"></div>
+                      <p className="text-neutral-500 dark:text-neutral-400">Loading map...</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Address Preview */}
               {(marker || state?.address?.formatted_address) && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -326,7 +481,6 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
           </motion.div>
         )}
 
-        {/* Instructions */}
         <div className="p-4 rounded-xl bg-gradient-to-r from-accent-blue/5 to-accent-green/5 border border-accent-blue/20">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-lg bg-accent-blue/20 text-accent-blue">

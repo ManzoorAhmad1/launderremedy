@@ -17,7 +17,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import authService from "@/services/auth.service";
-import { setLoader } from "@/redux/features/userSlice";
+import { setLoader } from "@/lib/features/userSlice";
 import { Button } from "../ui/button";
 
 interface ContactInfoFormProps {

@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setSelectedServicesList,
   setStepByValue,
-} from "@/redux/features/orderSlice";
+} from "@/lib/features/orderSlice";
 import orderService from "@/services/order.service";
 import { useReactToPrint, UseReactToPrintOptions } from "react-to-print";
 

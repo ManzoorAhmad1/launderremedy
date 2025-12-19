@@ -1,65 +1,38 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { Fetch } from '@/utils/fetchWrapper';
 
 const paymentService = {
+  _PREFIX: '/payment/v1',
+
   // Get Stripe configuration
   getStripeConfig: async () => {
     try {
-      const response = await axios.get(`${API_URL}/payment/stripe-config`);
-      return response.data;
-    } catch (error) {
-      throw error;
+      const res = await Fetch.get(`${paymentService._PREFIX}/stripe-config`);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to get Stripe config');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 
   // Create payment intent
-  createPaymentIntent: async (orderData: any) => {
+  createPaymentIntent: async (payload: {
+    amount: number;
+    currency?: string;
+    orderId?: string;
+  }) => {
     try {
-      const response = await axios.post(`${API_URL}/payment/create-intent`, orderData);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Confirm payment
-  confirmPayment: async (paymentData: any) => {
-    try {
-      const response = await axios.post(`${API_URL}/payment/confirm`, paymentData);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Save payment method
-  savePaymentMethod: async (paymentMethodData: any) => {
-    try {
-      const response = await axios.post(`${API_URL}/payment/save-method`, paymentMethodData);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get saved payment methods
-  getPaymentMethods: async () => {
-    try {
-      const response = await axios.get(`${API_URL}/payment/methods`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Delete payment method
-  deletePaymentMethod: async (paymentMethodId: string) => {
-    try {
-      const response = await axios.delete(`${API_URL}/payment/methods/${paymentMethodId}`);
-      return response.data;
-    } catch (error) {
-      throw error;
+      const res = await Fetch.post(
+        `${paymentService._PREFIX}/create-payment-intent`,
+        payload
+      );
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to create payment intent');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 };

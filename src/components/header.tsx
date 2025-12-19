@@ -6,20 +6,20 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X, Sun, Moon, User, ShoppingBag } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useDispatch, useSelector } from 'react-redux'
-import { logoutUser } from '@/lib/features/userSlice'
 import { clearData } from '@/lib/features/orderSlice'
 import { RootState } from '@/lib/store'
 import Image from 'next/image'
 import logo from '../../public/logo-02.png'
 import {Button} from './ui/button'
+import { logOutUser } from '@/lib/features/userSlice'
 
 const NavData = [
   { id: 1, title: "Home", path: "/", live: true },
   { id: 2, title: "How it works", path: "/how-it-works", live: true },
   { id: 3, title: "Pricing", path: "/pricing", live: true },
-  { id: 4, title: "About us", path: "#", live: true },
+  { id: 4, title: "About us", path: "about-us", live: true },
   { id: 5, title: "FAQ", path: "/faq", live: true },
-  { id: 6, title: "Contact Us", path: "/#", live: true },
+  { id: 6, title: "Contact Us", path: "/contact", live: true },
   { id: 7, title: "Dashboard", path: "/dashboard", live: true, protected: true },
 ]
 
@@ -48,7 +48,7 @@ export default function Header() {
 
   const handleLogout = () => {
     if (user?._id) {
-      dispatch(logoutUser(user._id) as any)
+      dispatch(logOutUser(user._id) as any)
       dispatch(clearData())
       router.push('/')
     }

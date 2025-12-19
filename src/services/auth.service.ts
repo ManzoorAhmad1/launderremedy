@@ -1,84 +1,118 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { Fetch } from '@/utils/fetchWrapper';
 
 const authService = {
-  // Login user
-  login: async (credentials: { email: string; password: string }) => {
+  _PREFIX: '/user/v1',
+
+  // Register new user
+  register: async (payload: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    phone_number: string;
+  }) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, credentials);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
+      const res = await Fetch.post(`${authService._PREFIX}/sign-up`, payload);
+      if (res.success) {
+        return res;
       }
-      return response.data;
-    } catch (error) {
-      throw error;
+      throw new Error(res.message ?? 'Registration failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 
-  // Register new user
-  register: async (userData: any) => {
+  // Login user
+  login: async (payload: { email: string; password: string }) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, userData);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
+      const res = await Fetch.post(`${authService._PREFIX}/log-in`, payload);
+      if (res.success) {
+        return res;
       }
-      return response.data;
-    } catch (error) {
-      throw error;
+      throw new Error(res.message ?? 'Login failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
+
+  // Update profile
+  updateProfile: async (payload: {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    phone_number?: string;
+    bundles?: any[];
+  }) => {
+    try {
+      const res = await Fetch.put(`${authService._PREFIX}/update-profile`, payload);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Update failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
+
+  // Delete account
+  deleteAccount: async (userId: string) => {
+    try {
+      const res = await Fetch.delete(`${authService._PREFIX}/delete-user/${userId}`);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Delete failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
+
+  // Logout
+  logout: async (userId: string) => {
+    try {
+      const res = await Fetch.post(`${authService._PREFIX}/log-out/${userId}`);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Logout failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 
   // Check if email is taken
-  isEmailTaken: async (data: { email: string }) => {
+  isEmailTaken: async (payload: { email: string }) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/check-email`, data);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Logout user
-  logout: () => {
-    localStorage.removeItem('token');
-  },
-
-  // Get current user
-  getCurrentUser: async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return null;
-
-      const response = await axios.get(`${API_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      return null;
+      const res = await Fetch.post(`${authService._PREFIX}/is-email-taken`, payload);
+      return res;
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 
   // Forgot password
-  forgotPassword: async (email: string) => {
+  forgotPassword: async (payload: { email: string }) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
-      return response.data;
-    } catch (error) {
-      throw error;
+      const res = await Fetch.post(`${authService._PREFIX}/forgot-password`, payload);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Request failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 
   // Reset password
-  resetPassword: async (token: string, password: string) => {
+  resetPassword: async (payload: { token: string; password: string }) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/reset-password`, {
-        token,
-        password,
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
+      const res = await Fetch.post(`${authService._PREFIX}/reset-password`, payload);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Reset failed');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
     }
   },
 };

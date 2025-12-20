@@ -1,11 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  CheckCircle, 
-  Clock, 
-  Truck, 
-  Headphones, 
+import {
+  CheckCircle,
+  Clock,
+  Truck,
+  Headphones,
   Shield,
   Leaf,
   Sparkles,
@@ -13,7 +13,8 @@ import {
   Award,
   Download,
   Star,
-  ArrowRight
+  ArrowRight,
+  Smartphone
 } from "lucide-react";
 import { useState } from "react";
 import Image from 'next/image';
@@ -41,25 +42,25 @@ const AboutPage = () => {
   ];
 
   const features = [
-    { 
-      icon: Clock, 
-      title: "24h turnaround time", 
+    {
+      icon: Clock,
+      title: "24h turnaround time",
       description: "Get your clothes back within 24 hours",
       color: "text-primary-600",
       bg: "bg-primary-50 dark:bg-primary-900/20",
       image: "/img17.png"
     },
-    { 
-      icon: Truck, 
-      title: "Free collection & delivery", 
+    {
+      icon: Truck,
+      title: "Free collection & delivery",
       description: "We pick up and deliver at your doorstep",
       color: "text-secondary-600",
       bg: "bg-secondary-50 dark:bg-secondary-900/20",
       image: "/img18.png"
     },
-    { 
-      icon: Headphones, 
-      title: "Dedicated 24/7 support", 
+    {
+      icon: Headphones,
+      title: "Dedicated 24/7 support",
       description: "Round-the-clock customer service",
       color: "text-accent-yellow",
       bg: "bg-accent-yellow/10 dark:bg-accent-yellow/20",
@@ -69,9 +70,9 @@ const AboutPage = () => {
 
   const values = [
     { icon: Shield, title: "Quality", description: "Never compromise on quality", image: "/img20.png" },
-    { icon: Leaf, title: "Eco-friendly", description: "Sustainable cleaning solutions", image: "/img21.png" },
-    { icon: Sparkles, title: "Innovation", description: "Constantly improving our process", image: "/img22.png" },
-    { icon: Users, title: "Community", description: "Supporting local businesses", image: "/img23.png" },
+    { icon: Leaf, title: "Eco-friendly", description: "Sustainable cleaning solutions", image: "/img17.png" },
+    { icon: Sparkles, title: "Innovation", description: "Constantly improving our process", image: "/img11.jpg" },
+    { icon: Users, title: "Community", description: "Supporting local businesses", image: "/img15.png" },
   ];
 
   const stats = [
@@ -88,7 +89,7 @@ const AboutPage = () => {
         <div className="absolute inset-0 bg-gradient-purple opacity-5 dark:opacity-10"></div>
         <div className="absolute top-10 right-10 w-72 h-72 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-30 animate-float"></div>
         <div className="absolute bottom-10 left-10 w-72 h-72 bg-secondary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-30 animate-float animation-delay-2000"></div>
-        
+
         <div className="relative max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -106,8 +107,8 @@ const AboutPage = () => {
                 SINCE 2018
               </span>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -123,8 +124,8 @@ const AboutPage = () => {
                 and dry cleaning
               </span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
@@ -132,8 +133,8 @@ const AboutPage = () => {
             >
               Making sure that your most comfortable clothes are safe, clean, and cared for with premium laundry solutions delivered to your door.
             </motion.p>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
@@ -152,7 +153,7 @@ const AboutPage = () => {
       </section>
 
       {/* Featured Logos */}
-      <motion.section 
+      <motion.section
         initial="initial"
         whileInView="animate"
         viewport={{ once: true }}
@@ -193,7 +194,7 @@ const AboutPage = () => {
                 <span className="text-neutral-900 dark:text-white">Who </span>
                 <span className="text-gradient">we are</span>
               </h2>
-              
+
               <div className="space-y-4 text-neutral-600 dark:text-neutral-300">
                 <p className="text-lg">
                   Founded in 2018 in Launder, our team of technical pioneers has been revolutionizing laundry and dry cleaning for modern lifestyles.
@@ -205,7 +206,7 @@ const AboutPage = () => {
                   With strategically located facilities across the county, we provide fast, reliable service backed by transparent pricing and quality guarantees.
                 </p>
               </div>
-              
+
               <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
                   <motion.div
@@ -227,7 +228,7 @@ const AboutPage = () => {
                 ))}
               </div>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -239,7 +240,7 @@ const AboutPage = () => {
                 {/* Image with overlay */}
                 <div className="relative w-full h-full">
                   <Image
-                    src="/img24.png"
+                    src="/img16.jpg"
                     alt="Launder Remedy professional team"
                     fill
                     className="object-cover"
@@ -248,7 +249,7 @@ const AboutPage = () => {
                   />
                   {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-primary-900/70 via-primary-700/40 to-transparent"></div>
-                  
+
                   {/* Content overlay */}
                   <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
                     <div className="text-center">
@@ -290,7 +291,7 @@ const AboutPage = () => {
               Simple, efficient, and reliable laundry service at your fingertips
             </p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <motion.div
@@ -302,11 +303,10 @@ const AboutPage = () => {
                 whileHover={{ scale: 1.05 }}
                 onMouseEnter={() => setHoveredCard(index)}
                 onMouseLeave={() => setHoveredCard(null)}
-                className={`relative rounded-2xl overflow-hidden transition-all duration-300 border ${
-                  hoveredCard === index 
-                    ? 'shadow-primary-lg bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-700 border-primary-200 dark:border-primary-900/50' 
+                className={`relative rounded-2xl overflow-hidden transition-all duration-300 border ${hoveredCard === index
+                    ? 'shadow-primary-lg bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-700 border-primary-200 dark:border-primary-900/50'
                     : 'shadow-sm bg-white dark:bg-neutral-700/30 border-neutral-200 dark:border-neutral-700'
-                }`}
+                  }`}
               >
                 {/* Image Section */}
                 <div className="relative h-48 overflow-hidden">
@@ -319,7 +319,7 @@ const AboutPage = () => {
                   />
                   {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                  
+
                   {/* Icon badge */}
                   <div className="absolute top-4 right-4">
                     <div className={`p-3 rounded-xl ${feature.bg} backdrop-blur-sm border border-white/20`}>
@@ -327,7 +327,7 @@ const AboutPage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Content Section */}
                 <div className="p-6">
                   <h3 className="text-xl font-semibold mb-3 text-neutral-900 dark:text-white">
@@ -340,7 +340,7 @@ const AboutPage = () => {
               </motion.div>
             ))}
           </div>
-          
+
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -373,7 +373,7 @@ const AboutPage = () => {
                 <span className="text-neutral-900 dark:text-white">Quality </span>
                 <span className="text-gradient">without compromise</span>
               </h2>
-              
+
               <div className="space-y-6">
                 <p className="text-lg text-neutral-600 dark:text-neutral-300">
                   We partner with local businesses and suppliers to deliver premium products that ensure your clothes receive the care they deserve.
@@ -382,7 +382,7 @@ const AboutPage = () => {
                   We never compromise when it comes to quality and service. Our focus on attention to detail and care ensures exceptional results through every step of our modern cleaning process.
                 </p>
               </div>
-              
+
               <div className="mt-8 grid grid-cols-2 gap-6">
                 {values.map((value, index) => (
                   <motion.div
@@ -406,7 +406,7 @@ const AboutPage = () => {
                         <value.icon className="w-6 h-6 text-white" />
                       </div>
                     </div>
-                    
+
                     <div className="flex-1">
                       <h4 className="font-semibold text-neutral-900 dark:text-white">
                         {value.title}
@@ -419,7 +419,7 @@ const AboutPage = () => {
                 ))}
               </div>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -430,13 +430,13 @@ const AboutPage = () => {
               <div className="aspect-video rounded-2xl overflow-hidden shadow-primary-lg border border-neutral-200 dark:border-neutral-700">
                 <div className="relative w-full h-full">
                   <Image
-                    src="/img25.png"
+                    src="/img11.jpg"
                     alt="Premium laundry care process"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
                   />
-                  
+
                   {/* Content overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-primary-900/80 via-primary-700/50 to-transparent flex items-end">
                     <div className="p-6 md:p-8 w-full">
@@ -465,15 +465,9 @@ const AboutPage = () => {
             className="max-w-3xl mx-auto"
           >
             <div className="flex flex-col items-center mb-8">
-              <div className="p-4 rounded-2xl bg-white/10 mb-6">
-                <Image
-                  src="/img26.png"
-                  alt="Mobile app"
-                  width={80}
-                  height={80}
-                  className="rounded-lg"
-                />
-              </div>
+                <div className="p-4 rounded-2xl bg-white/10 mb-6">
+                  <Smartphone className="w-12 h-12" />
+                </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 Get the App
               </h2>
@@ -481,8 +475,8 @@ const AboutPage = () => {
                 Download our mobile app for easier booking, tracking, and exclusive offers
               </p>
             </div>
-            
-            <motion.div 
+
+            <motion.div
               className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -497,7 +491,7 @@ const AboutPage = () => {
                 </div>
                 <Download className="w-5 h-5 text-primary-600 group-hover:translate-y-1 transition-transform" />
               </button>
-              
+
               <button className="bg-neutral-900 hover:bg-black dark:bg-neutral-900 dark:hover:bg-black text-white px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-3 transition-colors group border border-neutral-800">
                 <div className="text-2xl">▶</div>
                 <div className="text-left">
@@ -507,7 +501,7 @@ const AboutPage = () => {
                 <Download className="w-5 h-5 text-white group-hover:translate-y-1 transition-transform" />
               </button>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}

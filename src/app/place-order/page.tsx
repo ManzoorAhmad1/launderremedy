@@ -7,18 +7,23 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   ArrowLeft,
-  MapPin,
-  Calendar,
-  ShoppingBag,
-  User,
-  CreditCard,
   CheckCircle,
   Truck,
   Package,
   Sparkles,
   ChevronRight,
   ArrowRight,
-  Clock
+  Clock,
+  Home,
+  MapPin,
+  Calendar,
+  User,
+  CreditCard,
+  Menu,
+  X,
+  Phone,
+  Mail,
+  Shield
 } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -36,37 +41,39 @@ import toast from "react-hot-toast";
 import { CardNumberElement } from "@stripe/react-stripe-js";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
 export default function PlaceOrderPage() {
   const [state, setState] = useState<any>({});
   const [stripe, setStripe] = useState<any>(null);
   const [elements, setElements] = useState<any>(null);
   const [counters, setCounters] = useState<number[]>([]);
   const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes in seconds
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [showMobileStepper, setShowMobileStepper] = useState(false);
+  const [showOrderSummary, setShowOrderSummary] = useState(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
   const step = useSelector((state: any) => state.order.step);
-  console.log(step,'step')
   const user = useSelector((state: any) => state.user.user);
   const selectedServicesList = useSelector((state: any) => state.order.selectedServicesList);
   const orderDetail = useSelector((state: any) => state.order.orderDetail);
 
-  // Timer effect
-  // useEffect(() => {
-  //   if (step > 0 && step < 6) {
-  //     const timer = setInterval(() => {
-  //       setTimeRemaining((prev) => {
-  //         if (prev <= 1) {
-  //           clearInterval(timer);
-  //           return 0;
-  //         }
-  //         return prev - 1;
-  //       });
-  //     }, 1000);
+  const CART_STORAGE_KEY = 'launderremedy-cart';
 
-  //     return () => clearInterval(timer);
-  //   }
-  // }, [step]);
+  // Check device type
+  useEffect(() => {
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -74,9 +81,29 @@ export default function PlaceOrderPage() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Countdown timer
+  useEffect(() => {
+    if (step > 0 && step < 6 && timeRemaining > 0) {
+      const timer = setInterval(() => {
+        setTimeRemaining((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [step, timeRemaining]);
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+    if (savedCart) {
+      try {
+        // setCart(JSON.parse(savedCart));
+      } catch (error) {
+        console.error('Failed to load cart:', error);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     dispatch(setStepByValue(1));
-    dispatch(clearData());
 
     // Initialize collection and delivery dates
     const currentDate = new Date();
@@ -272,6 +299,28 @@ export default function PlaceOrderPage() {
         return false;
     }
   };
+
+  const getStepIcon = (stepNumber: number) => {
+    switch (stepNumber) {
+      case 1: return <MapPin className="w-4 h-4 md:w-5 md:h-5" />;
+      case 2: return <Calendar className="w-4 h-4 md:w-5 md:h-5" />;
+      case 3: return <Package className="w-4 h-4 md:w-5 md:h-5" />;
+      case 4: return <User className="w-4 h-4 md:w-5 md:h-5" />;
+      case 5: return <CreditCard className="w-4 h-4 md:w-5 md:h-5" />;
+      default: return <CheckCircle className="w-4 h-4 md:w-5 md:h-5" />;
+    }
+  };
+
+  const getStepTitle = (stepNumber: number) => {
+    switch (stepNumber) {
+      case 1: return "Address";
+      case 2: return "Collection & Delivery";
+      case 3: return "Services";
+      case 4: return "Contact Info";
+      case 5: return "Payment";
+      default: return "Complete";
+    }
+  };
     
   const renderStepContent = () => {
     switch (step) {
@@ -294,23 +343,23 @@ export default function PlaceOrderPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-16"
+            className="text-center py-6 md:py-8 lg:py-16 px-4"
           >
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-accent-green/20 text-accent-green mb-6">
-              <CheckCircle className="w-10 h-10" />
+            <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full bg-accent-green/20 text-accent-green mb-4 lg:mb-6">
+              <CheckCircle className="w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10" />
             </div>
-            <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-4">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white mb-3 lg:mb-4">
               Order Placed Successfully!
             </h2>
-            <p className="text-neutral-600 dark:text-neutral-400 mb-8 max-w-md mx-auto">
+            <p className="text-sm md:text-base text-neutral-600 dark:text-neutral-400 mb-6 lg:mb-8 max-w-md mx-auto px-2">
               Thank you for your order. We'll contact you shortly with updates and tracking information.
             </p>
             <button
               onClick={() => router.push("/dashboard")}
-              className="btn-primary px-8 py-3 rounded-xl text-lg font-semibold inline-flex items-center gap-2"
+              className="px-5 py-2.5 md:px-6 md:py-3 rounded-lg md:rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-semibold hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300 inline-flex items-center gap-2 text-sm md:text-base"
             >
               View Dashboard
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </motion.div>
         );
@@ -320,59 +369,177 @@ export default function PlaceOrderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800 pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800 pt-16 md:pt-20 lg:pt-24 pb-12 md:pb-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        {/* Mobile Stepper Button */}
+        {(isMobile || isTablet) && step < 6 && (
+          <button
+            onClick={() => setShowMobileStepper(!showMobileStepper)}
+            className="fixed top-16 md:top-20 right-3 md:right-4 z-50 p-2 md:p-3 rounded-full bg-primary-600 text-white shadow-lg lg:hidden"
+          >
+            {showMobileStepper ? <X className="w-4 h-4 md:w-5 md:h-5" /> : <Menu className="w-4 h-4 md:w-5 md:h-5" />}
+          </button>
+        )}
+
+        {/* Mobile Order Summary Toggle Button */}
+        {isMobile && step < 6 && (
+          <button
+            onClick={() => setShowOrderSummary(!showOrderSummary)}
+            className="fixed top-16 left-3 z-50 p-2 rounded-full bg-secondary-600 text-white shadow-lg lg:hidden"
+          >
+            <Package className="w-4 h-4" />
+          </button>
+        )}
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-4 md:mb-6 lg:mb-8"
         >
-          <button
-            onClick={() => router.back()}
-            className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6 group transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back
-          </button>
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center text-primary-600 hover:text-primary-700 group transition-colors text-sm md:text-base"
+            >
+              <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2 group-hover:-translate-x-1 transition-transform" />
+              <span className="hidden sm:inline">Back</span>
+            </button>
 
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {(isMobile || isTablet) && step < 6 && (
+              <div className="text-right">
+                <div className="inline-flex items-center px-2 py-1 md:px-3 md:py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-xs font-medium border border-amber-200 dark:border-amber-700">
+                  <Clock className="w-3 h-3 mr-1 animate-pulse" />
+                  <span className="font-mono">{formatTime(timeRemaining)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-3 lg:gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-2">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-neutral-900 dark:text-white mb-1 md:mb-2">
                 Place Your <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">Order</span>
               </h1>
-              <p className="text-neutral-600 dark:text-neutral-400">
+              <p className="text-xs md:text-sm lg:text-base text-neutral-600 dark:text-neutral-400 max-w-lg">
                 Simple steps to get your laundry done professionally
               </p>
             </div>
 
-            <div className="flex flex-col gap-3">
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 text-sm font-medium">
-                <Sparkles className="w-4 h-4 mr-2" />
-                Eco-friendly & Professional
-              </div>
+            <div className="flex flex-col gap-2 md:gap-3 mt-2 md:mt-0">
+              {!isMobile && (
+                <div className="inline-flex items-center px-3 py-1 md:px-4 md:py-1.5 lg:py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 text-xs md:text-sm font-medium">
+                  <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2" />
+                  <span className="hidden sm:inline">Eco-friendly & Professional</span>
+                  <span className="sm:hidden">Eco-friendly</span>
+                </div>
+              )}
 
-              {step > 0 && step < 6 && timeRemaining > 0 && (
-                <div className="inline-flex items-center px-4 py-2 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-sm font-medium border border-amber-200 dark:border-amber-700">
-                  <Clock className="w-4 h-4 mr-2 animate-pulse" />
+              {!isMobile && step > 0 && step < 6 && timeRemaining > 0 && (
+                <div className="inline-flex items-center px-3 py-1 md:px-4 md:py-1.5 lg:py-2 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-xs md:text-sm font-medium border border-amber-200 dark:border-amber-700">
+                  <Clock className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2 animate-pulse" />
                   <span className="font-mono">{formatTime(timeRemaining)}</span>
-                  <span className="ml-1">remaining</span>
+                  <span className="ml-1 hidden md:inline">remaining</span>
                 </div>
               )}
             </div>
           </div>
         </motion.div>
 
+        {/* Mobile Stepper Overlay */}
+        {(isMobile || isTablet) && showMobileStepper && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-x-0 top-16 md:top-20 bg-white dark:bg-neutral-800 shadow-xl z-40 lg:hidden"
+          >
+            <div className="p-4 border-b border-neutral-200 dark:border-neutral-700">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-base md:text-lg text-neutral-900 dark:text-white">Order Steps</h3>
+                <button
+                  onClick={() => setShowMobileStepper(false)}
+                  className="p-1 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex flex-col space-y-2">
+                {[1, 2, 3, 4, 5].map((stepNum) => (
+                  <button
+                    key={stepNum}
+                    onClick={() => {
+                      dispatch(setStepByValue(stepNum));
+                      setShowMobileStepper(false);
+                    }}
+                    className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                      step === stepNum
+                        ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400'
+                        : step > stepNum
+                        ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                        : 'bg-neutral-50 dark:bg-neutral-900/20 text-neutral-600 dark:text-neutral-400'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      step === stepNum
+                        ? 'bg-primary-600 text-white'
+                        : step > stepNum
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                        : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400'
+                    }`}>
+                      {step > stepNum ? <CheckCircle className="w-4 h-4" /> : getStepIcon(stepNum)}
+                    </div>
+                    <div className="text-left flex-1 min-w-0">
+                      <div className="font-medium text-sm">Step {stepNum}</div>
+                      <div className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{getStepTitle(stepNum)}</div>
+                    </div>
+                    {stepNum === step && (
+                      <ChevronRight className="w-4 h-4 ml-2 text-primary-600 flex-shrink-0" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
           {/* Left Column - Form Steps */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-2"
+            className={`${isTablet ? 'col-span-2' : 'lg:col-span-2'}`}
           >
-            <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-6 lg:p-8 border border-neutral-200 dark:border-neutral-700">
+            {/* Mobile Step Indicator */}
+            {(isMobile || isTablet) && step < 6 && (
+              <div className="mb-3 md:mb-4 bg-white dark:bg-neutral-800 rounded-xl shadow-sm p-3 md:p-4 border border-neutral-200 dark:border-neutral-700">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center ${
+                      canProceed() 
+                        ? 'bg-primary-600 text-white' 
+                        : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400'
+                    }`}>
+                      {getStepIcon(step)}
+                    </div>
+                    <div>
+                      <div className="text-xs text-neutral-500 dark:text-neutral-400">Step {step} of 5</div>
+                      <div className="font-semibold text-neutral-900 dark:text-white text-sm md:text-base">{getStepTitle(step)}</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowMobileStepper(true)}
+                    className="text-primary-600 text-xs md:text-sm font-medium px-2 py-1 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20"
+                  >
+                    View all
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white dark:bg-neutral-800 rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 lg:p-8 border border-neutral-200 dark:border-neutral-700">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={step}
@@ -390,15 +557,15 @@ export default function PlaceOrderPage() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="flex items-center justify-between mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-700"
+                  className="flex items-center justify-between mt-6 md:mt-8 pt-6 md:pt-8 border-t border-neutral-200 dark:border-neutral-700"
                 >
                   {step > 1 ? (
                     <button
                       onClick={() => dispatch(setStepByValue(step - 1))}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
+                      className="inline-flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-4 md:py-2.5 lg:px-6 lg:py-3 rounded-lg md:rounded-xl border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors text-sm md:text-base"
                     >
-                      <ArrowLeft className="w-5 h-5" />
-                      Back
+                      <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
+                      <span className="hidden xs:inline">Back</span>
                     </button>
                   ) : (
                     <div></div>
@@ -408,7 +575,7 @@ export default function PlaceOrderPage() {
                     onClick={handleNext}
                     disabled={!canProceed()}
                     className={`
-                      inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all
+                      inline-flex items-center gap-1.5 md:gap-2 px-4 py-2.5 md:px-6 md:py-3 lg:px-8 lg:py-3 rounded-lg md:rounded-xl font-semibold transition-all text-sm md:text-base whitespace-nowrap
                       ${canProceed()
                         ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40'
                         : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'
@@ -416,61 +583,98 @@ export default function PlaceOrderPage() {
                     `}
                   >
                     {step === 5 ? 'Place Order' : 'Continue'}
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                 </motion.div>
               )}
             </div>
 
-            {/* Mobile Order Summary */}
-            <div className="lg:hidden mt-8">
+            {/* Mobile/Tablet Order Summary */}
+            {(isMobile || isTablet) && step < 6 && (
+              <AnimatePresence>
+                {(showOrderSummary || isTablet) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    className={`mt-4 md:mt-6 ${isMobile ? 'fixed inset-x-4 bottom-20 z-40' : ''}`}
+                  >
+                    {isMobile && (
+                      <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-700 max-h-[60vh] overflow-y-auto">
+                        <div className="p-4 border-b border-neutral-200 dark:border-neutral-700">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-bold text-lg text-neutral-900 dark:text-white">Order Summary</h3>
+                            <button
+                              onClick={() => setShowOrderSummary(false)}
+                              className="p-1 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <OrderInfo
+                            state={state}
+                            counters={counters}
+                            setCounters={setCounters}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {isTablet && (
+                      <OrderInfo
+                        state={state}
+                        counters={counters}
+                        setCounters={setCounters}
+                      />
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
+          </motion.div>
+
+          {/* Right Column - Order Summary (Desktop) */}
+          {!isMobile && !isTablet && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="lg:col-span-1"
+            >
               <OrderInfo
                 state={state}
                 counters={counters}
                 setCounters={setCounters}
               />
-            </div>
-          </motion.div>
-
-          {/* Right Column - Order Summary */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="lg:col-span-1 hidden lg:block"
-          >
-            <OrderInfo
-              state={state}
-              counters={counters}
-              setCounters={setCounters}
-            />
-          </motion.div>
+            </motion.div>
+          )}
         </div>
 
         {/* Bottom CTA */}
-        {step < 6 && (
+        {step < 6 && !isMobile && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="mt-12"
+            className="mt-6 md:mt-8 lg:mt-12"
           >
-            <div className="flex flex-col md:flex-row items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-primary-500/5 to-secondary-600/5 border border-primary-200 dark:border-primary-900/30">
-              <div className="flex items-center gap-4 mb-4 md:mb-0">
-                <div className="p-3 rounded-xl bg-primary-100 dark:bg-primary-900/30">
-                  <Truck className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+            <div className="flex flex-col md:flex-row items-center justify-between p-4 md:p-5 lg:p-6 rounded-xl lg:rounded-2xl bg-gradient-to-r from-primary-500/5 to-secondary-600/5 border border-primary-200 dark:border-primary-900/30">
+              <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-0">
+                <div className="p-2 md:p-2.5 lg:p-3 rounded-lg lg:rounded-xl bg-primary-100 dark:bg-primary-900/30">
+                  <Truck className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-primary-600 dark:text-primary-400" />
                 </div>
                 <div className="text-left">
-                  <h4 className="font-semibold text-neutral-900 dark:text-white">
+                  <h4 className="font-semibold text-neutral-900 dark:text-white text-sm md:text-base">
                     Free Collection & Delivery
                   </h4>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-400">
                     Professional service at your doorstep
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Package className="w-4 h-4 text-accent-green" />
+              <div className="flex items-center gap-2 text-xs md:text-sm">
+                <Package className="w-3 h-3 md:w-4 md:h-4 text-accent-green" />
                 <span className="text-neutral-600 dark:text-neutral-400">
                   Minimum order: <span className="font-semibold">£20</span>
                 </span>
@@ -478,7 +682,69 @@ export default function PlaceOrderPage() {
             </div>
           </motion.div>
         )}
+
+        {/* Mobile Bottom Bar */}
+        {isMobile && step < 6 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 p-3 shadow-2xl z-50">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-xs text-neutral-500 dark:text-neutral-400">Total</div>
+                <div className="font-bold text-lg text-primary-600 dark:text-primary-400">
+                  £{selectedServicesList.reduce((total: number, service: any) => {
+                    const price = typeof service.price === 'string' ? parseFloat(service.price) : service.price;
+                    return total + (price * (service.quantity || 1));
+                  }, 0).toFixed(2)}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowOrderSummary(true)}
+                  className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400"
+                >
+                  <Package className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={!canProceed()}
+                  className={`
+                    px-5 py-2.5 rounded-xl font-semibold transition-all text-sm min-w-[120px]
+                    ${canProceed()
+                      ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-lg'
+                      : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'
+                    }
+                  `}
+                >
+                  {step === 5 ? 'Place Order' : 'Continue'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tablet Contact Info */}
+        {isTablet && step < 6 && (
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="p-3 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-900/30">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                  <Phone className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                </div>
+                <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Need Help?</span>
+              </div>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400">Call us: +44 123 456 7890</p>
+            </div>
+            <div className="p-3 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/30">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900/30">
+                  <Shield className="w-4 h-4 text-green-600 dark:text-green-400" />
+                </div>
+                <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Secure Payment</span>
+              </div>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400">SSL encrypted & secure</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
+}

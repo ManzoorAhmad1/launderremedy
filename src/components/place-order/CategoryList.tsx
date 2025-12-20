@@ -5,10 +5,13 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Plus, Check, Printer, Grid3x3, List, ChevronRight, Tag } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 import {
   setSelectedServicesList,
   setStepByValue,
+  setSelectedServicesListFull,
+  clearData
 } from "@/lib/features/orderSlice";
 import orderService from "@/services/order.service";
 import { useReactToPrint, UseReactToPrintOptions } from "react-to-print";
@@ -27,9 +30,10 @@ import img11 from "../../../public/boots.png";
 
 const CategoryList = ({ state, setState }: any) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
-const handlePrint = useReactToPrint({
-  content: () => componentRef.current,
-} as UseReactToPrintOptions);
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  } as UseReactToPrintOptions);
+  const router = useRouter();
 
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [searchValue, setSearchValue] = useState("");
@@ -37,10 +41,11 @@ const handlePrint = useReactToPrint({
   const [filteredCategories, setFilteredCategories] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
 
   const dispatch = useDispatch();
-  const selectedServicesList = useSelector((state: any) => state.order.selectedServicesList);
-
+  const selectedServicesList = useSelector((state: any) => state.order.selectedServicesList || []);
+  
   // Map title to image
   const getImageForTitle = (title: string) => {
     const imageMap: Record<string, any> = {
@@ -58,10 +63,46 @@ const handlePrint = useReactToPrint({
     return imageMap[title] || null;
   };
 
+  // Set mounted state
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
+
   // Fetch categories from API
   useEffect(() => {
     getAllServicesApi();
   }, []);
+
+  // Sync cart state when component mounts
+  useEffect(() => {
+    if (isMounted) {
+      
+      // If coming back from checkout/pricing page, ensure cart is preserved
+      if (selectedServicesList.length > 0) {
+        
+        // Clean up the cart data - ensure all items have proper structure
+        const cleanedItems = selectedServicesList.map((item: any) => ({
+          ...item,
+          quantity: item.quantity || 1,
+          price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
+          categoryTitle: item.categoryTitle || item.category || 'Unknown Category'
+        }));
+        
+        // Only update if there are changes needed
+        const needsUpdate = cleanedItems.some((item: any, index: number) => {
+          const original = selectedServicesList[index];
+          return item.quantity !== original.quantity || 
+                 item.price !== original.price ||
+                 item.categoryTitle !== original.categoryTitle;
+        });
+        
+        if (needsUpdate) {
+          // dispatch(setSelectedServicesListFull(cleanedItems));
+        }
+      }
+    }
+  }, [isMounted, dispatch]);
 
   const getAllServicesApi = async () => {
     setLoading(true);
@@ -74,7 +115,9 @@ const handlePrint = useReactToPrint({
         }));
         setCategories(modifiedList);
         setFilteredCategories(modifiedList);
-        setSelectedCategory(modifiedList[0]);
+        if (modifiedList.length > 0) {
+          setSelectedCategory(modifiedList[0]);
+        }
       }
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -118,6 +161,23 @@ const handlePrint = useReactToPrint({
     }));
   };
 
+  // Handle quantity updates directly
+  const handleQuantityUpdate = (service: any, newQuantity: number) => {
+    
+    const serviceData = {
+      ...service,
+      id: service._id,
+      quantity: newQuantity,
+      price: parseFloat(service.price),
+      categoryTitle: service.categoryTitle || selectedCategory?.title
+    };
+    
+    dispatch(setSelectedServicesList({ 
+      data: serviceData, 
+      type: newQuantity > 0 ? "+" : "-" 
+    }));
+  };
+
   const isServiceSelected = (subcategoryId: string) => {
     return selectedServicesList?.some((service: any) => service._id === subcategoryId);
   };
@@ -129,8 +189,21 @@ const handlePrint = useReactToPrint({
 
   const getTotalPrice = () => {
     return selectedServicesList.reduce((total: number, service: any) => {
-      return total + (service.price * service.quantity);
+      const price = typeof service.price === 'string' ? parseFloat(service.price) : service.price;
+      const quantity = service.quantity || 1;
+      return total + (price * quantity);
     }, 0);
+  };
+
+  const getTotalItemsCount = () => {
+    return selectedServicesList.reduce((total: number, service: any) => {
+      return total + (service.quantity || 1);
+    }, 0);
+  };
+
+  // Clear cart completely
+  const handleClearCart = () => {
+    dispatch(setSelectedServicesListFull([]));
   };
 
   // Loading State
@@ -355,7 +428,7 @@ const handlePrint = useReactToPrint({
                               : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:shadow-xl hover:border-primary-300'
                             }
                           `}
-                          onClick={() => handleSubcategoryClick(subcategory)}
+                          onClick={() => handleSubcategoryClick(subcategory, isSelected ? "-" : "+")}
                         >
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
@@ -451,7 +524,7 @@ const handlePrint = useReactToPrint({
                     <span className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
                       <Check className="w-6 h-6" />
                     </span>
-                    Your Selected Services
+                    Your Selected Services ({getTotalItemsCount()} items)
                   </h3>
                   <p className="text-neutral-600 dark:text-neutral-400 mt-2">
                     Review and manage your selected services
@@ -462,7 +535,7 @@ const handlePrint = useReactToPrint({
                     £{getTotalPrice().toFixed(2)}
                   </div>
                   <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-                    Total for {selectedServicesList.length} items
+                    Total for {selectedServicesList.length} services
                   </p>
                 </div>
               </div>
@@ -470,7 +543,7 @@ const handlePrint = useReactToPrint({
               <div className="space-y-4">
                 {selectedServicesList.map((service: any, index: number) => (
                   <motion.div
-                    key={index}
+                    key={`${service._id}-${index}`}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 hover:shadow-md transition-shadow"
@@ -481,11 +554,11 @@ const handlePrint = useReactToPrint({
                           {service.title}
                         </h4>
                         <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400">
-                          {service.categoryTitle}
+                          {service.categoryTitle || service.category}
                         </span>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
-                        <span>£{service.price.toFixed(2)} × {service.quantity}</span>
+                        <span>£{(typeof service.price === 'string' ? parseFloat(service.price) : service.price).toFixed(2)} × {service.quantity || 1}</span>
                         {service.bundleQuantity && (
                           <span className="flex items-center gap-1">
                             <Tag className="w-3 h-3" />
@@ -500,13 +573,11 @@ const handlePrint = useReactToPrint({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (service.quantity > 1) {
-                              handleSubcategoryClick(service, "-");
-                            }
+                            handleQuantityUpdate(service, (service.quantity || 1) - 1);
                           }}
-                          disabled={service.quantity <= 1}
+                          disabled={(service.quantity || 1) <= 1}
                           className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${
-                            service.quantity > 1 
+                            (service.quantity || 1) > 1 
                               ? 'bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600' 
                               : 'bg-neutral-50 dark:bg-neutral-800 opacity-50 cursor-not-allowed'
                           }`}
@@ -515,7 +586,7 @@ const handlePrint = useReactToPrint({
                         </button>
                         <div className="flex flex-col items-center">
                           <span className="w-12 text-center font-bold text-lg text-neutral-900 dark:text-white">
-                            {service.quantity}
+                            {service.quantity || 1}
                           </span>
                           <span className="text-xs text-neutral-500 dark:text-neutral-400">
                             items
@@ -524,7 +595,7 @@ const handlePrint = useReactToPrint({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSubcategoryClick(service, "+");
+                            handleQuantityUpdate(service, (service.quantity || 1) + 1);
                           }}
                           className="w-9 h-9 flex items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
                         >
@@ -533,12 +604,12 @@ const handlePrint = useReactToPrint({
                       </div>
                       <div className="text-right">
                         <div className="font-bold text-xl text-primary-600 dark:text-primary-400">
-                          £{(service.price * service.quantity).toFixed(2)}
+                          £{((typeof service.price === 'string' ? parseFloat(service.price) : service.price) * (service.quantity || 1)).toFixed(2)}
                         </div>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSubcategoryClick(service, "-");
+                            handleQuantityUpdate(service, 0);
                           }}
                           className="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors mt-1"
                         >
@@ -560,12 +631,25 @@ const handlePrint = useReactToPrint({
                       Review your selections before continuing
                     </p>
                   </div>
-                  <button
-                    onClick={() => dispatch(setStepByValue(4))}
-                    className="px-8 py-3 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-semibold hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300 transform hover:-translate-y-0.5"
-                  >
-                    Proceed to Checkout
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleClearCart}
+                      className="px-6 py-3 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                    >
+                      Clear All
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (selectedServicesList.length > 0) {
+                          dispatch(setStepByValue(4));
+                          router.push('/place-order');
+                        }
+                      }}
+                      className="px-8 py-3 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-semibold hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300 transform hover:-translate-y-0.5"
+                    >
+                      Proceed to Checkout
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>

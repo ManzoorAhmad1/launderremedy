@@ -119,32 +119,55 @@ const orderSlice = createSlice({
     setSelectedServicesListFull: (state, action: PayloadAction<any[]>) => {
       state.selectedServicesList = action.payload;
     },
-    setSelectedServicesList: (state, action: PayloadAction<{data: any, type: string}>) => {
+    // In your orderSlice.ts, update the setSelectedServicesList reducer:
+    setSelectedServicesList: (state, action: PayloadAction<{ data: any, type: string }>) => {
       const subcategory = action.payload.data;
       const type = action.payload.type;
 
-      const updatedList = state.selectedServicesList
-        .map((item) => {
-          if (item?._id === subcategory?._id) {
-            const updatedQuantity = type === '+' 
-              ? parseInt(item.quantity) + 1 
-              : Math.max(parseInt(item.quantity) - 1, 0);
-
-            // If the updated quantity is zero, don't include the item in the list
-            return updatedQuantity > 0 ? { ...item, quantity: updatedQuantity } : null;
-          }
-          return item;
-        })
-        .filter(Boolean); // Remove null entries (items with quantity zero)
-
-      if (!updatedList.some((item) => item?._id === subcategory._id)) {
-        // If the subcategory is not in the list and quantity is not zero, add it with quantity 1
-        if (type !== '-') {
-          updatedList.push({ ...subcategory, quantity: 1 });
-        }
+      if (!subcategory || !subcategory._id) {
+        console.error('Invalid subcategory data:', subcategory);
+        return;
       }
 
-      state.selectedServicesList = updatedList;
+      const existingIndex = state.selectedServicesList.findIndex(
+        (item) => item?._id === subcategory?._id
+      );
+
+      if (existingIndex >= 0) {
+        // Item exists in cart
+        const updatedList = [...state.selectedServicesList];
+        const existingItem = updatedList[existingIndex];
+
+        if (type === '+') {
+          // Add quantity
+          updatedList[existingIndex] = {
+            ...existingItem,
+            quantity: (existingItem.quantity || 1) + 1
+          };
+        } else if (type === '-') {
+          // Subtract quantity or remove
+          const newQuantity = Math.max((existingItem.quantity || 1) - 1, 0);
+          if (newQuantity === 0) {
+            updatedList.splice(existingIndex, 1); // Remove item
+          } else {
+            updatedList[existingIndex] = {
+              ...existingItem,
+              quantity: newQuantity
+            };
+          }
+        }
+
+        state.selectedServicesList = updatedList;
+      } else if (type === '+') {
+        // Item doesn't exist and we're adding it
+        const newItem = {
+          ...subcategory,
+          quantity: subcategory.quantity || 1
+        };
+        state.selectedServicesList = [...state.selectedServicesList, newItem];
+      }
+
+      console.log('Updated cart:', state.selectedServicesList);
     },
     setCollectionTimes: (state, action: PayloadAction<any>) => {
       state.collection = action.payload.collection;

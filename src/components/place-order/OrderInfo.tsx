@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
-import { 
+import {
   Plus,
   Minus,
   MapPin,
@@ -17,9 +17,8 @@ import {
 import { motion } from "framer-motion";
 
 import {
-  setOrderData,
-  setSelectedServicesList,
   setStepByValue,
+  setSelectedServicesList,
 } from "@/lib/features/orderSlice";
 import CheckboxWithTerms from "../ui/acceptTerms";
 import { Button } from "../ui/button";
@@ -33,33 +32,76 @@ interface OrderInfoProps {
 
 const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isEdit = false }) => {
   const dispatch = useDispatch();
-  
+
   const step = useSelector((state: any) => state.order.step);
   const selectedServicesList = useSelector((state: any) => state.order.selectedServicesList);
   const orderDetail = useSelector((state: any) => state.order.orderDetail);
   const user = useSelector((state: any) => state.user.user);
-  
+
   const [isChecked, setIsChecked] = useState(false);
 
   const getTotalPrice = () => {
     let totalPrice = 0;
-    
+
     selectedServicesList?.forEach((item: any) => {
       totalPrice += item?.price * item?.quantity;
     });
-    
+
     const bundles = isEdit ? state?.bundles : user?.bundles;
     bundles?.forEach((item: any, i: number) => {
       if (counters[i] > 0) {
         totalPrice += item?.perItemPrice * counters[i];
       }
     });
-    
+
     return totalPrice < 20 ? 20 : totalPrice;
   };
 
-  const handleSubcategoryClick = (subcategory: any, type: string) => {
-    // Implementation from your original code
+  // Handle service quantity updates
+  const handleServiceQuantityUpdate = (service: any, newQuantity: number) => {
+    if (!service?._id) return;
+
+    const serviceData = {
+      ...service,
+      id: service._id,
+      quantity: newQuantity,
+      price: typeof service.price === 'string' ? parseFloat(service.price) : service.price,
+      categoryTitle: service.categoryTitle || service.category || 'Unknown Category'
+    };
+
+    dispatch(setSelectedServicesList({
+      data: serviceData,
+      type: newQuantity > 0 ? "+" : "-"
+    }));
+  };
+
+  // Increase quantity
+  const increaseQuantity = (service: any) => {
+    const currentQuantity = service.quantity || 1;
+    handleServiceQuantityUpdate(service, currentQuantity + 1);
+  };
+
+  // Decrease quantity
+  const decreaseQuantity = (service: any) => {
+    const currentQuantity = service.quantity || 1;
+    if (currentQuantity > 1) {
+      handleServiceQuantityUpdate(service, currentQuantity - 1);
+    } else {
+      // Remove item if quantity becomes 0
+      handleServiceQuantityUpdate(service, 0);
+    }
+  };
+
+  // Remove item completely
+  const removeService = (service: any) => {
+    handleServiceQuantityUpdate(service, 0);
+  };
+
+  // Calculate total items in cart
+  const getTotalItemsCount = () => {
+    return selectedServicesList.reduce((total: number, service: any) => {
+      return total + (service.quantity || 1);
+    }, 0);
   };
 
   return (
@@ -72,7 +114,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
       <div className="p-6 border-b border-neutral-200 dark:border-neutral-700">
         <h3 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
           <Package className="w-5 h-5 text-primary-600" />
-          Order Summary
+          Order Summary ({getTotalItemsCount()} items)
         </h3>
         <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
           Review your selections before placing order
@@ -110,7 +152,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
               {isEdit ? "Order Prepaid Bundles" : "Your Prepaid Bundles"}
             </h4>
           </div>
-          
+
           <div className="space-y-4">
             {(isEdit ? state?.bundles : user?.bundles)?.map((item: any, i: number) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-700">
@@ -122,7 +164,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                     Remaining: {item?.prepaidTotalItems}
                   </p>
                 </div>
-                
+
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
                     <button
@@ -135,11 +177,11 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                     >
                       <Minus className="w-4 h-4" />
                     </button>
-                    
+
                     <span className="w-8 text-center font-medium text-neutral-900 dark:text-white">
                       {counters[i] || 0}
                     </span>
-                    
+
                     <button
                       onClick={() => {
                         const newCounters = [...counters];
@@ -154,7 +196,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                       <Plus className="w-4 h-4" />
                     </button>
                   </div>
-                  
+
                   <span className="font-semibold text-primary-600 dark:text-primary-400 min-w-[60px] text-right">
                     £{(item?.perItemPrice * (counters[i] || 0)).toFixed(2)}
                   </span>
@@ -244,7 +286,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                   <CheckCircle className="w-4 h-4 text-accent-green" />
                 )}
               </div>
-              
+
               {selectedServicesList?.length > 0 ? (
                 <div className="space-y-3 mt-2">
                   {selectedServicesList.map((service: any, index: number) => (
@@ -257,34 +299,64 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                           £{service.price.toFixed(2)} each
                         </p>
                       </div>
-                      
+
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
+                          {/* MINUS BUTTON - Should decrease quantity */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              // handleSubcategoryClick(service, "-");
+                              console.log('Decreasing quantity for:', service.title);
+
+                              // Create service data for minus operation
+                              const serviceData = {
+                                ...service,
+                                id: service._id || service.id,
+                                quantity: service.quantity || 1,
+                                price: service.price,
+                                categoryTitle: service.categoryTitle || service.category
+                              };
+
+                              dispatch(setSelectedServicesList({
+                                data: serviceData,
+                                type: "-"  // MINUS operation
+                              }));
                             }}
                             className="w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
-                          
+
                           <span className="w-6 text-center text-sm font-medium text-neutral-900 dark:text-white">
                             {service.quantity}
                           </span>
-                          
+
+                          {/* PLUS BUTTON - Should increase quantity */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              // handleSubcategoryClick(service, "+");
+                              console.log('Increasing quantity for:', service.title);
+
+                              // Create service data for plus operation
+                              const serviceData = {
+                                ...service,
+                                id: service._id || service.id,
+                                quantity: service.quantity || 1,
+                                price: service.price,
+                                categoryTitle: service.categoryTitle || service.category
+                              };
+
+                              dispatch(setSelectedServicesList({
+                                data: serviceData,
+                                type: "+"  // PLUS operation
+                              }));
                             }}
                             className="w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
                         </div>
-                        
+
                         <span className="font-semibold text-primary-600 dark:text-primary-400 text-sm min-w-[60px] text-right">
                           £{(service.price * service.quantity).toFixed(2)}
                         </span>
@@ -366,12 +438,12 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                 £{getTotalPrice().toFixed(2)}
               </span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-neutral-600 dark:text-neutral-400">Delivery</span>
               <span className="text-accent-green font-medium">FREE</span>
             </div>
-            
+
             {getTotalPrice() < 20 && (
               <div className="flex items-center justify-between pt-2 border-t border-neutral-200 dark:border-neutral-700">
                 <span className="text-neutral-600 dark:text-neutral-400">Minimum Order Charge</span>
@@ -380,7 +452,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                 </span>
               </div>
             )}
-            
+
             <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-700">
               <span className="text-lg font-bold text-neutral-900 dark:text-white">Total</span>
               <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
@@ -394,10 +466,10 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
       {/* Terms Checkbox */}
       {step > 4 && (
         <div className="p-6 border-t border-neutral-200 dark:border-neutral-700">
-          <CheckboxWithTerms 
-            type="terms" 
-            handleCheckboxChange={() => setIsChecked(!isChecked)} 
-            isChecked={isChecked} 
+          <CheckboxWithTerms
+            type="terms"
+            handleCheckboxChange={() => setIsChecked(!isChecked)}
+            isChecked={isChecked}
           />
         </div>
       )}
@@ -406,9 +478,13 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
       <div className="p-6 border-t border-neutral-200 dark:border-neutral-700">
         <Button
           width="full"
-        //   type={step > 5 ? "tertiary" : step > 4 && !isChecked ? "grey" : "primary"}
+          onClick={() => {
+            if (step <= 4) {
+              dispatch(setStepByValue(step + 1));
+            }
+          }}
           disabled={step > 5 || (step > 4 && !isChecked)}
-          className="h-12 text-lg font-semibold rounded-xl"
+          className="h-12 text-lg font-semibold rounded-xl bg-primary-600 hover:bg-primary-700 text-white disabled:bg-neutral-300 disabled:text-neutral-500 disabled:cursor-not-allowed"
         >
           {isEdit ? "Update Order" : step > 4 ? "Place Order" : "Continue"}
         </Button>

@@ -8,31 +8,62 @@ import {
   Minus,
   X,
   Search,
-  Filter,
   Package,
   Clock,
-  Check,
   Star,
   Truck,
   Shield,
   Sparkles,
-  Tag,
-  ChevronDown,
   Grid,
-  List,
   ShoppingBag,
   Percent,
   Zap,
   CheckCircle,
   Leaf,
-  RotateCcw
+  RotateCcw,
+  Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { useDispatch, useSelector } from 'react-redux';
+import { setSelectedServicesList, setStepByValue } from '@/lib/features/orderSlice';
+import orderService from '@/services/order.service';
+
+// Import your images
+import img1 from "../../../public/men-shirt-icon.png";
+import img2 from "../../../public/mens-suit-icon.png";
+import img3 from "../../../public/jeans-pants-icon.png";
+import img5 from "../../../public/iron-icon.png";
+import img6 from "../../../public/hoodie-jacket-icon.png";
+import img7 from "../../../public/girl-dress-icon.png";
+import img8 from "../../../public/double-bed-icon.png";
+import img9 from "../../../public/clothes-washing-icon.png";
+import img10 from "../../../public/alteration.png";
+import img11 from "../../../public/boots.png";
+import { useRouter } from 'next/navigation';
 
 // Types
+interface Subcategory {
+  _id: string;
+  title: string;
+  description: string;
+  price: string | number;
+  quantity: number;
+  prepaidTotalItems?: string;
+  perItemPrice?: string;
+  bundleQuantity?: number;
+}
+
+interface Category {
+  _id: string;
+  title: string;
+  imageUrl: string;
+  customImageUrl?: any;
+  subcategories: Subcategory[];
+}
+
 interface ServiceItem {
   id: string;
   name: string;
@@ -45,108 +76,249 @@ interface ServiceItem {
     quantity: number;
     perItemPrice: number;
   };
-  type?: 'dry-clean' | 'wash-iron' | 'pressing' | 'repair' | 'bundle';
+  type?: 'dry-clean' | 'wash-iron' | 'pressing' | 'repair' | 'bundle' | 'laundry' | 'home-textile';
   popular?: boolean;
   fastService?: boolean;
   ecoFriendly?: boolean;
+  _id?: string;
+  prepaidTotalItems?: string;
+  perItemPrice?: string;
+  bundleQuantity?: number;
+  categoryTitle?: string;
 }
 
 interface CartItem extends ServiceItem {
   quantity: number;
 }
 
-// Local storage key
-const CART_STORAGE_KEY = 'launderremedy-cart';
-
-// Categories data
+// Categories data (for UI display)
 const categories = [
   { id: 'all', label: 'All Services', icon: Grid, color: 'bg-gradient-to-r from-primary-500 to-primary-600' },
-  { id: 'dryclean', label: 'Dry Cleaning', icon: Package, color: 'bg-gradient-to-r from-primary-600 to-secondary-500' },
-  { id: 'dresses', label: 'Dresses & Skirts', icon: ShoppingBag, color: 'bg-gradient-to-r from-accent-pink to-purple-500' },
-  { id: 'shirts', label: 'Shirts & Tops', icon: Grid, color: 'bg-gradient-to-r from-accent-teal to-blue-500' },
-  { id: 'suits', label: 'Elegant Suits', icon: ShoppingBag, color: 'bg-gradient-to-r from-primary-700 to-primary-800' },
-  { id: 'trousers', label: 'Trousers', icon: Grid, color: 'bg-gradient-to-r from-accent-green to-emerald-500' },
-  { id: 'pressing', label: 'Pressing', icon: Zap, color: 'bg-gradient-to-r from-secondary-500 to-secondary-600' },
-  { id: 'alterations', label: 'Alterations', icon: RotateCcw, color: 'bg-gradient-to-r from-accent-yellow to-amber-500' },
-  { id: 'shoes', label: 'Shoe Repair', icon: Shield, color: 'bg-gradient-to-r from-neutral-700 to-neutral-800' },
-  { id: 'bundles', label: 'Bundles', icon: Percent, color: 'bg-gradient-to-r from-secondary-600 to-purple-600', badge: 'Save 20%' },
+  { id: 'Laundry Services', label: 'Laundry Services', icon: Grid, color: 'bg-gradient-to-r from-primary-600 to-secondary-500' },
+  { id: 'Shirts and Tops Care', label: 'Shirts & Tops', icon: ShoppingBag, color: 'bg-gradient-to-r from-accent-teal to-blue-500' },
+  { id: 'Elegant Suits Care', label: 'Elegant Suits', icon: ShoppingBag, color: 'bg-gradient-to-r from-primary-700 to-primary-800' },
+  { id: 'Dresses and Skirts Care', label: 'Dresses & Skirts', icon: ShoppingBag, color: 'bg-gradient-to-r from-accent-pink to-purple-500' },
+  { id: 'Trousers Care', label: 'Trousers', icon: Grid, color: 'bg-gradient-to-r from-accent-green to-emerald-500' },
+  { id: 'Outdoor Clothing', label: 'Outdoor Wear', icon: Grid, color: 'bg-gradient-to-r from-accent-yellow to-amber-500' },
+  { id: 'Home Textile Services', label: 'Home Textiles', icon: Grid, color: 'bg-gradient-to-r from-primary-500 to-primary-600' },
+  { id: 'Ironing Services', label: 'Ironing', icon: Zap, color: 'bg-gradient-to-r from-secondary-500 to-secondary-600' },
+  { id: 'Alterations', label: 'Alterations', icon: RotateCcw, color: 'bg-gradient-to-r from-accent-yellow to-amber-500' },
+  { id: 'Shoe Repair', label: 'Shoe Repair', icon: Shield, color: 'bg-gradient-to-r from-neutral-700 to-neutral-800' },
 ];
 
+const getImageForTitle = (title: string) => {
+  const imageMap: Record<string, any> = {
+    "Laundry Services": img9,
+    "Shirts and Tops Care": img1,
+    "Elegant Suits Care": img2,
+    "Trousers Care": img3,
+    "Outdoor Clothing": img6,
+    "Alterations": img10,
+    "Shoe Repair": img11,
+    "Home Textile Services": img8,
+    "Ironing Services": img5,
+    "Dresses and Skirts Care": img7,
+  };
+  return imageMap[title] || img9; // Default image
+};
+
+const getServiceType = (title: string, category: string): ServiceItem['type'] => {
+  const titleLower = title.toLowerCase();
+
+  if (titleLower.includes('bundle') || titleLower.includes('prepaid')) {
+    return 'bundle';
+  }
+
+  if (titleLower.includes('dry clean') || titleLower.includes('dryclean')) {
+    return 'dry-clean';
+  }
+
+  if (titleLower.includes('wash') || titleLower.includes('fold')) {
+    return 'wash-iron';
+  }
+
+  if (titleLower.includes('iron') || titleLower.includes('pressing')) {
+    return 'pressing';
+  }
+
+  if (titleLower.includes('repair') || titleLower.includes('alteration') ||
+    titleLower.includes('sew') || titleLower.includes('zip')) {
+    return 'repair';
+  }
+
+  if (category.includes('Home Textile') || category.includes('Laundry')) {
+    return category.includes('Laundry') ? 'laundry' : 'home-textile';
+  }
+
+  return 'dry-clean'; // Default
+};
+
 export default function PricingPage() {
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showCart, setShowCart] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showCategories, setShowCategories] = useState<boolean>(true);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
-
-  // Load cart from localStorage on mount
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [categoriesList, setCategoriesList] = useState<Category[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter()
+  const dispatch = useDispatch();
+  const cart = useSelector((state: any) => state.order.selectedServicesList || []);
+  // Load data from API
   useEffect(() => {
-    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Failed to load cart:', error);
-      }
-    }
+    getAllServicesApi();
   }, []);
 
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-  }, [cart]);
+  const getAllServicesApi = async () => {
+    setLoading(true);
+    try {
+      const response = await orderService.getCategoriesList();
 
-  // Service data
-  const services: ServiceItem[] = [
-    // Dry Clean Services
-    { id: 'dc1', name: 'Blazer Dry Clean', price: 15.99, category: 'dryclean', type: 'dry-clean', popular: true, fastService: true },
-    { id: 'dc2', name: 'Jacket Dry Clean', price: 18.99, category: 'dryclean', type: 'dry-clean', description: 'Velvet, sequins, silk & leather' },
-    { id: 'dc3', name: 'Designer Jacket', price: 29.99, category: 'dryclean', type: 'dry-clean', popular: true },
-    { id: 'dc4', name: 'Overcoat Dry Clean', price: 24.99, category: 'dryclean', type: 'dry-clean', fastService: true },
-    { id: 'dc5', name: 'Cardigan Dry Clean', price: 12.99, category: 'dryclean', type: 'dry-clean', ecoFriendly: true },
+      if (response?.data) {
+        const modifiedList = response.data.map((item: Category) => ({
+          ...item,
+          customImageUrl: getImageForTitle(item.title),
+        }));
 
-    // Dresses & Skirts
-    { id: 'ds1', name: 'Single Dress', price: 12.00, category: 'dresses', type: 'dry-clean', popular: true, fastService: true },
-    { id: 'ds2', name: 'Delicate Dress', price: 15.00, category: 'dresses', type: 'dry-clean' },
-    { id: 'ds3', name: 'Evening Dress', price: 20.00, category: 'dresses', type: 'dry-clean', popular: true },
-    { id: 'ds4', name: 'Silk Dress', price: 15.00, category: 'dresses', type: 'dry-clean' },
-    { id: 'ds5', name: 'Skirt Dry Clean', price: 6.95, category: 'dresses', type: 'dry-clean', fastService: true },
+        setCategoriesList(modifiedList);
 
-    // Shirts & Tops
-    { id: 'st1', name: 'Hung Shirt Service', price: 2.80, category: 'shirts', type: 'wash-iron', fastService: true, ecoFriendly: true },
-    { id: 'st2', name: 'Folded Shirt', price: 3.35, category: 'shirts', type: 'wash-iron' },
-    { id: 'st3', name: 'Blouse Dry Clean', price: 6.00, category: 'shirts', type: 'dry-clean' },
-    { id: 'st4', name: 'Ladies Shirt Care', price: 3.00, category: 'shirts', type: 'wash-iron' },
+        // Transform API data to ServiceItem format
+        const transformedServices: ServiceItem[] = [];
+        modifiedList.forEach((category: Category) => {
+          category.subcategories.forEach((subcategory) => {
+            // Determine if this is a popular item
+            const isPopular =
+              subcategory.title.toLowerCase().includes('bundle') ||
+              subcategory.title.toLowerCase().includes('prepaid') ||
+              parseFloat(subcategory.price.toString()) < 10;
 
-    // Elegant Suits
-    { id: 'es1', name: '2-Piece Suit', price: 19.99, category: 'suits', type: 'dry-clean', popular: true, fastService: true },
-    { id: 'es2', name: '3-Piece Suit', price: 24.99, category: 'suits', type: 'dry-clean' },
-    { id: 'es3', name: 'Dinner Suit', price: 22.99, category: 'suits', type: 'dry-clean' },
-    { id: 'es4', name: 'Tie Dry Clean', price: 4.99, category: 'suits', type: 'dry-clean' },
+            // Determine if this is fast service
+            const isFastService =
+              !subcategory.title.toLowerCase().includes('feather') &&
+              !subcategory.title.toLowerCase().includes('72 hours');
 
-    // Trousers
-    { id: 'tr1', name: 'Single Trouser', price: 3.80, category: 'trousers', type: 'dry-clean', fastService: true },
-    { id: 'tr2', name: 'Jeans Dry Clean', price: 6.00, category: 'trousers', type: 'dry-clean', ecoFriendly: true },
-    { id: 'tr3', name: 'Shorts', price: 4.75, category: 'trousers', type: 'dry-clean' },
+            // Determine if eco-friendly
+            const isEcoFriendly =
+              subcategory.title.toLowerCase().includes('wash') ||
+              subcategory.title.toLowerCase().includes('clean') &&
+              !subcategory.title.toLowerCase().includes('dry clean');
 
-    // Bundles
-    { id: 'b1', name: '5x Blouse Bundle', price: 28.75, originalPrice: 30.00, category: 'bundles', type: 'bundle', bundle: { quantity: 5, perItemPrice: 5.75 }, popular: true },
-    { id: 'b2', name: '10x Dress Bundle', price: 97.50, originalPrice: 105.00, category: 'bundles', type: 'bundle', bundle: { quantity: 10, perItemPrice: 9.75 } },
-    { id: 'b3', name: '5x Suit Bundle', price: 58.50, originalPrice: 62.50, category: 'bundles', type: 'bundle', bundle: { quantity: 5, perItemPrice: 11.70 } },
-    { id: 'b4', name: '20x Shirt Bundle', price: 90.00, originalPrice: 95.00, category: 'bundles', type: 'bundle', bundle: { quantity: 20, perItemPrice: 4.50 }, popular: true },
+            const serviceItem: ServiceItem = {
+              id: subcategory._id,
+              _id: subcategory._id,
+              name: subcategory.title,
+              description: subcategory.description,
+              price: typeof subcategory.price === 'string' ? parseFloat(subcategory.price) : subcategory.price,
+              category: category.title,
+              categoryTitle: category.title,
+              type: getServiceType(subcategory.title, category.title),
+              popular: isPopular,
+              fastService: isFastService,
+              ecoFriendly: isEcoFriendly,
+              bundle: subcategory.prepaidTotalItems ? {
+                quantity: parseInt(subcategory.prepaidTotalItems),
+                perItemPrice: subcategory.perItemPrice ? parseFloat(subcategory.perItemPrice) : 0
+              } : undefined,
+              prepaidTotalItems: subcategory.prepaidTotalItems,
+              perItemPrice: subcategory.perItemPrice,
+              bundleQuantity: subcategory.bundleQuantity
+            };
 
-    // Alterations
-    { id: 'al1', name: 'Trouser Length', price: 14.50, category: 'alterations', type: 'repair', fastService: true },
-    { id: 'al2', name: 'Sew On Button', price: 2.99, category: 'alterations', type: 'repair' },
-    { id: 'al3', name: 'Skirt Length', price: 17.00, category: 'alterations', type: 'repair' },
+            transformedServices.push(serviceItem);
+          });
+        });
 
-    // Shoe Repair
-    { id: 'sr1', name: 'Ladies Half Sole', price: 26.00, category: 'shoes', type: 'repair' },
-    { id: 'sr2', name: 'Shoe Cleaning', price: 11.00, category: 'shoes', type: 'repair', fastService: true },
-    { id: 'sr3', name: 'Ankle Boots Cleaning', price: 25.00, category: 'shoes', type: 'repair' },
-  ];
+        setServices(transformedServices);
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle adding/removing items from cart using Redux dispatch
+  const handleAddToCart = (service: ServiceItem, operation: "+" | "-" = "+") => {
+    setAddingToCart(service.id);
+
+    const serviceData = {
+      ...service,
+      id: service._id || service.id,
+      quantity: operation === "+" ? 1 : 0,
+      price: service.price,
+      categoryTitle: service.category
+    };
+
+    dispatch(setSelectedServicesList({
+      data: serviceData,
+      type: operation
+    }));
+
+    // Reset animation after delay
+    setTimeout(() => setAddingToCart(null), 300);
+  };
+
+  // Check if service is in cart
+  const isServiceSelected = (serviceId: string) => {
+    return cart?.some((item: any) => item._id === serviceId);
+  };
+
+  // Get quantity of service in cart
+  const getSelectedServiceQuantity = (serviceId: string) => {
+    const service = cart?.find((item: any) => item._id === serviceId);
+    return service?.quantity || 0;
+  };
+
+
+  // In PricingPage, update the updateCartQuantity function:
+  const updateCartQuantity = (serviceId: string, newQuantity: number) => {
+    const service = services.find(s => s._id === serviceId || s.id === serviceId);
+    if (service) {
+
+      const serviceData = {
+        ...service,
+        id: service._id || service.id,
+        quantity: newQuantity,
+        price: service.price,
+        categoryTitle: service.category
+      };
+
+      dispatch(setSelectedServicesList({
+        data: serviceData,
+        type: newQuantity > 0 ? "+" : "-"
+      }));
+    }
+  };
+
+  // And update the removeFromCart function:
+  const removeFromCart = (serviceId: string) => {
+    const service = services.find(s => s._id === serviceId || s.id === serviceId);
+    if (service) {
+      const serviceData = {
+        ...service,
+        id: service._id || service.id,
+        quantity: 0,
+        price: service.price,
+        categoryTitle: service.category
+      };
+
+      dispatch(setSelectedServicesList({
+        data: serviceData,
+        type: "-"
+      }));
+    }
+  };
+
+  // Clear cart
+  const clearCart = () => {
+    // Remove all items from cart
+    cart.forEach((item: any) => {
+      const service = services.find(s => s._id === item._id);
+      if (service) {
+        handleAddToCart(service, "-");
+      }
+    });
+  };
 
   // Filter services
   const filteredServices = services.filter(service => {
@@ -162,50 +334,9 @@ export default function PricingPage() {
     return true;
   });
 
-  // Cart operations - FIXED
-  const addToCart = (item: ServiceItem) => {
-    setAddingToCart(item.id);
-
-    setCart(prev => {
-      const existing = prev.find(i => i.id === item.id);
-      if (existing) {
-        return prev.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      } else {
-        return [...prev, { ...item, quantity: 1 }];
-      }
-    });
-
-    // Reset animation after delay
-    setTimeout(() => setAddingToCart(null), 300);
-  };
-
-  const removeFromCart = (id: string) => {
-    setCart(prev => prev.filter(item => item.id !== id));
-  };
-
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity < 1) {
-      removeFromCart(id);
-      return;
-    }
-
-    setCart(prev => prev.map(item =>
-      item.id === id ? { ...item, quantity } : item
-    ));
-  };
-
-  const clearCart = () => {
-    setCart([]);
-    localStorage.removeItem(CART_STORAGE_KEY);
-  };
-
-  // Totals - FIXED
-  const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const discount = cart.reduce((sum, item) =>
-    sum + (item.originalPrice ? (item.originalPrice - item.price) * item.quantity : 0), 0);
+  // Totals
+  const cartTotal = cart.reduce((sum: number, item: any) => sum + (item.price * (item.quantity || 1)), 0);
+  const cartCount = cart.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
 
   // Format price
   const formatPrice = (price: number) => `£${price.toFixed(2)}`;
@@ -218,9 +349,22 @@ export default function PricingPage() {
       case 'wash-iron': return Sparkles;
       case 'pressing': return Zap;
       case 'repair': return Shield;
+      case 'laundry': return Grid;
+      case 'home-textile': return Grid;
       default: return Package;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-primary-100">
+        <div className="text-center">
+          <RotateCcw className="w-8 h-8 mx-auto text-primary-600 animate-spin mb-4" />
+          <p className="text-primary-700">Loading services...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800">
@@ -348,9 +492,9 @@ export default function PricingPage() {
                           </div>
                           <span className="font-medium">{cat.label}</span>
                         </div>
-                        {cat.badge && (
+                        {cat.id !== 'all' && services.filter(s => s.category === cat.id).length > 0 && (
                           <Badge variant="secondary" className="text-xs">
-                            {cat.badge}
+                            {services.filter(s => s.category === cat.id).length}
                           </Badge>
                         )}
                       </button>
@@ -380,12 +524,13 @@ export default function PricingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredServices.map((service) => {
                 const ServiceIcon = getServiceIcon(service.type);
-                const isInCart = cart.find(item => item.id === service.id);
+                const isSelected = isServiceSelected(service._id || service.id);
+                const selectedQuantity = getSelectedServiceQuantity(service._id || service.id);
                 const categoryData = categories.find(c => c.id === service.category);
 
                 return (
                   <motion.div
-                    key={service.id}
+                    key={service._id || service.id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
@@ -422,15 +567,23 @@ export default function PricingPage() {
                                 <span>24H Service</span>
                               </div>
                             )}
+                            {isSelected && (
+                              <div className="flex items-center gap-1 mt-2 px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
+                                <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+                                <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                                  {selectedQuantity} added
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
 
-                        {/* Service Name - BLACK TEXT */}
+                        {/* Service Name */}
                         <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2">
                           {service.name}
                         </h3>
 
-                        {/* Description - DARK GRAY TEXT */}
+                        {/* Description */}
                         {service.description && (
                           <p className="text-sm text-gray-700 dark:text-primary-400 mb-4">
                             {service.description}
@@ -449,9 +602,9 @@ export default function PricingPage() {
                           </div>
                           <div className="flex items-center justify-between text-xs text-gray-600 dark:text-primary-400">
                             <span>{formatPrice(service.bundle.perItemPrice)}/item</span>
-                            {service.originalPrice && (
+                            {service.perItemPrice && service.price && (
                               <span className="text-red-600 dark:text-red-400 font-medium">
-                                Save {Math.round(((service.originalPrice - service.price) / service.originalPrice) * 100)}%
+                                Save {Math.round(((service.bundle.quantity * service.bundle.perItemPrice - service.price) / (service.bundle.quantity * service.bundle.perItemPrice)) * 100)}%
                               </span>
                             )}
                           </div>
@@ -464,17 +617,16 @@ export default function PricingPage() {
                           {/* Price */}
                           <div>
                             <div className="flex items-baseline gap-2">
-                              {/* Price in Black for light mode */}
                               <span className="text-2xl font-bold text-gray-900 dark:text-white">
                                 {formatPrice(service.price)}
                               </span>
-                              {service.originalPrice && (
-                                <span className="text-sm text-gray-500 dark:text-neutral-400 line-through">
-                                  {formatPrice(service.originalPrice)}
+                              {service.bundle && service.perItemPrice && (
+                                <span className="text-sm text-gray-500 dark:text-neutral-400">
+                                  {formatPrice(parseFloat(service.perItemPrice))}/item
                                 </span>
                               )}
                             </div>
-                            {/* Category label in dark gray */}
+                            {/* Category label */}
                             <p className="text-xs text-gray-600 dark:text-primary-400 mt-1">
                               {categoryData?.label}
                             </p>
@@ -482,18 +634,18 @@ export default function PricingPage() {
 
                           {/* Add to Cart */}
                           <Button
-                            onClick={() => addToCart(service)}
+                            onClick={() => handleAddToCart(service, isSelected ? "-" : "+")}
                             size="sm"
-                            variant={isInCart ? "secondary" : "default"}
-                            className={`rounded-lg font-medium px-4 py-2 transition-all duration-300 ${isInCart
-                                ? 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-primary-900 dark:text-white dark:hover:bg-primary-800'
-                                : 'bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white'
+                            variant={isSelected ? "secondary" : "default"}
+                            className={`rounded-lg font-medium px-4 py-2 transition-all duration-300 ${isSelected
+                              ? 'bg-green-100 text-green-900 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/40'
+                              : 'bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white'
                               }`}
                             disabled={addingToCart === service.id}
                           >
                             {addingToCart === service.id ? (
                               <RotateCcw className="w-4 h-4 animate-spin" />
-                            ) : isInCart ? (
+                            ) : isSelected ? (
                               <div className="flex items-center gap-2">
                                 <CheckCircle className="w-4 h-4" />
                                 <span>Added</span>
@@ -521,7 +673,7 @@ export default function PricingPage() {
             </div>
 
             {/* Empty State */}
-            {filteredServices.length === 0 && (
+            {filteredServices.length === 0 && !loading && (
               <div className="text-center py-12">
                 <Search className="w-12 h-12 mx-auto text-primary-400 mb-4" />
                 <h3 className="text-lg font-semibold text-primary-900 dark:text-white mb-2">
@@ -545,7 +697,7 @@ export default function PricingPage() {
         </div>
       </main>
 
-      {/* Cart Sidebar - FIXED */}
+      {/* Cart Sidebar */}
       <AnimatePresence>
         {showCart && (
           <>
@@ -597,22 +749,22 @@ export default function PricingPage() {
                     </p>
                     <Button
                       onClick={() => setShowCart(false)}
-                    // variant="accent"
                     >
                       Browse Services
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {cart.map((item) => (
-                      <div key={item.id} className="p-4 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-200 dark:border-primary-800">
+                    {cart.map((item: any) => (
+                      <div key={item._id} className="p-4 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-200 dark:border-primary-800">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h4 className="font-semibold text-primary-900 dark:text-white">{item.name}</h4>
-                            <p className="text-sm text-primary-600 dark:text-primary-400">{item.category}</p>
+                            <h4 className="font-semibold text-primary-900 dark:text-white">{item.title || item.name}</h4>
+                            <p className="text-sm text-primary-600 dark:text-primary-400">{item.categoryTitle || item.category}</p>
                           </div>
                           <button
-                            onClick={() => removeFromCart(item.id)}
+                            type='button'
+                            onClick={() => removeFromCart(item._id)}
                             className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                           >
                             <X className="w-4 h-4 text-red-500" />
@@ -622,16 +774,16 @@ export default function PricingPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              onClick={() => updateCartQuantity(item._id, (item.quantity || 1) - 1)}
                               className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary-300 dark:border-primary-700 hover:bg-primary-100 dark:hover:bg-primary-900/30"
                             >
                               <Minus className="w-3 h-3" />
                             </button>
                             <span className="font-medium w-8 text-center text-primary-900 dark:text-white">
-                              {item.quantity}
+                              {item.quantity || 1}
                             </span>
                             <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              onClick={() => updateCartQuantity(item._id, (item.quantity || 1) + 1)}
                               className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary-300 dark:border-primary-700 hover:bg-primary-100 dark:hover:bg-primary-900/30"
                             >
                               <Plus className="w-3 h-3" />
@@ -640,7 +792,7 @@ export default function PricingPage() {
 
                           <div className="text-right">
                             <p className="font-bold text-lg text-primary-900 dark:text-white">
-                              {formatPrice(item.price * item.quantity)}
+                              {formatPrice(item.price * (item.quantity || 1))}
                             </p>
                             <p className="text-xs text-primary-600 dark:text-primary-400">
                               {formatPrice(item.price)} each
@@ -657,12 +809,6 @@ export default function PricingPage() {
               {cart.length > 0 && (
                 <div className="border-t border-primary-200 dark:border-primary-800 p-6 space-y-4">
                   <div className="space-y-3">
-                    {discount > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-primary-600 dark:text-primary-400">You Save</span>
-                        <span className="font-semibold text-accent-green">-{formatPrice(discount)}</span>
-                      </div>
-                    )}
                     <div className="flex justify-between text-sm">
                       <span className="text-primary-600 dark:text-primary-400">Subtotal</span>
                       <span className="font-medium">{formatPrice(cartTotal)}</span>
@@ -689,12 +835,11 @@ export default function PricingPage() {
                   <div className="space-y-3">
                     <Button
                       onClick={() => {
-                        alert(`Order placed successfully!\n\nTotal: ${formatPrice(cartTotal + 2.5)}\nItems: ${cartCount}\n\nThank you for choosing LaunderRemedy!`);
-                        clearCart();
+                        // dispatch(setStepByValue(4));
+                        router.push('/place-order')
                         setShowCart(false);
                       }}
-                      // variant="accent"
-                      className="w-full h-12 text-lg"
+                      className="w-full h-12 text-lg bg-gradient-to-r from-primary-600 to-secondary-600"
                     >
                       Proceed to Checkout
                     </Button>
@@ -736,7 +881,7 @@ export default function PricingPage() {
               <Button className="bg-white text-primary-900 hover:bg-primary-100">
                 Schedule Pickup
               </Button>
-              <Button variant="outline" className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:bg-white hover-text-gradient-to-r">
+              <Button variant="outline" className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:bg-white hover:text-primary-900">
                 Contact Us
               </Button>
             </div>

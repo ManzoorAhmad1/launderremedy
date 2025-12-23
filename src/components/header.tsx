@@ -20,7 +20,7 @@ const NavData = [
   { id: 4, title: "About us", path: "about-us", live: true },
   { id: 5, title: "FAQ", path: "/faq", live: true },
   { id: 6, title: "Contact Us", path: "/contact", live: true },
-  { id: 7, title: "Dashboard", path: "/dashboard", live: true, protected: true },
+  { id: 7, title: "Admin Dashboard", path: "/admin/dashboard", live: true, protected: true },
 ]
 
 export default function Header() {
@@ -125,11 +125,15 @@ export default function Header() {
             {/* User Actions */}
             {isLogin ? (
               <>
-                <Link href="/dashboard" onClick={closeMenu}>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </Link>
+                {/* Admin Panel Button - Only show for admin users */}
+                {(user?.email === 'admin@launderremedy.com' || user?.role === 'admin') && (
+                  <Link href="/admin/dashboard" onClick={closeMenu}>
+                    <Button variant="secondary" className="shadow-sm">
+                      Admin Panel
+                    </Button>
+                  </Link>
+                )}
+                
                 <Button
                   variant="outline"
                   onClick={handleLogout}
@@ -209,9 +213,9 @@ export default function Header() {
               <div className="pt-4 border-t border-neutral-200 flex flex-col space-y-3">
                 {isLogin ? (
                   <>
-                    <Link href="/dashboard" onClick={closeMenu}>
+                    <Link href="/admin/dashboard" onClick={closeMenu}>
                       <Button variant="outline" className="w-full">
-                        Dashboard
+                       Admin Dashboard
                       </Button>
                     </Link>
                     <Button

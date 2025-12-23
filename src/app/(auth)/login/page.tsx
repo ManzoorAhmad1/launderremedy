@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/lib/features/userSlice";
 import { 
   Mail, 
   Lock, 
@@ -19,6 +22,8 @@ import {
 } from "lucide-react";
 
 const LoginPage = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -47,12 +52,26 @@ const LoginPage = () => {
     // Simulate API call
     setTimeout(() => {
       if (formData.email && formData.password) {
-        setSuccessMessage('Login successful! Redirecting to dashboard...');
-        // In real app: router.push('/dashboard');
+        setSuccessMessage('Login successful!');
+        
+        // Create mock user data
+        const userData = {
+          _id: formData.email === 'admin@launderremedy.com' ? 'admin1' : 'user1',
+          email: formData.email,
+          first_name: formData.email === 'admin@launderremedy.com' ? 'Admin' : 'User',
+          last_name: formData.email === 'admin@launderremedy.com' ? 'User' : 'Name',
+          phone_number: '+44 7700 900100',
+          role: formData.email === 'admin@launderremedy.com' ? 'admin' : 'user',
+          bundles: []
+        };
+        
+        // Store user in Redux with login state
+        dispatch(setUser({ user: userData, isLogin: true, token: 'mock-token-123' }));
+        setIsLoading(false);
       } else {
         setErrorMessage('Please fill in all required fields');
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }, 1500);
   };
 

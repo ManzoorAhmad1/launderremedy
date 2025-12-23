@@ -9,11 +9,32 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist'
-import storage from 'redux-persist/lib/storage' // uses localStorage
+import createWebStorage from 'redux-persist/lib/storage/createWebStorage'
 
 import userReducer from './features/userSlice'
 import orderReducer from './features/orderSlice'
 import themeReducer from './features/themeSlice'
+
+// Create a noop storage for SSR
+const createNoopStorage = () => {
+  return {
+    getItem(_key: string) {
+      return Promise.resolve(null)
+    },
+    setItem(_key: string, value: any) {
+      return Promise.resolve(value)
+    },
+    removeItem(_key: string) {
+      return Promise.resolve()
+    },
+  }
+}
+
+// Use noop storage during SSR, real storage on client
+const storage =
+  typeof window !== 'undefined'
+    ? createWebStorage('local')
+    : createNoopStorage()
 
 // 1️⃣ Combine reducers
 const rootReducer = combineReducers({

@@ -38,8 +38,7 @@ export interface User {
   updatedAt?: string;
 }
 
-const userApi = {
-  // Update user profile
+const userApi:any = {
   updateProfile: async (payload: UpdateProfilePayload) => {
     return await apiClient.put('/user/v1/update-profile', payload);
   },

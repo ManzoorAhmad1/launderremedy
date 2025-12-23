@@ -14,6 +14,13 @@ export interface MockService {
   updated_at: string;
   total_orders: number;
   prepaidTotalItems?: number;
+  subcategories?: any[];
+  priceList?: Array<{
+    title: string;
+    price: number;
+    description?: string;
+    subCategory?: any[];
+  }>;
 }
 
 export const mockServices: MockService[] = [

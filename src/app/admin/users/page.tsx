@@ -5,11 +5,11 @@ import { Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/tables/DataTable";
 import { getUserColumns } from "@/components/tables/columns/userColumns";
-import adminService from "@/services/admin.service";
-import { userApi } from "@/api";
+import { orderApi, userApi } from "@/api";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import UserViewModal from "@/components/admin/UserViewModal";
 import toast from "react-hot-toast";
+import adminService from "@/services/admin.service";
 
 // Local User interface matching backend
 interface User {
@@ -45,14 +45,43 @@ export default function UsersPage() {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      // Note: Backend getAllUsers API is not implemented yet, using mock data
-      const response = await adminService.users.getAll(1, 100);
-      const usersData = response.data.map((u: any) => ({
-        ...u,
-        role: u.role || u.type || 'user',
-        created_at: u.created_at || u.createdAt || new Date().toISOString(),
-      }));
+      
+      // Get all orders to extract unique users (since backend getAllUsers API is not implemented)
+      const response = await orderApi.getAllOrders({ page: 1, itemPerPage: 10000 });
+      const ordersData = response?.data?.items || response?.data || [];
+      
+      // Extract unique users from orders
+      const userMap = new Map<string, User>();
+      
+      ordersData.forEach((order: any) => {
+        const userId = order.user_id || order.email;
+        if (!userMap.has(userId)) {
+          userMap.set(userId, {
+            _id: order.user_id || order._id,
+            first_name: order.first_name,
+            last_name: order.last_name,
+            email: order.email,
+            phone_number: order.phone_number || 'N/A',
+            role: order.user_type || 'user',
+            status: 'active',
+            created_at: order.createdAt || order.created_at || new Date().toISOString(),
+            total_orders: 0,
+            total_spent: 0,
+          });
+        }
+        
+        // Update order count and total spent
+        const user = userMap.get(userId)!;
+        user.total_orders = (user.total_orders || 0) + 1;
+        user.total_spent = (user.total_spent || 0) + (order.totalPrice || 0);
+      });
+      
+      const usersData = Array.from(userMap.values());
       setUsers(usersData);
+      
+      if (usersData.length === 0) {
+        toast.error("No users found. Users will appear when orders are placed.");
+      }
     } catch (error) {
       toast.error("Failed to load users");
       console.error(error);

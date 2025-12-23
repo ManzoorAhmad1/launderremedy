@@ -282,6 +282,7 @@ export default function ServicesPage() {
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
         service={selectedService as any}
+        onUpdate={loadServices}
       />
     </div>
   );

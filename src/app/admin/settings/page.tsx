@@ -1,20 +1,92 @@
 "use client";
 
-import React, { useState } from "react";
-import { Save, Bell, Clock, MapPin, CreditCard, Shield } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Save, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
+import { userApi } from "@/api";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [profileData, setProfileData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+  });
+  
+  const user = useSelector((state: RootState) => state.user.user);
 
-  const handleSave = async () => {
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        first_name: user.first_name || "",
+        last_name: user.last_name || "",
+        email: user.email || "",
+        phone_number: user.phone_number || "",
+      });
+    }
+  }, [user]);
+
+  const handlePasswordChange = async () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword) {
+      toast.error("Please fill all password fields");
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
     setSaving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    toast.success("Settings saved successfully");
-    setSaving(false);
+    try {
+      await userApi.changePassword({
+        oldPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+      
+      toast.success("Password updated successfully");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update password");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleProfileUpdate = async () => {
+    if (!profileData.first_name || !profileData.email) {
+      toast.error("Please fill required fields");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await userApi.updateProfile(profileData);
+      toast.success("Profile updated successfully");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -24,29 +96,25 @@ export default function SettingsPage() {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Settings</h1>
           <p className="text-muted-foreground mt-1">
-            Manage your admin panel and system preferences
+            Manage your admin profile and preferences
           </p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="gap-2">
-          <Save className="h-4 w-4" />
-          {saving ? "Saving..." : "Save Changes"}
-        </Button>
       </div>
 
       {/* Settings Sections */}
       <div className="space-y-6">
-        {/* General Settings */}
+        {/* Admin Profile Settings */}
         <div className="bg-card rounded-lg border border-border p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/50">
-              <Shield className="h-5 w-5 text-primary-700 dark:text-primary-300" />
+              <User className="h-5 w-5 text-primary-700 dark:text-primary-300" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">
-                General Settings
+                Admin Profile
               </h2>
               <p className="text-sm text-muted-foreground">
-                Basic configuration for your platform
+                Update your personal information
               </p>
             </div>
           </div>
@@ -54,192 +122,111 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  Business Name
+                  First Name <span className="text-red-500">*</span>
                 </label>
-                <Input defaultValue="Launder Remedy" />
+                <Input 
+                  value={profileData.first_name}
+                  onChange={(e) => setProfileData({...profileData, first_name: e.target.value})}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  Support Email
+                  Last Name
                 </label>
-                <Input defaultValue="support@launderremedy.com" type="email" />
+                <Input 
+                  value={profileData.last_name}
+                  onChange={(e) => setProfileData({...profileData, last_name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <Input 
+                  type="email"
+                  value={profileData.email}
+                  onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                  disabled
+                  className="bg-muted cursor-not-allowed"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
                   Phone Number
                 </label>
-                <Input defaultValue="+44 7700 900100" type="tel" />
+                <Input 
+                  type="tel"
+                  value={profileData.phone_number}
+                  onChange={(e) => setProfileData({...profileData, phone_number: e.target.value})}
+                />
               </div>
-              <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">
-                  Currency
-                </label>
-                <select className="w-full h-10 px-3 rounded-lg border border-input bg-background text-sm">
-                  <option value="GBP">GBP (£)</option>
-                  <option value="USD">USD ($)</option>
-                  <option value="EUR">EUR (€)</option>
-                </select>
-              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={handleProfileUpdate} disabled={saving} className="gap-2">
+                <Save className="h-4 w-4" />
+                {saving ? "Updating..." : "Update Profile"}
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Time Slot Settings */}
+        {/* Change Password Section */}
         <div className="bg-card rounded-lg border border-border p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50">
-              <Clock className="h-5 w-5 text-blue-700 dark:text-blue-300" />
+            <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/50">
+              <Lock className="h-5 w-5 text-red-700 dark:text-red-300" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">
-                Time Slot Configuration
+                Change Password
               </h2>
               <p className="text-sm text-muted-foreground">
-                Manage collection and delivery time slots
+                Update your password to keep your account secure
               </p>
             </div>
           </div>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="md:col-span-2">
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  Collection Start Time
+                  Current Password <span className="text-red-500">*</span>
                 </label>
-                <Input type="time" defaultValue="08:00" />
+                <Input 
+                  type="password"
+                  placeholder="Enter current password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  Collection End Time
+                  New Password <span className="text-red-500">*</span>
                 </label>
-                <Input type="time" defaultValue="20:00" />
+                <Input 
+                  type="password"
+                  placeholder="Enter new password (min 6 characters)"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  Delivery Start Time
+                  Confirm New Password <span className="text-red-500">*</span>
                 </label>
-                <Input type="time" defaultValue="09:00" />
+                <Input 
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                />
               </div>
-              <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">
-                  Delivery End Time
-                </label>
-                <Input type="time" defaultValue="21:00" />
-              </div>
             </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                Slot Duration (minutes)
-              </label>
-              <Input type="number" defaultValue="120" min="30" step="30" />
-            </div>
-          </div>
-        </div>
-
-        {/* Service Area Settings */}
-        <div className="bg-card rounded-lg border border-border p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50">
-              <MapPin className="h-5 w-5 text-green-700 dark:text-green-300" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">
-                Service Area
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Define your service coverage area
-              </p>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                Primary Location
-              </label>
-              <Input defaultValue="London, UK" />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                Service Radius (km)
-              </label>
-              <Input type="number" defaultValue="15" min="1" />
-            </div>
-          </div>
-        </div>
-
-        {/* Payment Settings */}
-        <div className="bg-card rounded-lg border border-border p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/50">
-              <CreditCard className="h-5 w-5 text-purple-700 dark:text-purple-300" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">
-                Payment Configuration
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Manage payment methods and processing
-              </p>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                Stripe Publishable Key
-              </label>
-              <Input
-                type="password"
-                defaultValue="pk_test_••••••••••••••••"
-                placeholder="pk_test_..."
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                Minimum Order Amount (£)
-              </label>
-              <Input type="number" defaultValue="10.00" min="0" step="0.01" />
-            </div>
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="enableCash" defaultChecked className="rounded" />
-              <label htmlFor="enableCash" className="text-sm font-medium text-foreground">
-                Enable cash payment option
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Notification Settings */}
-        <div className="bg-card rounded-lg border border-border p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/50">
-              <Bell className="h-5 w-5 text-orange-700 dark:text-orange-300" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">
-                Notifications
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Configure notification preferences
-              </p>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="emailOrders" defaultChecked className="rounded" />
-              <label htmlFor="emailOrders" className="text-sm font-medium text-foreground">
-                Email notifications for new orders
-              </label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="emailPayments" defaultChecked className="rounded" />
-              <label htmlFor="emailPayments" className="text-sm font-medium text-foreground">
-                Email notifications for payments
-              </label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="emailUsers" defaultChecked className="rounded" />
-              <label htmlFor="emailUsers" className="text-sm font-medium text-foreground">
-                Email notifications for new user registrations
-              </label>
+            <div className="flex justify-end">
+              <Button onClick={handlePasswordChange} disabled={saving} className="gap-2 bg-red-600 hover:bg-red-700">
+                <Lock className="h-4 w-4" />
+                {saving ? "Updating..." : "Change Password"}
+              </Button>
             </div>
           </div>
         </div>

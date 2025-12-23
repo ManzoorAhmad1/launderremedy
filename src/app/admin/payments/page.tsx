@@ -4,14 +4,31 @@ import React, { useEffect, useState } from "react";
 import { Loader2, DollarSign, CheckCircle, Clock, XCircle } from "lucide-react";
 import { DataTable } from "@/components/tables/DataTable";
 import { getPaymentColumns } from "@/components/tables/columns/paymentColumns";
-import { MockPayment } from "@/lib/mockData/payments";
-import adminService from "@/services/admin.service";
-import StatCard from "@/components/admin/StatCard";import PaymentViewModal from "@/components/admin/PaymentViewModal";import toast from "react-hot-toast";
+import { orderApi } from "@/api";
+import StatCard from "@/components/admin/StatCard";
+import PaymentViewModal from "@/components/admin/PaymentViewModal";
+import toast from "react-hot-toast";
+
+// Payment interface matching order payment data
+interface Payment {
+  _id: string;
+  transaction_id: string;
+  order_id: string;
+  order_number?: string;
+  user_id?: string;
+  user_name?: string;
+  user_email?: string;
+  amount: number;
+  payment_status: "success" | "pending" | "failed" | "refunded";
+  payment_method: string;
+  created_at: string;
+  [key: string]: any;
+}
 
 export default function PaymentsPage() {
-  const [payments, setPayments] = useState<MockPayment[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPayment, setSelectedPayment] = useState<MockPayment | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState< null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
 
   useEffect(() => {
@@ -21,8 +38,29 @@ export default function PaymentsPage() {
   const loadPayments = async () => {
     try {
       setLoading(true);
-      const response = await adminService.payments.getAll(1, 100);
-      setPayments(response.data);
+      // Get all orders and map to payment format
+      const response = await orderApi.getAllOrders({ page: 1, itemPerPage: 1000 });
+      
+      const ordersData = response?.data?.items || response?.data || [];
+      
+      // Map orders to payment format
+      const paymentsData = ordersData
+        .filter((order: any) => order.payment_done) // Only paid orders
+        .map((order: any) => ({
+          _id: order._id,
+          transaction_id: order.stripe_payment_intent_id || order._id,
+          order_id: order._id,
+          order_number: order.orderId || order.order_number,
+          user_id: order.user_id,
+          user_name: `${order.first_name} ${order.last_name}`,
+          user_email: order.email,
+          amount: order.totalPrice || order.total_amount || 0,
+          payment_status: order.payment_done ? "success" : "pending",
+          payment_method: order.payment_method || "card",
+          created_at: order.createdAt || order.created_at,
+        }));
+      
+      setPayments(paymentsData);
     } catch (error) {
       toast.error("Failed to load payments");
       console.error(error);
@@ -31,12 +69,12 @@ export default function PaymentsPage() {
     }
   };
 
-  const handleView = (payment: MockPayment) => {
+  const handleView = (payment: any) => {
     setSelectedPayment(payment);
     setShowViewModal(true);
   };
 
-  const columns = getPaymentColumns(handleView);
+  const columns = getPaymentColumns(handleView as any);
 
   if (loading) {
     return (
@@ -118,7 +156,7 @@ export default function PaymentsPage() {
         </div>
         <DataTable
           columns={columns}
-          data={payments}
+          data={payments as any}
           searchKey="transaction_id"
           searchPlaceholder="Search by transaction ID, order, or customer..."
         />
@@ -128,7 +166,7 @@ export default function PaymentsPage() {
       <PaymentViewModal
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
-        payment={selectedPayment}
+        payment={selectedPayment as any}
       />
     </div>
   );

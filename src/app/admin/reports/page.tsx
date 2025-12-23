@@ -11,14 +11,15 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatCard from "@/components/admin/StatCard";
+import { orderApi, serviceApi } from "@/api";
 import adminService from "@/services/admin.service";
-import { mockOrders } from "@/lib/mockData/orders";
-import { mockServices } from "@/lib/mockData/services";
 import toast from "react-hot-toast";
 
 export default function ReportsPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
+  const [services, setServices] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
     loadData();
@@ -27,10 +28,44 @@ export default function ReportsPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const data = await adminService.dashboard.getStats();
-      setStats(data);
+      
+      // Fetch real data from APIs
+      const [ordersCountRes, servicesRes, allOrdersRes, usersData] = await Promise.all([
+        orderApi.getOrdersCount(),
+        serviceApi.getAllServices(),
+        orderApi.getAllOrders({ page: 1, itemPerPage: 1000 }),
+        adminService.users.getAll(1, 1000).catch(() => ({ data: [] })),
+      ]);
+
+      const ordersData = allOrdersRes?.data?.items || allOrdersRes?.data || [];
+      const servicesData = servicesRes?.data || [];
+      
+      setOrders(ordersData);
+      setServices(servicesData);
+
+      // Calculate stats from real data
+      const totalOrders = ordersData.length;
+      const completedOrders = ordersData.filter((o: any) => o.status === "completed").length;
+      const pendingOrders = ordersData.filter((o: any) => o.status === "pending").length;
+      const processingOrders = ordersData.filter((o: any) => o.status === "processing").length;
+      const totalRevenue = ordersData
+        .filter((o: any) => o.payment_done)
+        .reduce((sum: number, o: any) => sum + (o.totalPrice || 0), 0);
+      
+      const calculatedStats = {
+        totalRevenue,
+        totalOrders,
+        totalUsers: usersData?.data?.length || 0,
+        activeServices: servicesData.filter((s: any) => s.status === "active").length,
+        completedOrders,
+        pendingOrders,
+        processingOrders,
+      };
+      
+      setStats(calculatedStats);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to load reports data");
     } finally {
       setLoading(false);
     }
@@ -40,25 +75,34 @@ export default function ReportsPage() {
     toast.success(`Exporting ${type} report... (Feature coming soon)`);
   };
 
-  // Calculate service popularity
-  const serviceStats = mockServices
-    .map((service) => ({
+  // Calculate service popularity from real data
+  const serviceStats = services
+    .map((service: any) => ({
       name: service.title,
-      orders: service.total_orders,
-      revenue: service.price * service.total_orders,
+      orders: service.total_orders || 0,
+      revenue: (service.priceList?.[0]?.price || service.price || 0) * (service.total_orders || 0),
     }))
     .sort((a, b) => b.orders - a.orders)
     .slice(0, 5);
 
-  // Calculate monthly revenue (mock data)
-  const monthlyRevenue = [
-    { month: "Jan", revenue: 12500 },
-    { month: "Feb", revenue: 15200 },
-    { month: "Mar", revenue: 18900 },
-    { month: "Apr", revenue: 21400 },
-    { month: "May", revenue: 23800 },
-    { month: "Jun", revenue: 26500 },
-  ];
+  // Calculate monthly revenue from real orders
+  const monthlyRevenue = React.useMemo(() => {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const revenueByMonth: { [key: string]: number } = {};
+    
+    orders.forEach((order: any) => {
+      if (order.payment_done && order.createdAt) {
+        const date = new Date(order.createdAt);
+        const monthKey = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+        revenueByMonth[monthKey] = (revenueByMonth[monthKey] || 0) + (order.totalPrice || 0);
+      }
+    });
+    
+    // Get last 6 months
+    return Object.entries(revenueByMonth)
+      .map(([month, revenue]) => ({ month: month.split(' ')[0], revenue }))
+      .slice(-6);
+  }, [orders]);
 
   if (loading) {
     return (
@@ -134,25 +178,32 @@ export default function ReportsPage() {
             <TrendingUp className="h-5 w-5 text-green-600" />
           </div>
           <div className="space-y-4">
-            {monthlyRevenue.map((item, index) => (
-              <div key={index} className="flex items-center gap-4">
-                <div className="w-12 text-sm font-medium text-muted-foreground">
-                  {item.month}
-                </div>
-                <div className="flex-1">
-                  <div className="h-8 bg-muted rounded-lg overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-primary-500 to-primary-700 flex items-center justify-end pr-3 text-white text-sm font-medium"
-                      style={{
-                        width: `${(item.revenue / 30000) * 100}%`,
-                      }}
-                    >
-                      £{item.revenue.toLocaleString()}
+            {monthlyRevenue.length > 0 ? monthlyRevenue.map((item, index) => {
+              const maxRevenue = Math.max(...monthlyRevenue.map(m => m.revenue), 1);
+              return (
+                <div key={index} className="flex items-center gap-4">
+                  <div className="w-12 text-sm font-medium text-muted-foreground">
+                    {item.month}
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-8 bg-muted rounded-lg overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary-500 to-primary-700 flex items-center justify-end pr-3 text-white text-sm font-medium"
+                        style={{
+                          width: `${Math.max((item.revenue / maxRevenue) * 100, 5)}%`,
+                        }}
+                      >
+                        £{item.revenue.toLocaleString()}
+                      </div>
                     </div>
                   </div>
                 </div>
+              );
+            }) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No revenue data available
               </div>
-            ))}
+            )}
           </div>
         </div>
 

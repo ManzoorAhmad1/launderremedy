@@ -18,6 +18,14 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor - Add auth token to every request
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Debug logging
+    console.log('API Request:', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      baseURL: config.baseURL,
+      fullURL: `${config.baseURL}${config.url}`,
+    });
+
     const token = getCookie('user_token');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -25,6 +33,7 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error: AxiosError) => {
+    console.error('Request Interceptor Error:', error);
     return Promise.reject(error);
   }
 );
@@ -36,8 +45,34 @@ apiClient.interceptors.response.use(
     return response.data;
   },
   (error: AxiosError<any>) => {
+    // Log detailed error for debugging
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+    });
+
     if (error.response) {
       const { status, data } = error.response;
+      
+      // Extract error message from various backend response formats
+      let errorMessage = 'An error occurred';
+      
+      // Backend format: { success: false, message: "...", code: 400 }
+      if (data?.message) {
+        errorMessage = data.message;
+      }
+      // Backend format: "Error message:statusCode"
+      else if (typeof data === 'string' && data.includes(':')) {
+        const [message] = data.split(':');
+        errorMessage = message;
+      }
+      // Plain string response
+      else if (typeof data === 'string') {
+        errorMessage = data;
+      }
 
       // Handle 401 Unauthorized - Session expired
       if (status === 401) {
@@ -49,45 +84,55 @@ apiClient.interceptors.response.use(
           if (typeof window !== 'undefined') {
             window.location.href = '/login';
           }
+        } else {
+          toast.error(errorMessage || 'Authentication required');
         }
       }
 
       // Handle 403 Forbidden - No permission
-      if (status === 403) {
-        toast.error('You do not have permission to access this resource.');
+      else if (status === 403) {
+        toast.error(errorMessage || 'You do not have permission to access this resource.');
       }
 
       // Handle 404 Not Found
-      if (status === 404) {
-        console.error('Resource not found:', error.config?.url);
-        toast.error('Resource not found');
+      else if (status === 404) {
+        console.error('404 Not Found:', {
+          url: error.config?.url,
+          baseURL: error.config?.baseURL,
+          fullURL: `${error.config?.baseURL}${error.config?.url}`,
+        });
+        toast.error(errorMessage || `Resource not found: ${error.config?.url || 'Unknown URL'}`);
       }
 
       // Handle 409 Conflict (duplicate data, etc)
-      if (status === 409) {
-        const message = data?.message || 'Conflict error occurred';
-        toast.error(message);
+      else if (status === 409) {
+        toast.error(errorMessage || 'Conflict error occurred');
       }
 
-      // Handle 500 Internal Server Error
-      if (status >= 500) {
-        toast.error('Server error. Please try again later.');
+      // Handle 400 Bad Request
+      else if (status === 400) {
+        toast.error(errorMessage || 'Invalid request data');
       }
 
-      // Parse backend error message format (Error:statusCode)
-      if (typeof data === 'string' && data.includes(':')) {
-        const [message, code] = data.split(':');
-        return Promise.reject({
-          success: false,
-          message,
-          code: parseInt(code) || status,
-        });
+      // Handle 422 Unprocessable Entity
+      else if (status === 422) {
+        toast.error(errorMessage || 'Validation error');
       }
 
-      // Return error data
+      // Handle 500+ Server Errors
+      else if (status >= 500) {
+        toast.error(errorMessage || 'Server error. Please try again later.');
+      }
+
+      // Any other status code
+      else {
+        toast.error(errorMessage);
+      }
+
+      // Return structured error
       return Promise.reject({
         success: false,
-        message: data?.message || 'An error occurred',
+        message: errorMessage,
         code: status,
         data: data,
       });
@@ -95,15 +140,22 @@ apiClient.interceptors.response.use(
 
     // Network error - No response from server
     if (error.request) {
-      toast.error('Network error. Please check your internet connection.');
+      console.error('Network Error:', {
+        baseURL: error.config?.baseURL,
+        url: error.config?.url,
+        message: error.message,
+      });
+      toast.error('Cannot connect to server. Please check if the backend is running.');
       return Promise.reject({
         success: false,
-        message: 'Network error. Please check your internet connection.',
+        message: 'Cannot connect to server. Please check if the backend is running.',
         code: 0,
       });
     }
 
     // Something else happened
+    console.error('Unexpected Error:', error.message);
+    toast.error(error.message || 'An unexpected error occurred');
     return Promise.reject({
       success: false,
       message: error.message || 'An unexpected error occurred',

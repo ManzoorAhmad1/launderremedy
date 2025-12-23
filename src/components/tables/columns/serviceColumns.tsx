@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MockService } from "@/lib/mockData/services";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2, Eye, ChevronRight } from "lucide-react";
 
 export const getServiceColumns = (
   onEdit: (service: MockService) => void,
@@ -16,7 +16,16 @@ export const getServiceColumns = (
     header: "Service Name",
     cell: ({ row }) => {
       const title = row.getValue("title") as string;
-      return <span className="font-medium">{title}</span>;
+      const service = row.original;
+      return (
+        <div 
+          className="flex items-center gap-2 cursor-pointer hover:text-primary-600 transition-colors group"
+          onClick={() => onView(service)}
+        >
+          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary-600" />
+          <span className="font-medium">{title}</span>
+        </div>
+      );
     },
   },
   {

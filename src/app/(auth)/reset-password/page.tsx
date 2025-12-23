@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { authApi } from "@/api";
+import toast from "react-hot-toast";
 import { 
   Lock, 
   Eye, 
@@ -16,8 +18,11 @@ import {
   Sparkles
 } from "lucide-react";
 
-const ResetPasswordPage = () => {
+const ResetPasswordForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token'); // Get reset token from URL
+  
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: ''
@@ -55,29 +60,51 @@ const ResetPasswordPage = () => {
     setSuccessMessage('');
     
     // Validation
+    if (!token) {
+      setErrorMessage('Invalid or expired reset link');
+      toast.error('Invalid or expired reset link');
+      setIsLoading(false);
+      return;
+    }
+    
     if (formData.password !== formData.confirmPassword) {
       setErrorMessage('Passwords do not match');
+      toast.error('Passwords do not match');
       setIsLoading(false);
       return;
     }
     
     if (passwordStrength < 75) {
       setErrorMessage('Please use a stronger password');
+      toast.error('Please use a stronger password');
       setIsLoading(false);
       return;
     }
     
-    // Simulate API call
-    setTimeout(() => {
-      setSuccessMessage('Password reset successfully! Redirecting to login...');
-      
-      // Redirect after success
-      setTimeout(() => {
-        router.push('/login');
-      }, 2000);
-      
+    try {
+      // Call real backend API
+      const response:any = await authApi.resetPassword({
+        token: token,
+        newPassword: formData.password,
+      });
+
+      if (response.success) {
+        setSuccessMessage('Password reset successfully! Redirecting to login...');
+        toast.success('Password reset successful!');
+        
+        // Redirect to login after success
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      }
+    } catch (error: any) {
+      console.error('Reset password error:', error);
+      const errorMsg = error?.message || 'Failed to reset password. Please try again.';
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -451,6 +478,21 @@ const ResetPasswordPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const ResetPasswordPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br mt-16 from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 };
 

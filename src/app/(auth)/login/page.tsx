@@ -7,6 +7,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/lib/features/userSlice";
+import { authApi } from "@/api";
+import { setCookie } from "@/utils/helpers";
+import toast from "react-hot-toast";
 import { 
   Mail, 
   Lock, 
@@ -49,30 +52,48 @@ const LoginPage = () => {
     setErrorMessage('');
     setSuccessMessage('');
     
-    // Simulate API call
-    setTimeout(() => {
-      if (formData.email && formData.password) {
-        setSuccessMessage('Login successful!');
+    try {
+      // Call real backend API
+      const response = await authApi.login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.success && response.token) {
+        setSuccessMessage('Login successful! Redirecting...');
         
-        // Create mock user data
-        const userData = {
-          _id: formData.email === 'admin@launderremedy.com' ? 'admin1' : 'user1',
-          email: formData.email,
-          first_name: formData.email === 'admin@launderremedy.com' ? 'Admin' : 'User',
-          last_name: formData.email === 'admin@launderremedy.com' ? 'User' : 'Name',
-          phone_number: '+44 7700 900100',
-          role: formData.email === 'admin@launderremedy.com' ? 'admin' : 'user',
-          bundles: []
-        };
+        // Store token in cookie
+        setCookie('user_token', response.token, formData.rememberMe ? 30 : 1);
         
-        // Store user in Redux with login state
-        dispatch(setUser({ user: userData, isLogin: true, token: 'mock-token-123' }));
-        setIsLoading(false);
-      } else {
-        setErrorMessage('Please fill in all required fields');
-        setIsLoading(false);
+        // Store user data in cookie
+        setCookie('user', JSON.stringify(response.user), formData.rememberMe ? 30 : 1);
+        
+        // Store user in Redux
+        dispatch(setUser({ 
+          user: response.user, 
+          isLogin: true, 
+          token: response.token 
+        }));
+
+        toast.success('Welcome back!');
+        
+        // Redirect based on user type
+        setTimeout(() => {
+          if (response.user.type === 'admin') {
+            router.push('/admin/dashboard');
+          } else {
+            router.push('/');
+          }
+        }, 1000);
       }
-    }, 1500);
+    } catch (error: any) {
+      console.error('Login error:', error);
+      const errorMsg = error?.message || 'Login failed. Please check your credentials.';
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

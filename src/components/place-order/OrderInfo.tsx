@@ -296,7 +296,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                           {service.title}
                         </p>
                         <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                          £{service.price.toFixed(2)} each
+                          £{Number(service.price).toFixed(2)} each
                         </p>
                       </div>
 

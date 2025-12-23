@@ -68,7 +68,7 @@ export default function ServiceViewModal({
               <DollarSign className="h-5 w-5 text-green-600 mt-0.5" />
               <div>
                 <p className="text-xs font-medium text-muted-foreground">Price</p>
-                <p className="text-sm font-semibold text-foreground">£{service.price.toFixed(2)}</p>
+                <p className="text-sm font-semibold text-foreground">£{Number(service.price).toFixed(2)}</p>
               </div>
             </div>
 

@@ -12,8 +12,8 @@ import {
   AlertCircle,
 } from "lucide-react";
 import StatCard from "@/components/admin/StatCard";
-import adminService from "@/services/admin.service";
-import { mockOrders } from "@/lib/mockData/orders";
+import { orderApi, serviceApi } from "@/api";
+import toast from "react-hot-toast";
 
 interface DashboardStats {
   totalUsers: number;
@@ -23,26 +23,54 @@ interface DashboardStats {
   pendingOrders: number;
   processingOrders: number;
   completedOrders: number;
-  pendingPayments: number;
-  successPayments: number;
-  failedPayments: number;
+  deliveredOrders: number;
+  cancelledOrders: number;
 }
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
   useEffect(() => {
-    loadStats();
+    loadDashboardData();
   }, []);
 
-  const loadStats = async () => {
+  const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const data = await adminService.dashboard.getStats();
-      setStats(data);
-    } catch (error) {
-      console.error("Failed to load stats:", error);
+      
+      // Fetch orders count by status
+      const ordersCountResponse = await orderApi.getOrdersCount();
+      
+      // Fetch services to get active count
+      const servicesResponse = await serviceApi.getAllServices();
+      
+      // Fetch recent orders
+      const recentOrdersResponse = await orderApi.getAllOrders({
+        page: 1,
+        itemPerPage: 5,
+      });
+
+      // Calculate stats from orders count
+      const ordersData = ordersCountResponse?.data || [];
+      const statsData: DashboardStats = {
+        totalUsers: 0, // Would need separate users API endpoint
+        totalOrders: ordersData.reduce((sum: number, item: any) => sum + item.count, 0),
+        totalRevenue: 0, // Would need separate revenue calculation
+        activeServices: servicesResponse?.data?.length || 0,
+        pendingOrders: ordersData.find((item: any) => item.status === 'pending')?.count || 0,
+        processingOrders: ordersData.find((item: any) => item.status === 'processing')?.count || 0,
+        completedOrders: ordersData.find((item: any) => item.status === 'completed')?.count || 0,
+        deliveredOrders: ordersData.find((item: any) => item.status === 'delivered')?.count || 0,
+        cancelledOrders: ordersData.find((item: any) => item.status === 'cancelled')?.count || 0,
+      };
+
+      setStats(statsData);
+      setRecentOrders(recentOrdersResponse?.data?.items || []);
+    } catch (error: any) {
+      console.error("Failed to load dashboard data:", error);
+      toast.error(error?.message || "Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -105,42 +133,6 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Secondary Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Pending Orders"
-          value={stats?.pendingOrders || 0}
-          icon={Clock}
-          description="Awaiting collection"
-          iconColor="text-yellow-700 dark:text-yellow-300"
-          iconBgColor="bg-yellow-100 dark:bg-yellow-900/50"
-        />
-        <StatCard
-          title="Processing"
-          value={stats?.processingOrders || 0}
-          icon={TrendingUp}
-          description="In progress"
-          iconColor="text-indigo-700 dark:text-indigo-300"
-          iconBgColor="bg-indigo-100 dark:bg-indigo-900/50"
-        />
-        <StatCard
-          title="Completed"
-          value={stats?.completedOrders || 0}
-          icon={CheckCircle}
-          description="Successfully delivered"
-          iconColor="text-teal-700 dark:text-teal-300"
-          iconBgColor="bg-teal-100 dark:bg-teal-900/50"
-        />
-        <StatCard
-          title="Failed Payments"
-          value={stats?.failedPayments || 0}
-          icon={AlertCircle}
-          description="Requires attention"
-          iconColor="text-red-700 dark:text-red-300"
-          iconBgColor="bg-red-100 dark:bg-red-900/50"
-        />
-      </div>
-
       {/* Recent Orders Section */}
       <div className="bg-card rounded-lg border border-border p-3 sm:p-4 md:p-6">
         <div className="flex items-center justify-between mb-4 md:mb-6">
@@ -152,73 +144,82 @@ export default function AdminDashboard() {
             View all →
           </a>
         </div>
-        <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6">
-          <div className="inline-block min-w-full align-middle">
-            <table className="min-w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4">
-                    Order
-                  </th>
-                  <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4 hidden sm:table-cell">
-                    Customer
-                  </th>
-                  <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4">
-                    Status
-                  </th>
-                  <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4">
-                    Amount
-                  </th>
-                  <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4 hidden md:table-cell">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockOrders.slice(0, 5).map((order) => (
-                  <tr key={order._id} className="border-b border-border hover:bg-muted/50">
-                    <td className="py-3 px-3 sm:px-4">
-                      <div className="text-xs sm:text-sm font-medium text-foreground">
-                        {order.order_number}
-                      </div>
-                      <div className="text-xs text-muted-foreground sm:hidden mt-0.5">
-                        {order.user_name}
-                      </div>
-                    </td>
-                    <td className="py-3 px-3 sm:px-4 text-xs sm:text-sm text-muted-foreground hidden sm:table-cell">
-                      {order.user_name}
-                    </td>
-                    <td className="py-3 px-3 sm:px-4">
-                      <span
-                        className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] xs:text-xs font-medium whitespace-nowrap
-                          ${
-                            order.status === "completed"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
-                              : order.status === "processing"
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
-                              : order.status === "pending"
-                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
-                              : order.status === "cancelled"
-                              ? "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300"
-                              : "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300"
-                          }
-                        `}
-                      >
-                        {order.status.replace("_", " ")}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-foreground whitespace-nowrap">
-                      £{order.total_amount.toFixed(2)}
-                    </td>
-                    <td className="py-3 px-3 sm:px-4 text-xs sm:text-sm text-muted-foreground hidden md:table-cell">
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        
+        {recentOrders.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No recent orders found
           </div>
-        </div>
+        ) : (
+          <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6">
+            <div className="inline-block min-w-full align-middle">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4">
+                      Order
+                    </th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4 hidden sm:table-cell">
+                      Customer
+                    </th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4">
+                      Status
+                    </th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4">
+                      Amount
+                    </th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-3 sm:px-4 hidden md:table-cell">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentOrders.map((order) => (
+                    <tr key={order._id} className="border-b border-border hover:bg-muted/50">
+                      <td className="py-3 px-3 sm:px-4">
+                        <div className="text-xs sm:text-sm font-medium text-foreground">
+                          #{order.orderId || order._id?.slice(-6)}
+                        </div>
+                        <div className="text-xs text-muted-foreground sm:hidden mt-0.5">
+                          {order.first_name} {order.last_name}
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 sm:px-4 text-xs sm:text-sm text-muted-foreground hidden sm:table-cell">
+                        {order.first_name} {order.last_name}
+                      </td>
+                      <td className="py-3 px-3 sm:px-4">
+                        <span
+                          className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] xs:text-xs font-medium whitespace-nowrap
+                            ${
+                              order.status === "completed"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
+                                : order.status === "processing"
+                                ? "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
+                                : order.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
+                                : order.status === "cancelled"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300"
+                                : order.status === "delivered"
+                                ? "bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-300"
+                                : "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300"
+                            }
+                          `}
+                        >
+                          {order.status.replace("_", " ")}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-foreground whitespace-nowrap">
+                        £{(order.totalPrice || 0).toFixed(2)}
+                      </td>
+                      <td className="py-3 px-3 sm:px-4 text-xs sm:text-sm text-muted-foreground hidden md:table-cell">
+                        {new Date(order.createdAt || order.created_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

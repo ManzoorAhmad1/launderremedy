@@ -36,7 +36,8 @@ import ContactInfoForm from "@/components/place-order/ContactInfoForm";
 import PaymentForm from "@/components/place-order/PaymentForm";
 import OrderInfo from "@/components/place-order/OrderInfo";
 import FindAddress from "@/components/place-order/FindAddress";
-import orderService from "@/services/order.service";
+import { orderApi, paymentApi } from "@/api";
+import { getCookie } from "@/utils/helpers";
 import toast from "react-hot-toast";
 import { CardNumberElement } from "@stripe/react-stripe-js";
 
@@ -122,6 +123,25 @@ export default function PlaceOrderPage() {
   }, [dispatch]);
 
   const handleNext = async () => {
+    // Check if user is logged in before proceeding to payment
+    if (step === 4) {
+      const token = getCookie('user_token');
+      if (!token || !user || !user._id) {
+        toast.error('Please login or signup to continue', {
+          duration: 4000,
+          icon: '🔐',
+        });
+        // Save current order data to localStorage
+        localStorage.setItem('pending_order', JSON.stringify({
+          orderDetail,
+          selectedServicesList,
+          step: 4
+        }));
+        router.push('/login?redirect=/place-order');
+        return;
+      }
+    }
+    
     if (step === 5) {
       await handlePaymentAndCreateOrder();
     } else if (step < 6) {
@@ -134,6 +154,13 @@ export default function PlaceOrderPage() {
 
   const handlePaymentAndCreateOrder = async () => {
     try {
+      // Recheck user login
+      if (!user || !user._id) {
+        toast.error('Please login to complete your order');
+        router.push('/login?redirect=/place-order');
+        return;
+      }
+
       // Validate services selected
       if (!selectedServicesList || selectedServicesList.length === 0) {
         toast.error('Please select at least one service');
@@ -141,7 +168,7 @@ export default function PlaceOrderPage() {
       }
 
       // Create payment token
-      let paymentId = '';
+      let paymentToken = '';
       if (elements && stripe) {
         const cardElement = elements.getElement(CardNumberElement);
         if (cardElement) {
@@ -152,11 +179,11 @@ export default function PlaceOrderPage() {
             toast.error(error.message || 'Payment failed');
             return;
           }
-          paymentId = token.id;
+          paymentToken = token.id;
         }
       }
 
-      if (!paymentId) {
+      if (!paymentToken) {
         toast.error('Please enter valid payment details');
         return;
       }
@@ -197,7 +224,7 @@ export default function PlaceOrderPage() {
               id: service._id,
               title: service.title,
               description: service.description,
-              orderId: "21"
+              orderId: "pending"
             });
           }
         });
@@ -211,74 +238,85 @@ export default function PlaceOrderPage() {
         totalPrice,
         orderPrice: totalPrice,
         serviceFee,
-        payment_id: paymentId,
         bundles: prepaidBundles,
         payment_done: false,
         address: orderDetail?.address,
+        postcode: orderDetail?.address?.postal_code || orderDetail?.postcode || '',
         frequency: orderDetail?.frequency?.toLowerCase() || 'just once',
-        collection_date: orderDetail?.collection_day?.value?.trim(),
-        collection_time: orderDetail?.collection_time?.value?.trim(),
-        delivery_date: orderDetail?.delivery_day?.value?.trim(),
-        delivery_time: orderDetail?.delivery_time?.value?.trim(),
-        driver_instructions_collection_time: orderDetail?.driver_instructions_collection_time?.value?.trim() || '',
-        driver_instructions_delivery_time: orderDetail?.driver_instructions_delivery_time?.value?.trim() || '',
-        phone_number: orderDetail?.phone || '',
+        collection_date: orderDetail?.collection_day?.timestamp || orderDetail?.collection_day?.value?.trim(),
+        collection_time: orderDetail?.collection_time?.start || orderDetail?.collection_time?.value?.trim(),
+        delivery_date: orderDetail?.delivery_day?.timestamp || orderDetail?.delivery_day?.value?.trim(),
+        delivery_time: orderDetail?.delivery_time?.start || orderDetail?.delivery_time?.value?.trim(),
+        driver_instructions_collection_time: orderDetail?.driver_instructions_collection_time || '',
+        driver_instructions_delivery_time: orderDetail?.driver_instructions_delivery_time || '',
+        phone_number: orderDetail?.phone || user?.phone_number || '',
         first_name: orderDetail?.first_name || user?.first_name || '',
         last_name: orderDetail?.last_name || user?.last_name || '',
         email: orderDetail?.email || user?.email || '',
         selected_services: selectedServicesList.map((service: any) => ({
-          title: service.title,
+          category: service.categoryTitle || service.category || 'Unknown',
+          subcategory: service.title || service.name,
+          quantity: service.quantity || 1,
           price: parseFloat(service.price),
-          description: service.description,
-          quantity: service.quantity,
-          bundleQuantity: service?.bundleQuantity,
-          id: service?._id
         })),
       };
 
-      // Create order
-      const response = await orderService.createOrder({
-        user_id: user._id,
-        ...orderData,
-      });
+      // Create order using real API
+      const response:any = await orderApi.createOrder(orderData);
 
-      if (response?.success) {
-        // Update user bundles if any prepaid items
-        const newBundles: any[] = [];
-        selectedServicesList.forEach((service: any) => {
-          if (service?.prepaidTotalItems > 0) {
-            newBundles.push({
-              prepaidTotalItems: service.prepaidTotalItems,
-              remaining: service.prepaidTotalItems,
-              perItemPrice: service.perItemPrice,
-              id: service._id,
-              title: service.title,
-              description: service.description,
-              orderId: response?.data?.orderId
+      if (response?.success && response?.data) {
+        const orderId = response.data._id || response.data.orderId;
+        
+        // Process payment if not prepaid
+        if (prepaidBundles.length === 0 || orderPrice > 0) {
+          try {
+            const paymentResponse:any = await paymentApi.createPaymentIntent({
+              amount: Math.round(totalPrice * 100), // Convert to pence
+              description: `Order payment for ${selectedServicesList.length} items`,
+              payment_method_id: paymentToken,
+              user_id: user._id,
+              id: orderId,
+              type: prepaidBundles.length > 0 ? 'prepaid' : 'payment',
             });
-          }
-        });
 
-        if (newBundles.length > 0 && user?.type !== 'admin') {
-          // Update user profile with bundles - backend handles this
+            if (!paymentResponse?.success) {
+              throw new Error('Payment processing failed');
+            }
+          } catch (paymentError: any) {
+            dispatch(setLoader(false));
+            toast.error(paymentError?.message || 'Payment failed');
+            return;
+          }
         }
 
+        // Update user in Redux if backend sent updated user
         if (response?.updatedUser) {
-          dispatch(setUser(response.updatedUser));
+          dispatch(setUser({ 
+            user: response.updatedUser, 
+            isLogin: true, 
+            token: getCookie('user_token') || '' 
+          }));
         }
 
         dispatch(setLoader(false));
         dispatch(setStep());
-        toast.success('Order placed successfully! 🎉');
+        toast.success('Order placed successfully! 🎉', {
+          duration: 4000,
+        });
+
+        // Clear pending order from localStorage
+        localStorage.removeItem('pending_order');
 
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/");
           dispatch(setStepByValue(1));
+          dispatch(clearData());
         }, 2000);
       }
     } catch (error: any) {
       dispatch(setLoader(false));
-      toast.error(error.message || 'Failed to place order');
+      const errorMsg = error?.message || 'Failed to place order';
+      toast.error(errorMsg);
       console.error('Order creation error:', error);
     }
   };

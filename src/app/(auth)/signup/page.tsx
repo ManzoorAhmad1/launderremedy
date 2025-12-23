@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { authApi } from "@/api";
+import toast from "react-hot-toast";
 import { 
   User, 
   Mail, 
@@ -20,6 +23,7 @@ import {
 } from "lucide-react";
 
 const SignupPage = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -63,28 +67,57 @@ const SignupPage = () => {
     // Validation
     if (formData.password !== formData.confirmPassword) {
       setErrorMessage('Passwords do not match');
+      toast.error('Passwords do not match');
       setIsLoading(false);
       return;
     }
     
     if (!formData.acceptTerms) {
       setErrorMessage('Please accept the terms and conditions');
+      toast.error('Please accept the terms and conditions');
       setIsLoading(false);
       return;
     }
     
     if (passwordStrength < 75) {
       setErrorMessage('Please use a stronger password');
+      toast.error('Please use a stronger password');
       setIsLoading(false);
       return;
     }
     
-    // Simulate API call
-    setTimeout(() => {
-      setSuccessMessage('Account created successfully! Redirecting to login...');
-      // In real app: router.push('/login');
+    try {
+      // Split full name into first and last name
+      const nameParts = formData.fullName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || nameParts[0] || '';
+      
+      // Call real backend API
+      const response:any = await authApi.signUp({
+        first_name: firstName,
+        last_name: lastName,
+        email: formData.email,
+        password: formData.password,
+        phone_number: formData.phone,
+      });
+
+      if (response.success) {
+        setSuccessMessage('Account created successfully! Redirecting to login...');
+        toast.success('Account created! Please login to continue.');
+        
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      }
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      const errorMsg = error?.message || 'Registration failed. Please try again.';
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg);
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

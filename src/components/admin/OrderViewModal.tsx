@@ -122,7 +122,7 @@ export default function OrderViewModal({
                     </div>
                   </div>
                   <span className="text-sm font-bold text-foreground">
-                    £{service.price.toFixed(2)}
+                    £{Number(service.price).toFixed(2)}
                   </span>
                 </div>
               ))}

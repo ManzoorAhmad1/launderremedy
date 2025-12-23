@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { authApi } from "@/api";
+import toast from "react-hot-toast";
 import { 
   Mail, 
   ArrowLeft, 
@@ -35,15 +37,28 @@ const ForgotPasswordPage = () => {
     
     if (!email) {
       setErrorMessage('Please enter your email address');
+      toast.error('Please enter your email address');
       setIsLoading(false);
       return;
     }
     
-    // Simulate API call
-    setTimeout(() => {
-      setSuccessMessage(`Reset link sent to ${email}. Please check your inbox.`);
+    try {
+      // Call real backend API
+      const response:any = await authApi.forgotPassword({ email });
+
+      if (response.success) {
+        setSuccessMessage(`Password reset instructions have been sent to ${email}. Please check your inbox.`);
+        toast.success('Reset link sent! Check your email.');
+        setEmail(''); // Clear email field
+      }
+    } catch (error: any) {
+      console.error('Forgot password error:', error);
+      const errorMsg = error?.message || 'Failed to send reset link. Please try again.';
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (

@@ -13,7 +13,7 @@ import {
   setSelectedServicesListFull,
   clearData
 } from "@/lib/features/orderSlice";
-import orderService from "@/services/order.service";
+import { serviceApi } from "@/api";
 import { useReactToPrint, UseReactToPrintOptions } from "react-to-print";
 
 // Import your images
@@ -109,8 +109,8 @@ const CategoryList = ({ state, setState }: any) => {
   const getAllServicesApi = async () => {
     setLoading(true);
     try {
-      const response = await orderService.getCategoriesList();
-      if (response?.data) {
+      const response = await serviceApi.getAllServices();
+      if (response?.data && Array.isArray(response.data)) {
         const modifiedList = response.data.map((item: any) => ({
           ...item,
           customImageUrl: getImageForTitle(item?.title),
@@ -121,8 +121,9 @@ const CategoryList = ({ state, setState }: any) => {
           setSelectedCategory(modifiedList[0]);
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching categories:', err);
+      // toast.error(err?.message || 'Failed to load services');
     } finally {
       setLoading(false);
     }

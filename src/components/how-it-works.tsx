@@ -118,7 +118,7 @@ export default function HowItWorks() {
           {/* Steps Visualization */}
           <div className="relative">
             {/* Progress Line - Hide on mobile, show on tablet+ */}
-            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-green-500 via-purple-500 to-amber-500 hidden md:block" />
+            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-amber-500 hidden md:block" />
 
             {/* Steps */}
             <div className="space-y-6 md:space-y-8">
@@ -469,12 +469,11 @@ export default function HowItWorks() {
               </div>
 
               <a
-                className="w-full mt-3 md:mt-4 text-primary group text-sm md:text-base"
+                href="/faq"
+                className="w-full mt-3 md:mt-4 text-primary group text-sm md:text-base flex items-center justify-center"
               >
-                <a href="/faq" className="flex items-center justify-center">
-                  View all FAQs
-                  <span className="ml-1 md:ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                </a>
+                View all FAQs
+                <span className="ml-1 md:ml-2 group-hover:translate-x-1 transition-transform">→</span>
               </a>
             </motion.div>
           </div>

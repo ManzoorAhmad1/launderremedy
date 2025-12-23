@@ -5,17 +5,36 @@ import { Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/tables/DataTable";
 import { getUserColumns } from "@/components/tables/columns/userColumns";
-import { MockUser } from "@/lib/mockData/users";
 import adminService from "@/services/admin.service";
+import { userApi } from "@/api";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import UserViewModal from "@/components/admin/UserViewModal";
 import toast from "react-hot-toast";
 
+// Local User interface matching backend
+interface User {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  type?: 'user' | 'admin';
+  role: 'user' | 'admin';
+  status: 'active' | 'inactive' | 'suspended';
+  bundles?: any[];
+  address?: any;
+  created_at: string;
+  createdAt?: string;
+  updatedAt?: string;
+  total_orders?: number;
+  total_spent?: number;
+}
+
 export default function UsersPage() {
-  const [users, setUsers] = useState<MockUser[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<MockUser | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
 
@@ -26,8 +45,14 @@ export default function UsersPage() {
   const loadUsers = async () => {
     try {
       setLoading(true);
+      // Note: Backend getAllUsers API is not implemented yet, using mock data
       const response = await adminService.users.getAll(1, 100);
-      setUsers(response.data);
+      const usersData = response.data.map((u: any) => ({
+        ...u,
+        role: u.role || u.type || 'user',
+        created_at: u.created_at || u.createdAt || new Date().toISOString(),
+      }));
+      setUsers(usersData);
     } catch (error) {
       toast.error("Failed to load users");
       console.error(error);
@@ -36,17 +61,17 @@ export default function UsersPage() {
     }
   };
 
-  const handleEdit = (user: MockUser) => {
+  const handleEdit = (user: User) => {
     toast.success(`Edit user: ${user.email} (Feature coming soon)`);
     // TODO: Open edit modal
   };
 
-  const handleView = (user: MockUser) => {
+  const handleView = (user: User) => {
     setSelectedUser(user);
     setShowViewModal(true);
   };
 
-  const handleDelete = (user: MockUser) => {
+  const handleDelete = (user: User) => {
     setSelectedUser(user);
     setDeleteDialogOpen(true);
   };
@@ -56,7 +81,8 @@ export default function UsersPage() {
     
     try {
       setDeleteLoading(true);
-      await adminService.users.delete(selectedUser._id);
+      // Using real API for delete
+      await userApi.deleteAccount(selectedUser._id);
       toast.success("User deleted successfully");
       loadUsers();
       setDeleteDialogOpen(false);
@@ -68,8 +94,9 @@ export default function UsersPage() {
     }
   };
 
-  const handleStatusChange = async (user: MockUser, newStatus: MockUser['status']) => {
+  const handleStatusChange = async (user: User, newStatus: User['status']) => {
     try {
+      // Using mock service for now, real API not implemented yet
       await adminService.users.update(user._id, { status: newStatus });
       toast.success(`User status updated to ${newStatus}`);
       loadUsers();
@@ -136,7 +163,7 @@ export default function UsersPage() {
       <div className="bg-card rounded-lg border border-border p-3 sm:p-4 md:p-6">
         <DataTable
           columns={columns}
-          data={users}
+          data={users as any}
           searchKey="email"
           searchPlaceholder="Search by email..."
         />
@@ -159,7 +186,7 @@ export default function UsersPage() {
       <UserViewModal
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
-        user={selectedUser}
+        user={selectedUser as any}
       />
     </div>
   );

@@ -5,17 +5,39 @@ import { Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/tables/DataTable";
 import { getServiceColumns } from "@/components/tables/columns/serviceColumns";
-import { MockService } from "@/lib/mockData/services";
-import adminService from "@/services/admin.service";
+import { serviceApi } from "@/api";
 import ServiceFormModal from "@/components/admin/ServiceFormModal";
 import ServiceViewModal from "@/components/admin/ServiceViewModal";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import toast from "react-hot-toast";
 
+// Local Service interface matching backend and MockService
+interface Service {
+  _id: string;
+  title: string;
+  image: string;
+  description: string;
+  price: number;
+  perItemPrice: number;
+  category: string;
+  priceList?: Array<{
+    title: string;
+    price: number;
+    description?: string;
+    subCategory?: any[];
+  }>;
+  subcategories?: any[];
+  status?: "active" | "inactive";
+  unit?: string;
+  total_orders?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export default function ServicesPage() {
-  const [services, setServices] = useState<MockService[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedService, setSelectedService] = useState<MockService | null>(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
@@ -29,8 +51,15 @@ export default function ServicesPage() {
   const loadServices = async () => {
     try {
       setLoading(true);
-      const response = await adminService.services.getAll(1, 100);
-      setServices(response.data);
+      const response = await serviceApi.getAllServices();
+      const servicesData = (response.data || []).map(s => ({
+        ...s,
+        price: s.priceList?.[0]?.price || 0,
+        perItemPrice: s.priceList?.[0]?.price || 0,
+        category: s.title || 'General',
+        description: s.description || '',
+      }));
+      setServices(servicesData);
     } catch (error) {
       toast.error("Failed to load services");
       console.error(error);
@@ -44,19 +73,25 @@ export default function ServicesPage() {
     setShowCreateModal(true);
   };
 
-  const handleView = (service: MockService) => {
+  const handleView = (service: Service) => {
     setSelectedService(service);
     setShowViewModal(true);
   };
 
-  const handleEdit = (service: MockService) => {
+  const handleEdit = (service: Service) => {
     setSelectedService(service);
     setShowEditModal(true);
   };
 
-  const handleCreateSubmit = async (data: Partial<MockService>) => {
+  const handleCreateSubmit = async (data: Partial<Service>) => {
     try {
-      await adminService.services.create(data as Omit<MockService, "_id" | "created_at" | "updated_at">);
+      await serviceApi.createService({
+        title: data.title!,
+        image: data.image || '',
+        description: data.description,
+        priceList: data.priceList,
+        subcategories: data.subcategories,
+      });
       toast.success("Service created successfully");
       loadServices();
       setShowCreateModal(false);
@@ -66,10 +101,10 @@ export default function ServicesPage() {
     }
   };
 
-  const handleEditSubmit = async (data: Partial<MockService>) => {
+  const handleEditSubmit = async (data: Partial<Service>) => {
     if (!selectedService) return;
     try {
-      await adminService.services.update(selectedService._id, data);
+      await serviceApi.updateService(selectedService._id, data);
       toast.success("Service updated successfully");
       loadServices();
       setShowEditModal(false);
@@ -79,7 +114,7 @@ export default function ServicesPage() {
     }
   };
 
-  const handleDelete = (service: MockService) => {
+  const handleDelete = (service: Service) => {
     setSelectedService(service);
     setShowDeleteDialog(true);
   };
@@ -89,7 +124,7 @@ export default function ServicesPage() {
     
     try {
       setDeleteLoading(true);
-      await adminService.services.delete(selectedService._id);
+      await serviceApi.deleteService(selectedService._id);
       toast.success("Service deleted successfully");
       loadServices();
       setShowDeleteDialog(false);
@@ -101,10 +136,10 @@ export default function ServicesPage() {
     }
   };
 
-  const handleStatusToggle = async (service: MockService) => {
+  const handleStatusToggle = async (service: Service) => {
     const newStatus = service.status === "active" ? "inactive" : "active";
     try {
-      await adminService.services.update(service._id, { status: newStatus });
+      await serviceApi.updateService(service._id, { status: newStatus } as any);
       toast.success(`Service ${newStatus === "active" ? "activated" : "deactivated"}`);
       loadServices();
     } catch (error) {
@@ -113,7 +148,7 @@ export default function ServicesPage() {
     }
   };
 
-  const columns = getServiceColumns(handleEdit, handleDelete, handleView);
+  const columns = getServiceColumns(handleEdit as any, handleDelete as any, handleView as any);
 
   if (loading) {
     return (
@@ -125,9 +160,12 @@ export default function ServicesPage() {
 
   const activeServices = services.filter((s) => s.status === "active").length;
   const inactiveServices = services.filter((s) => s.status === "inactive").length;
-  const totalOrders = services.reduce((sum, s) => sum + s.total_orders, 0);
+  const totalOrders = services.reduce((sum, s) => sum + (s.total_orders || 0), 0);
   const totalRevenue = services.reduce(
-    (sum, s) => sum + s.price * s.total_orders,
+    (sum, s) => {
+      const price = s.price || s.perItemPrice || s.priceList?.[0]?.price || 0;
+      return sum + price * (s.total_orders || 0);
+    },
     0
   );
 
@@ -203,7 +241,7 @@ export default function ServicesPage() {
       <div className="bg-card rounded-lg border border-border p-3 sm:p-4 md:p-6">
         <DataTable
           columns={columns}
-          data={services}
+          data={services as any}
           searchKey="title"
           searchPlaceholder="Search services..."
         />
@@ -222,7 +260,7 @@ export default function ServicesPage() {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSubmit={handleEditSubmit}
-        service={selectedService}
+        service={selectedService as any}
         mode="edit"
       />
 
@@ -243,7 +281,7 @@ export default function ServicesPage() {
       <ServiceViewModal
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
-        service={selectedService}
+        service={selectedService as any}
       />
     </div>
   );

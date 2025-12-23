@@ -13,24 +13,23 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // const router = useRouter();
-  // const { isLogin, user } = useSelector((state: RootState) => state.user);
+  const router = useRouter();
+  const { isLogin, user } = useSelector((state: RootState) => state.user);
 
-  // Authentication check temporarily disabled for design preview
-  // Will be enabled when backend is ready
-  
-  // useEffect(() => {
-  //   if (!isLogin) {
-  //     router.replace("/login");
-  //     return;
-  //   }
-  //   
-  //   const isAdmin = user?.email === 'admin@launderremedy.com' || user?.role === 'admin';
-  //   
-  //   if (!isAdmin) {
-  //     router.replace("/");
-  //   }
-  // }, [isLogin, user, router]);
+  useEffect(() => {
+    // Check if user is logged in
+    if (!isLogin) {
+      router.replace("/login");
+      return;
+    }
+    
+    // Check if user is admin
+    const isAdmin = user?.type === 'admin' || user?.role === 'admin' || user?.email === 'admin@launderremedy.com';
+    
+    if (!isAdmin) {
+      router.replace("/");
+    }
+  }, [isLogin, user, router]);
 
   return (
     <div className="min-h-screen bg-background">

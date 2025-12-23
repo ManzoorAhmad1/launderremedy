@@ -120,20 +120,11 @@ export default function Header() {
               ) : (
                 <Moon className="h-5 w-5" />
               )}
-            </Button>
+            </Button> 
 
             {/* User Actions */}
             {isLogin ? (
               <>
-                {/* Admin Panel Button - Only show for admin users */}
-                {(user?.email === 'admin@launderremedy.com' || user?.role === 'admin') && (
-                  <Link href="/admin/dashboard" onClick={closeMenu}>
-                    <Button variant="secondary" className="shadow-sm">
-                      Admin Panel
-                    </Button>
-                  </Link>
-                )}
-                
                 <Button
                   variant="outline"
                   onClick={handleLogout}

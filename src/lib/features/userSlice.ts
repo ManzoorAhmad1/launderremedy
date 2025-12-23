@@ -106,8 +106,16 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<any>) => {
-      state.user = action.payload;
-      state.isLogin = !!action.payload;
+      if (action.payload.user) {
+        // When payload has { user, token, isLogin } structure
+        state.user = action.payload.user;
+        state.token = action.payload.token || '';
+        state.isLogin = action.payload.isLogin || true;
+      } else {
+        // When payload is the user object directly
+        state.user = action.payload;
+        state.isLogin = !!action.payload;
+      }
     },
     setLoader: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;

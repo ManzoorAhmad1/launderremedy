@@ -62,8 +62,9 @@ const LoginPage = () => {
       if (response.success && response.token) {
         setSuccessMessage('Login successful! Redirecting...');
         
-        // Store token in cookie
+        // Store tokens in cookies
         setCookie('user_token', response.token, formData.rememberMe ? 30 : 1);
+        setCookie('refresh_token', response.refreshToken, formData.rememberMe ? 30 : 7);
         
         // Store user data in cookie
         setCookie('user', JSON.stringify(response.user), formData.rememberMe ? 30 : 1);

@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { getCookie, clearCookie } from '@/utils/helpers';
+import { getCookie, clearCookie, setCookie } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 // Backend base URL
@@ -14,6 +14,21 @@ const apiClient: AxiosInstance = axios.create({
   timeout: 30000, // 30 seconds
   withCredentials: false,
 });
+
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
 
 // Request interceptor - Add auth token to every request
 apiClient.interceptors.request.use(
@@ -77,15 +92,59 @@ apiClient.interceptors.response.use(
       // Handle 401 Unauthorized - Session expired
       if (status === 401) {
         const token = getCookie('user_token');
-        if (token) {
+        const refreshToken = getCookie('refresh_token');
+        
+        if (token && refreshToken && !isRefreshing) {
+          isRefreshing = true;
+          
+          // Try to refresh the token
+          return axios.post(`${BASE_URL}/user/v1/refresh-token`, { refreshToken })
+            .then((response: any) => {
+              const newToken = response.data.token;
+              setCookie('user_token', newToken, 7);
+              isRefreshing = false;
+              processQueue(null, newToken);
+              
+              // Retry the original request
+              if (error.config && error.config.headers) {
+                error.config.headers.Authorization = `Bearer ${newToken}`;
+              }
+              return apiClient(error.config!);
+            })
+            .catch((refreshError) => {
+              processQueue(refreshError, null);
+              isRefreshing = false;
+              
+              // Refresh token failed, logout user
+              clearCookie('user_token');
+              clearCookie('refresh_token');
+              clearCookie('user');
+              toast.error('Session expired. Please login again.');
+              if (typeof window !== 'undefined') {
+                window.location.href = '/login';
+              }
+              return Promise.reject(refreshError);
+            });
+        } else if (isRefreshing) {
+          // Queue the request while token is being refreshed
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          }).then(token => {
+            if (error.config && error.config.headers) {
+              error.config.headers.Authorization = `Bearer ${token}`;
+            }
+            return apiClient(error.config!);
+          }).catch(err => {
+            return Promise.reject(err);
+          });
+        } else {
           clearCookie('user_token');
+          clearCookie('refresh_token');
           clearCookie('user');
           toast.error('Session expired. Please login again.');
           if (typeof window !== 'undefined') {
             window.location.href = '/login';
           }
-        } else {
-          toast.error(errorMessage || 'Authentication required');
         }
       }
 

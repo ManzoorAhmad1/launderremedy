@@ -11,6 +11,7 @@ import ProgressBar from '@/components/ProgressBar'
 import { Toaster } from 'react-hot-toast'
 import { StoreProvider } from '@/providers/StoreProvider'
 import { usePathname } from 'next/navigation'
+import RoleGuard from '@/components/RoleGuard'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,6 +22,7 @@ export default function RootLayout({
 }) {
   const pathname = usePathname()
   const isAdminRoute = pathname?.startsWith('/admin')
+  const isAuthRoute = pathname?.startsWith('/login') || pathname?.startsWith('/signup') || pathname?.startsWith('/forgot-password') || pathname?.startsWith('/reset-password')
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -40,10 +42,12 @@ export default function RootLayout({
                 <Toaster position="top-right" />
               </>
             ) : (
-              // Public routes: with header/footer
+              // Public routes: with header/footer and role guard
               <div className="min-h-screen flex flex-col">
                 <Header />
-                <main className="flex-1">{children}</main>
+                <RoleGuard requiredRole={isAuthRoute || pathname === '/' ? undefined : 'user'}>
+                  <main className="flex-1">{children}</main>
+                </RoleGuard>
                 <Footer />
                 <Toaster position="bottom-right" />
               </div>

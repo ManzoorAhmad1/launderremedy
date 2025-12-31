@@ -29,11 +29,14 @@ export interface User {
   last_name: string;
   email: string;
   phone_number?: string;
-  type: 'user' | 'admin';
+  type: 'user' | 'admin' | 'subadmin';
   status?: 'active' | 'inactive' | 'suspended';
   bundles?: any[];
   address?: AddAddressPayload;
   fcm_token?: string;
+  permissions?: string[]; // For sub-admins
+  is_active?: boolean; // For sub-admins
+  created_by?: string; // For sub-admins
   createdAt?: string;
   updatedAt?: string;
 }

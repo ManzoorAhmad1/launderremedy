@@ -54,7 +54,7 @@ const LoginPage = () => {
     
     try {
       // Call real backend API
-      const response = await authApi.login({
+      const response:any = await authApi.login({
         email: formData.email,
         password: formData.password,
       });
@@ -80,7 +80,7 @@ const LoginPage = () => {
         
         // Redirect based on user type
         setTimeout(() => {
-          if (response.user.type === 'admin') {
+          if (response.user.type === 'admin' || response.user.type === 'subadmin') {
             router.push('/admin/dashboard');
           } else {
             router.push('/');

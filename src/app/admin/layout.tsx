@@ -23,8 +23,8 @@ export default function AdminLayout({
       return;
     }
     
-    // Check if user is admin
-    const isAdmin = user?.type === 'admin' || user?.role === 'admin' || user?.email === 'admin@launderremedy.com';
+    // Check if user is admin or subadmin
+    const isAdmin = user?.type === 'admin' || user?.type === 'subadmin' || user?.role === 'admin' || user?.email === 'admin@launderremedy.com';
     
     if (!isAdmin) {
       router.replace("/");

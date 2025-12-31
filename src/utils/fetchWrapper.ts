@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'ax
 import { getCookie, clearCookie } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
-const BASE_URL = 'https://launderremedy-f470d30f2aed.herokuapp.com/api';
+const BASE_URL = 'http://localhost:4000/api';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -97,6 +97,11 @@ export const Fetch = {
 
   delete: async (url: string, config?: any) => {
     const response = await apiClient.delete(url, config);
+    return response.data;
+  },
+
+  patch: async (url: string, data?: any, config?: any) => {
+    const response = await apiClient.patch(url, data, config);
     return response.data;
   },
 

@@ -18,9 +18,10 @@ const NavData = [
   { id: 2, title: "How it works", path: "/how-it-works", live: true },
   { id: 3, title: "Pricing", path: "/pricing", live: true },
   { id: 4, title: "About us", path: "about-us", live: true },
-  { id: 5, title: "FAQ", path: "/faq", live: true },
-  { id: 6, title: "Contact Us", path: "/contact", live: true },
-  { id: 7, title: "Admin Dashboard", path: "/admin/dashboard", live: true, protected: true },
+  { id: 5, title: "Blog", path: "/blog", live: true },
+  { id: 6, title: "FAQ", path: "/faq", live: true },
+  { id: 7, title: "Contact Us", path: "/contact", live: true },
+  { id: 8, title: "Admin Dashboard", path: "/admin/dashboard", live: true, protected: true },
 ]
 
 export default function Header() {
@@ -31,7 +32,7 @@ export default function Header() {
   const router = useRouter()
   const dispatch = useDispatch()
 
-  const { isLogin, user } = useSelector((state: RootState) => state.user)
+  const { isLogin, user } = useSelector((state: any) => state.user)
 
   // Auto-close menu when route changes
   useEffect(() => {
@@ -88,7 +89,12 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6">
             {NavData
-              .filter(item => isLogin ? true : !item.protected)
+              .filter(item => {
+                if (item.protected) {
+                  return isLogin && (user?.type === 'admin' || user?.type === 'subadmin');
+                }
+                return true;
+              })
               .map((item) => (
                 <Link
                   key={item.id}
@@ -186,7 +192,12 @@ export default function Header() {
           <div className="lg:hidden mt-4 pb-4 animate-slide-down">
             <div className="flex flex-col space-y-4">
               {NavData
-                .filter(item => isLogin ? true : !item.protected)
+                .filter(item => {
+                  if (item.protected) {
+                    return isLogin && (user?.type === 'admin' || user?.type === 'subadmin');
+                  }
+                  return true;
+                })
                 .map((item) => (
                   <Link
                     key={item.id}
@@ -204,11 +215,6 @@ export default function Header() {
               <div className="pt-4 border-t border-neutral-200 flex flex-col space-y-3">
                 {isLogin ? (
                   <>
-                    <Link href="/admin/dashboard" onClick={closeMenu}>
-                      <Button variant="outline" className="w-full">
-                       Admin Dashboard
-                      </Button>
-                    </Link>
                     <Button
                       variant="destructive"
                       onClick={() => {

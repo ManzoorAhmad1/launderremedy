@@ -16,6 +16,8 @@ import {
     LogOut,
     ChevronRight,
     User,
+    FileText,
+    Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +34,7 @@ interface SidebarItem {
     title: string;
     href: string;
     icon: React.ReactNode;
+    permission?: string; // Permission key required to view this item
 }
 
 const sidebarItems: SidebarItem[] = [
@@ -40,42 +43,63 @@ const sidebarItems: SidebarItem[] = [
         title: "Dashboard",
         href: "/admin/dashboard",
         icon: <LayoutDashboard className="h-5 w-5" />,
+        // Dashboard is always visible
     },
     {
         id: "users",
         title: "Users",
         href: "/admin/users",
         icon: <Users className="h-5 w-5" />,
+        permission: "users",
+    },
+    {
+        id: "subadmins",
+        title: "Sub-Admins",
+        href: "/admin/subadmins",
+        icon: <Shield className="h-5 w-5" />,
+        // Only admins can see sub-admins, handled separately
     },
     {
         id: "services",
         title: "Services",
         href: "/admin/services",
         icon: <Package className="h-5 w-5" />,
+        permission: "services",
     },
     {
         id: "orders",
         title: "Orders",
         href: "/admin/orders",
         icon: <ShoppingCart className="h-5 w-5" />,
+        permission: "orders",
     },
     {
         id: "payments",
         title: "Payments",
         href: "/admin/payments",
         icon: <CreditCard className="h-5 w-5" />,
+        permission: "payments",
+    },
+    {
+        id: "blogs",
+        title: "Blogs",
+        href: "/admin/blogs",
+        icon: <FileText className="h-5 w-5" />,
+        permission: "blogs",
     },
     {
         id: "reports",
         title: "Reports",
         href: "/admin/reports",
         icon: <BarChart3 className="h-5 w-5" />,
+        permission: "reports",
     },
     {
         id: "settings",
         title: "Settings",
         href: "/admin/settings",
         icon: <Settings className="h-5 w-5" />,
+        permission: "settings",
     },
 ];
 
@@ -180,7 +204,9 @@ export default function AdminSidebar() {
                                 <h3 className="text-xs font-semibold text-foreground truncate">
                                     {user?.first_name} {user?.last_name}
                                 </h3>
-                                <p className="text-[10px] text-muted-foreground truncate">Administrator</p>
+                                <p className="text-[10px] text-muted-foreground truncate">
+                                    {user?.type === 'admin' ? 'Administrator' : 'Sub-Admin'}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -189,6 +215,22 @@ export default function AdminSidebar() {
                     <nav className="flex-1 overflow-y-auto p-3 sm:p-4">
                         <ul className="space-y-1">
                             {sidebarItems.map((item) => {
+                                // Check permissions for sub-admins
+                                const isAdmin = user?.type === 'admin';
+                                const hasPermission = !item.permission || 
+                                    isAdmin || 
+                                    (user?.permissions && user.permissions.includes(item.permission));
+                                
+                                // Sub-admins page only for admins
+                                if (item.id === 'subadmins' && !isAdmin) {
+                                    return null;
+                                }
+                                
+                                // Hide if no permission
+                                if (!hasPermission) {
+                                    return null;
+                                }
+                                
                                 const isActive = pathname === item.href;
                                 return (
                                     <li key={item.id}>

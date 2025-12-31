@@ -3,7 +3,7 @@ import { getCookie, clearCookie, setCookie } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 // Backend base URL
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://launderrenmendy-backend.onrender.com/api';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

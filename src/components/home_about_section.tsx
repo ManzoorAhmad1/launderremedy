@@ -5,7 +5,6 @@ import { Leaf, Droplets, Users, ChevronRight, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Button } from './ui/button'
-import homeAboutImage from '../../public/img07.png'
 import Link from 'next/link'
 
 export default function HomeAboutSection() {
@@ -23,8 +22,8 @@ export default function HomeAboutSection() {
                     >
                         <div className="relative aspect-[4/5] lg:aspect-square rounded-2xl overflow-hidden shadow-xl border border-neutral-200 dark:border-neutral-800">
                             <Image
-                                src={homeAboutImage}
-                                alt="Our team providing professional cleaning services"
+                                src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&q=80"
+                                alt="Professional laundry team providing expert garment care services"
                                 fill
                                 className="object-cover"
                                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -36,7 +35,7 @@ export default function HomeAboutSection() {
                             {/* Image caption */}
                             <div className="absolute bottom-4 left-4 right-4 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm rounded-lg p-3 shadow-sm">
                                 <p className="text-sm font-medium text-center">
-                                    Quality service since 2015
+                                    Excellence in service since 2015
                                 </p>
                             </div>
                         </div>
@@ -61,13 +60,14 @@ export default function HomeAboutSection() {
                             </div>
 
                             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-                                More Than Just Clean Clothes
-                                <span className="block text-primary mt-2">A Commitment to Excellence</span>
+                                Transforming Garment Care
+                                <span className="block text-primary mt-2">Through Innovation & Excellence</span>
                             </h2>
 
                             <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed">
-                                We blend traditional cleaning expertise with modern, sustainable practices to deliver
-                                exceptional results while caring for our community and environment.
+                                Launder Remedy combines time-honored craftsmanship with advanced eco-friendly technology 
+                                to deliver unparalleled results. Our commitment extends beyond clean clothes—we're dedicated 
+                                to environmental stewardship and community enrichment.
                             </p>
                         </div>
 
@@ -79,9 +79,9 @@ export default function HomeAboutSection() {
                                     <Leaf className="w-6 h-6 text-green-600 dark:text-green-400" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-lg mb-1">Sustainable Innovation</h3>
+                                    <h3 className="font-semibold text-lg mb-1">Environmental Responsibility</h3>
                                     <p className="text-neutral-600 dark:text-neutral-400 text-sm">
-                                        Eco-friendly processes that reduce environmental impact
+                                        Sustainable practices minimizing environmental impact while maximizing cleaning efficiency
                                     </p>
                                 </div>
                             </div>
@@ -92,9 +92,9 @@ export default function HomeAboutSection() {
                                     <Droplets className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-lg mb-1">Advanced Technology</h3>
+                                    <h3 className="font-semibold text-lg mb-1">State-of-the-Art Technology</h3>
                                     <p className="text-neutral-600 dark:text-neutral-400 text-sm">
-                                        State-of-the-art equipment for superior cleaning results
+                                        Advanced equipment and techniques ensuring superior garment care and preservation
                                     </p>
                                 </div>
                             </div>
@@ -105,9 +105,9 @@ export default function HomeAboutSection() {
                                     <Users className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-lg mb-1">Expert Team</h3>
+                                    <h3 className="font-semibold text-lg mb-1">Certified Professionals</h3>
                                     <p className="text-neutral-600 dark:text-neutral-400 text-sm">
-                                        Certified professionals dedicated to quality service
+                                        Expert team trained in specialized fabric care and customer service excellence
                                     </p>
                                 </div>
                             </div>
@@ -115,14 +115,14 @@ export default function HomeAboutSection() {
 
                         {/* CTA */}
                         <div className="pt-4">
-                            <Link className="group" href="/about"   >
+                            <Link className="group" href="/about-us"   >
                                 <p className="flex items-center gap-2 text-white">
-                                    Learn Our Full Story
+                                    Discover Our Story
                                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </p>
                             </Link>
                             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-3">
-                                Discover our mission, values, and what makes us different
+                                Learn about our commitment to quality, sustainability, and customer satisfaction
                             </p>
                         </div>
                     </motion.div>

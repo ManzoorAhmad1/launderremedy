@@ -221,8 +221,8 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
             onChange={handleDayChange}
             options={dayOptions}
             isLoading={isDeliveryLoading}
-            isDisabled={isDeliveryLoading || dayOptions.length === 0}
-            placeholder={dayOptions.length === 0 ? "Loading days..." : "Select delivery day"}
+            isDisabled={isDeliveryLoading}
+            placeholder={isDeliveryLoading ? "Loading available days..." : (dayOptions.length === 0 ? "No days available" : "Select delivery day")}
             className="react-select-container"
             classNamePrefix="react-select"
             styles={typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? darkStyles : customStyles}

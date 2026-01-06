@@ -68,8 +68,8 @@ export default function HeroSection() {
                             {/* Text Overlay - Responsive padding */}
                             <div className="absolute bottom-4 md:bottom-6 left-0 right-12 text-center hidden md:block">
                                 <div className="inline-block bg-gradient-to-r from-white to-primary-50 dark:from-neutral-800 dark:to-primary-900/20 backdrop-blur-sm px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg border border-primary/10 mx-2">
-                                    <h3 className="text-sm md:text-lg font-bold text-neutral-800 dark:text-white">Fresh & Clean</h3>
-                                    <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-300">Professional laundry service</p>
+                                    <h3 className="text-sm md:text-lg font-bold text-neutral-800 dark:text-white">Impeccably Fresh & Clean</h3>
+                                    <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-300">Expert garment care specialists</p>
                                 </div>
                             </div>
 
@@ -109,25 +109,25 @@ export default function HeroSection() {
                     <div className="space-y-6 md:space-y-8 animate-fade-in animation-delay-100 lg:pt-8 order-1 lg:order-2">
                         <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs md:text-sm font-medium mb-2 md:mb-4 animate-slide-in-left">
                             <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                            #1 Rated Laundry Service in London
+                            London's Most Trusted Laundry Service
                         </div>
 
                         {/* Heading - Responsive text sizes */}
                         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
                             <span className="block text-neutral-900 dark:text-white">
-                                Quick & Easy
+                                Premium Laundry &
                             </span>
                             <span className="block bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
-                                Laundry & Dry Cleaning
+                                Expert Dry Cleaning
                             </span>
                             <span className="block text-lg sm:text-xl md:text-2xl text-neutral-600 dark:text-neutral-300 mt-1 md:mt-2">
-                                Services in London
+                                Delivered to Your Doorstep
                             </span>
                         </h1>
 
                         <p className="text-base sm:text-lg md:text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl leading-relaxed">
-                            Say goodbye to laundry day stress. We offer premium laundry, dry cleaning,
-                            and ironing services delivered right to your doorstep in 24 hours.
+                            Experience professional garment care with our comprehensive laundry and dry cleaning services. 
+                            Eco-friendly solutions, expert handling, and complimentary collection and delivery—all within 24 hours.
                         </p>
 
                         {/* Service Areas Section */}

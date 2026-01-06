@@ -223,8 +223,8 @@ const CollectionTime = ({ onCollectionChange }: { onCollectionChange: (day: any,
             onChange={handleDayChange}
             options={dayOptions}
             isLoading={isCollectionLoading}
-            isDisabled={isCollectionLoading || dayOptions.length === 0}
-            placeholder={dayOptions.length === 0 ? "Loading days..." : "Select collection day"}
+            isDisabled={isCollectionLoading}
+            placeholder={isCollectionLoading ? "Loading available days..." : (dayOptions.length === 0 ? "No days available" : "Select collection day")}
             className="react-select-container"
             classNamePrefix="react-select"
             styles={typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? darkStyles : customStyles}

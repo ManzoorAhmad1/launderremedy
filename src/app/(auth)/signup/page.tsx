@@ -60,6 +60,8 @@ const SignupPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     setIsLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
@@ -109,10 +111,12 @@ const SignupPage = () => {
         setTimeout(() => {
           router.push('/login');
         }, 2000);
+      } else {
+        throw new Error(response.message || 'Registration failed');
       }
     } catch (error: any) {
       console.error('Signup error:', error);
-      const errorMsg = error?.message || 'Registration failed. Please try again.';
+      const errorMsg = error?.message || error?.response?.data?.message || 'Registration failed. Please try again.';
       setErrorMessage(errorMsg);
       toast.error(errorMsg);
     } finally {

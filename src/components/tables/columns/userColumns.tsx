@@ -75,8 +75,8 @@ export const getUserColumns = (
   {
     accessorKey: "created_at",
     header: "Joined",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("created_at"));
+    cell: ({ row }:any) => {
+      const date = new Date(row?.original?.createdAt);
       return <span>{date.toLocaleDateString()}</span>;
     },
   },

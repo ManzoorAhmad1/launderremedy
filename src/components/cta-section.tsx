@@ -7,24 +7,22 @@ import { Button } from './ui/button'
 import { Sparkles, CheckCircle, ArrowRight, Shield, Leaf, Clock } from 'lucide-react'
 import { motion } from 'framer-motion'
 
-import img05 from '../../public/img05.png'
-
 export default function CTASection() {
   const features = [
     {
       icon: Shield,
-      title: "Quality Guaranteed",
-      description: "100% satisfaction on every order"
+      title: "Quality Assurance",
+      description: "100% satisfaction guaranteed on every order"
     },
     {
       icon: Leaf,
-      title: "Eco-Friendly",
-      description: "Sustainable cleaning process"
+      title: "Eco-Conscious",
+      description: "Environmentally responsible cleaning methods"
     },
     {
       icon: Clock,
       title: "24-Hour Service",
-      description: "Fast turnaround guaranteed"
+      description: "Rapid turnaround time guaranteed"
     }
   ]
 
@@ -42,37 +40,37 @@ export default function CTASection() {
             {/* Badge */}
             <div className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-primary/10 text-primary rounded-full text-sm sm:text-base">
               <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" />
-              <span className="font-medium">Transform Your Laundry Routine</span>
+              <span className="font-medium">Revolutionize Your Laundry Experience</span>
             </div>
 
             {/* Heading */}
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 dark:text-white leading-tight">
-              Ready for{' '}
+              Embrace{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-400">
-                Laundry-Free
+                Effortless Living
               </span>{' '}
-              Living?
+              Today
             </h2>
 
             {/* Description */}
             <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-300 leading-relaxed">
-              Join thousands of satisfied customers who have transformed their laundry routine. 
-              Book your first pickup today and experience the difference.
+              Join a community of discerning customers who have elevated their lifestyle with our premium services. 
+              Schedule your first collection today and experience professional garment care that exceeds expectations.
             </p>
 
             {/* Features */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center space-x-3">
                 <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
-                <span className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300">Zero Emission Delivery</span>
+                <span className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300">Carbon-Neutral Delivery Fleet</span>
               </div>
               <div className="flex items-center space-x-3">
                 <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
-                <span className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300">Efficient Water Use</span>
+                <span className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300">Advanced Water Conservation Technology</span>
               </div>
               <div className="flex items-center space-x-3">
                 <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
-                <span className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300">24/7 Customer Support</span>
+                <span className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300">Premium Round-the-Clock Support</span>
               </div>
             </div>
 
@@ -137,8 +135,8 @@ export default function CTASection() {
               {/* Main Image */}
               <div className="relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-6">
                 <Image
-                  src={img05}
-                  alt="Happy customer enjoying laundry-free living with Launder Remedy"
+                  src="https://images.unsplash.com/photo-1610633389918-7d5a98a9f0fd?w=800&q=80"
+                  alt="Professional laundry service - Fresh clean clothes delivered to your doorstep"
                   fill
                   className="object-cover"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"

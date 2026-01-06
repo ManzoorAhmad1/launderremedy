@@ -38,7 +38,10 @@ export default function AdminLayout({
 
       {/* Main Content Area */}
       <div className="lg:pl-64">
-        <main className="p-4 sm:p-6 lg:p-8">
+        {/* Admin Header */}
+        <AdminHeader />
+        
+        <main className="p-4 mt-16 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

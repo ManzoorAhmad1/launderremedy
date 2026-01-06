@@ -2,8 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Eye, Search, Filter } from "lucide-react";
+import Link from "next/link";
 import blogService from "@/services/blog.service";
 import toast from "react-hot-toast";
+import ImageUpload from "@/components/admin/ImageUpload";
+import RichTextEditor from "@/components/admin/RichTextEditor";
+import "./editor-custom.css";
 
 export default function AdminBlogsPage() {
   const [blogs, setBlogs] = useState<any[]>([]);
@@ -24,6 +28,7 @@ export default function AdminBlogsPage() {
     tags: "",
     meta_description: "",
     status: "draft",
+    category: "",
   });
 
   useEffect(() => {
@@ -61,6 +66,7 @@ export default function AdminBlogsPage() {
         tags: blog.tags?.join(", ") || "",
         meta_description: blog.meta_description || "",
         status: blog.status,
+        category: blog.category || "",
       });
     } else {
       setEditingBlog(null);
@@ -72,6 +78,7 @@ export default function AdminBlogsPage() {
         tags: "",
         meta_description: "",
         status: "draft",
+        category: "",
       });
     }
     setShowModal(true);
@@ -157,13 +164,22 @@ export default function AdminBlogsPage() {
           </p>
         </div>
         
-        <button
-          onClick={() => handleOpenModal()}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Create Blog
-        </button>
+        <div className="flex gap-3">
+          <Link
+            href="/admin/blogs/categories"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors border border-border"
+          >
+            <Filter className="w-4 h-4" />
+            Categories
+          </Link>
+          <button
+            onClick={() => handleOpenModal()}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Create Blog
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -265,17 +281,21 @@ export default function AdminBlogsPage() {
                     </td>
                     <td className="px-6 py-4 text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
-                        <a
-                          href={`/blog/${blog.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:text-primary-700 p-2"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </a>
+                        {(blog.slug || blog._id) && (
+                          <a
+                            href={`/blog/${blog.slug || blog._id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary-700 p-2"
+                            title="View Blog"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </a>
+                        )}
                         <button
                           onClick={() => handleOpenModal(blog)}
                           className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-2"
+                          title="Edit Blog"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
@@ -324,8 +344,14 @@ export default function AdminBlogsPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-border">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          onClick={handleCloseModal}
+        >
+          <div 
+            className="bg-white dark:bg-neutral-900 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-border"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6">
               <h2 className="text-2xl font-bold text-foreground mb-6">
                 {editingBlog ? "Edit Blog" : "Create Blog"}
@@ -359,32 +385,40 @@ export default function AdminBlogsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Content *
+                    Category
                   </label>
-                  <textarea
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={10}
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Supports HTML formatting
-                  </p>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="laundry-tips">Laundry Tips</option>
+                    <option value="how-to-guides">How-To Guides</option>
+                    <option value="news">News & Updates</option>
+                    <option value="industry-insights">Industry Insights</option>
+                  </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Featured Image URL
+                    Content *
                   </label>
-                  <input
-                    type="url"
-                    value={formData.featured_image}
-                    onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  <RichTextEditor
+                    content={formData.content}
+                    onChange={(value) => setFormData({ ...formData, content: value })}
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Use the toolbar to format your content
+                  </p>
                 </div>
 
+                <ImageUpload
+                  value={formData.featured_image}
+                  onChange={(url) => setFormData({ ...formData, featured_image: url })}
+                  label="Featured Image"
+                  helperText="Upload or paste image URL"
+                />
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Tags (comma-separated)

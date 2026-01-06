@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Menu, X, Sun, Moon, User, ShoppingBag } from 'lucide-react'
+import { Menu, X, Sun, Moon, User, ShoppingBag, ChevronDown } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearData } from '@/lib/features/orderSlice'
@@ -11,7 +11,7 @@ import { RootState } from '@/lib/store'
 import Image from 'next/image'
 import logo from '../../public/logo-02.png'
 import {Button} from './ui/button'
-import { logOutUser } from '@/lib/features/userSlice'
+import { logOutUser, logout } from '@/lib/features/userSlice'
 
 const NavData = [
   { id: 1, title: "Home", path: "/", live: true },
@@ -24,19 +24,46 @@ const NavData = [
   { id: 8, title: "Admin Dashboard", path: "/admin/dashboard", live: true, protected: true },
 ]
 
+const Categories = [
+  { id: 'laundry-services', title: 'Laundry Services', path: '/category/laundry-services' },
+  { id: 'shirts-and-tops', title: 'Shirts & Tops Care', path: '/category/shirts-and-tops' },
+  { id: 'elegant-suits', title: 'Elegant Suits Care', path: '/category/elegant-suits' },
+  { id: 'dresses-and-skirts', title: 'Dresses & Skirts Care', path: '/category/dresses-and-skirts' },
+  { id: 'trousers', title: 'Trousers Care', path: '/category/trousers' },
+  { id: 'outdoor-clothing', title: 'Outdoor Clothing', path: '/category/outdoor-clothing' },
+  { id: 'home-textiles', title: 'Home Textile Services', path: '/category/home-textiles' },
+  { id: 'ironing', title: 'Ironing Services', path: '/category/ironing' },
+  { id: 'alterations', title: 'Alterations', path: '/category/alterations' },
+  { id: 'shoe-repair', title: 'Shoe Repair', path: '/category/shoe-repair' },
+]
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
   const router = useRouter()
   const dispatch = useDispatch()
+  const categoriesRef = useRef<HTMLDivElement>(null)
 
   const { isLogin, user } = useSelector((state: any) => state.user)
+
+  // Listen for auth-logout event from API client
+  useEffect(() => {
+    const handleAuthLogout = () => {
+      dispatch(logout())
+      dispatch(clearData())
+    }
+
+    window.addEventListener('auth-logout', handleAuthLogout)
+    return () => window.removeEventListener('auth-logout', handleAuthLogout)
+  }, [dispatch])
 
   // Auto-close menu when route changes
   useEffect(() => {
     closeMenu()
+    setIsCategoriesOpen(false)
   }, [pathname])
 
   useEffect(() => {
@@ -45,6 +72,18 @@ export default function Header() {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Close categories dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (categoriesRef.current && !categoriesRef.current.contains(event.target as Node)) {
+        setIsCategoriesOpen(false)
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   const handleLogout = () => {
@@ -110,6 +149,40 @@ export default function Header() {
                     }`} />
                 </Link>
               ))}
+            
+            {/* Categories Dropdown */}
+            <div className="relative" ref={categoriesRef}>
+              <button
+                onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                className={`text-sm font-medium transition-colors relative group flex items-center gap-1 ${
+                  pathname.startsWith('/category')
+                    ? 'text-primary'
+                    : 'text-neutral-600 hover:text-primary'
+                }`}
+              >
+                Categories
+                <ChevronDown className={`w-4 h-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+                <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full ${
+                  pathname.startsWith('/category') ? 'w-full' : ''
+                }`} />
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isCategoriesOpen && (
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-neutral-200 dark:border-neutral-700 py-2 z-50 animate-slide-down">
+                  {Categories.map((category) => (
+                    <Link
+                      key={category.id}
+                      href={category.path}
+                      onClick={() => setIsCategoriesOpen(false)}
+                      className="block px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition-colors"
+                    >
+                      {category.title}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Desktop Actions */}
@@ -211,6 +284,32 @@ export default function Header() {
                     {item.title}
                   </Link>
                 ))}
+              
+              {/* Mobile Categories Section */}
+              <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4">
+                <button
+                  onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                  className="w-full flex items-center justify-between text-sm font-medium py-2 px-4 rounded-lg text-neutral-600 hover:bg-neutral-100 hover:text-primary transition-colors"
+                >
+                  <span>Categories</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {isCategoriesOpen && (
+                  <div className="mt-2 space-y-1 pl-4">
+                    {Categories.map((category) => (
+                      <Link
+                        key={category.id}
+                        href={category.path}
+                        className="block text-sm py-2 px-4 rounded-lg text-neutral-500 hover:bg-primary/5 hover:text-primary transition-colors"
+                        onClick={closeMenu}
+                      >
+                        {category.title}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               <div className="pt-4 border-t border-neutral-200 flex flex-col space-y-3">
                 {isLogin ? (

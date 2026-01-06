@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import Head from "next/head";
 import { motion } from "framer-motion";
 import { Calendar, User, Eye, ArrowLeft, Tag, Clock, Share2 } from "lucide-react";
 import blogService from "@/services/blog.service";
@@ -16,19 +17,34 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
   const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
 
   useEffect(() => {
-    loadBlog();
-    loadRelatedBlogs();
+    if (params.slug && params.slug !== 'undefined') {
+      loadBlog();
+      loadRelatedBlogs();
+    } else {
+      toast.error('Invalid blog URL');
+      setTimeout(() => {
+        router.push('/blog');
+      }, 1000);
+    }
   }, [params.slug]);
 
   const loadBlog = async () => {
     try {
       setLoading(true);
       const response = await blogService.getBlogBySlug(params.slug);
-      setBlog(response.data);
+      if (response.data) {
+        setBlog(response.data);
+      } else {
+        throw new Error('Blog not found');
+      }
     } catch (error: any) {
       console.error("Failed to load blog:", error);
       toast.error(error.message || "Blog not found");
-      router.push("/blog");
+      
+      // Redirect after showing error
+      setTimeout(() => {
+        router.push("/blog");
+      }, 2000);
     } finally {
       setLoading(false);
     }
@@ -76,8 +92,80 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
     return null;
   }
 
+  // Prepare meta data for SEO
+  const pageUrl = typeof window !== "undefined" ? window.location.href : "";
+  const metaTitle = `${blog.title} | Launder Remedy Blog`;
+  const metaDescription = blog.meta_description || blog.excerpt || blog.content.substring(0, 160);
+  const metaImage = blog.featured_image || "/og-image.jpg";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800">
+    <>
+      {/* SEO Meta Tags */}
+      <Head>
+        {/* Basic Meta Tags */}
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <meta name="keywords" content={blog.tags?.join(", ")} />
+        <meta name="author" content={blog.author_name || "Launder Remedy"} />
+
+        {/* OpenGraph Tags */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:image" content={metaImage} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:site_name" content="Launder Remedy" />
+        
+        {/* Article Specific */}
+        <meta property="article:published_time" content={blog.published_date || blog.createdAt} />
+        <meta property="article:author" content={blog.author_name} />
+        {blog.tags?.map((tag: string) => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
+
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDescription} />
+        <meta name="twitter:image" content={metaImage} />
+
+        {/* Canonical URL */}
+        <link rel="canonical" href={pageUrl} />
+      </Head>
+
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800">
+        {/* Structured Data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BlogPosting",
+              headline: blog.title,
+              description: metaDescription,
+              image: metaImage,
+              datePublished: blog.published_date || blog.createdAt,
+              dateModified: blog.updatedAt || blog.createdAt,
+              author: {
+                "@type": "Person",
+                name: blog.author_name || "Launder Remedy",
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "Launder Remedy",
+                logo: {
+                  "@type": "ImageObject",
+                  url: "/logo.png",
+                },
+              },
+              mainEntityOfPage: {
+                "@type": "WebPage",
+                "@id": pageUrl,
+              },
+            }),
+          }}
+        />
+
       {/* Hero Section */}
       <section className="relative pt-32 pb-16 px-4">
         <div className="container mx-auto max-w-4xl">
@@ -98,6 +186,20 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
           >
             {blog.title}
           </motion.h1>
+
+          {/* Category Badge */}
+          {blog.category && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="mb-6"
+            >
+              <span className="inline-block px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 text-sm font-medium">
+                {blog.category.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}
+              </span>
+            </motion.div>
+          )}
 
           {/* Meta Info */}
           <motion.div
@@ -180,9 +282,10 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="prose prose-lg dark:prose-invert max-w-none mb-16"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
-          />
+            className="prose prose-lg dark:prose-invert max-w-none mb-16 prose-headings:text-foreground prose-p:text-foreground prose-a:text-primary prose-strong:text-foreground prose-ul:text-foreground prose-ol:text-foreground"
+          >
+            <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+          </motion.article>
         </div>
       </section>
 
@@ -232,6 +335,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
           </div>
         </section>
       )}
-    </div>
+      </div>
+    </>
   );
 }

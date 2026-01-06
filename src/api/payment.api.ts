@@ -46,6 +46,16 @@ const paymentApi = {
   getCustomerCards: async (userId: string) => {
     return await apiClient.get(`/payment/v1/get-customers-cards/${userId}`);
   },
+
+  // Create SetupIntent to save card without charging
+  createSetupIntent: async () => {
+    return await apiClient.post('/payment/v1/create-setup-intent');
+  },
+
+  // Charge saved payment method when admin approves
+  chargeSavedCard: async (payload: { order_id: string; payment_method_id: string; amount: number }) => {
+    return await apiClient.post('/payment/v1/charge-saved-card', payload);
+  },
 };
 
 export default paymentApi;

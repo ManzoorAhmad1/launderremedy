@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setStep, setStepByValue, clearData, setOrderData } from "@/lib//features/orderSlice";
+import { setStep, setStepByValue, clearData, setOrderData, setSelectedServicesListFull } from "@/lib/features/orderSlice";
 import { setLoader, setUser } from "@/lib/features/userSlice";
 import { getSelectionDetails, getDeliveryDetails } from "@/lib/features/orderSlice";
 import CollectionDelivery from "@/components/place-order/CollectionDelivery";
@@ -104,7 +104,36 @@ export default function PlaceOrderPage() {
   }, []);
 
   useEffect(() => {
-    dispatch(setStepByValue(1));
+    // Try to restore order progress from localStorage
+    const savedOrderData = localStorage.getItem('order_in_progress');
+    if (savedOrderData) {
+      try {
+        const parsedData = JSON.parse(savedOrderData);
+        
+        // Restore order details if present
+        if (parsedData.orderDetail && Object.keys(parsedData.orderDetail).length > 0) {
+          dispatch(setOrderData(parsedData.orderDetail));
+          setState(parsedData.orderDetail);
+        }
+        
+        // Restore selected services if present
+        if (parsedData.selectedServicesList && parsedData.selectedServicesList.length > 0) {
+          dispatch(setSelectedServicesListFull(parsedData.selectedServicesList));
+        }
+        
+        // Restore step if greater than 1
+        if (parsedData.step && parsedData.step > 1) {
+          dispatch(setStepByValue(parsedData.step));
+        } else {
+          dispatch(setStepByValue(1));
+        }
+      } catch (error) {
+        console.error('Failed to load saved order:', error);
+        dispatch(setStepByValue(1));
+      }
+    } else {
+      dispatch(setStepByValue(1));
+    }
 
     // Initialize collection and delivery dates
     const currentDate = new Date();
@@ -118,11 +147,48 @@ export default function PlaceOrderPage() {
     }
 
     const formattedDate = currentDate.toISOString();
-    dispatch(getSelectionDetails(new Date().toISOString()) as any);
-    dispatch(getDeliveryDetails(formattedDate) as any);
+    
+    // Dispatch API calls to fetch collection and delivery slots
+    Promise.all([
+      dispatch(getSelectionDetails(new Date().toISOString()) as any),
+      dispatch(getDeliveryDetails(formattedDate) as any)
+    ]).then(() => {
+      console.log('Collection and delivery data loaded');
+    }).catch((error) => {
+      console.error('Error loading collection/delivery data:', error);
+    });
   }, [dispatch]);
 
+  // Save order progress to localStorage whenever critical data changes
+  useEffect(() => {
+    if (step > 0 && step < 6) {
+      const orderProgress = {
+        step,
+        orderDetail: state || orderDetail,
+        selectedServicesList,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('order_in_progress', JSON.stringify(orderProgress));
+    }
+  }, [step, state, orderDetail, selectedServicesList]);
+
   const handleNext = async () => {
+    // Validate current step before proceeding
+    if (!canProceed()) {
+      if (step === 3) {
+        toast.error('Please select at least one service to continue', {
+          duration: 3000,
+          icon: '📦',
+        });
+      } else if (step === 5) {
+        toast.error('Please enter valid payment details', {
+          duration: 3000,
+          icon: '💳',
+        });
+      }
+      return;
+    }
+
     // Check if user is logged in before proceeding to payment
     if (step === 4) {
       const token = getCookie('user_token');
@@ -149,6 +215,16 @@ export default function PlaceOrderPage() {
       if (state) {
         dispatch(setOrderData(state));
       }
+      
+      // Smooth scroll to top of content area
+      setTimeout(() => {
+        const contentElement = document.querySelector('.place-order-content');
+        if (contentElement) {
+          contentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 100);
     }
   };
 
@@ -164,6 +240,17 @@ export default function PlaceOrderPage() {
       // Validate services selected
       if (!selectedServicesList || selectedServicesList.length === 0) {
         toast.error('Please select at least one service');
+        dispatch(setStepByValue(3)); // Go back to services step
+        return;
+      }
+
+      // Validate at least one service has quantity > 0
+      const hasValidQuantity = selectedServicesList.some((service: any) => 
+        service.quantity && service.quantity > 0
+      );
+      if (!hasValidQuantity) {
+        toast.error('Please add quantity to at least one service');
+        dispatch(setStepByValue(3)); // Go back to services step
         return;
       }
 
@@ -304,8 +391,9 @@ export default function PlaceOrderPage() {
           duration: 4000,
         });
 
-        // Clear pending order from localStorage
+        // Clear all order data from localStorage
         localStorage.removeItem('pending_order');
+        localStorage.removeItem('order_in_progress');
 
         setTimeout(() => {
           router.push("/");
@@ -328,11 +416,20 @@ export default function PlaceOrderPage() {
       case 2:
         return orderDetail?.collection_day && orderDetail?.delivery_day;
       case 3:
-        return selectedServicesList && selectedServicesList.length > 0;
+        // Ensure at least one service is selected with quantity > 0
+        if (!selectedServicesList || selectedServicesList.length === 0) {
+          return false;
+        }
+        // Check if at least one service has quantity greater than 0
+        const hasValidService = selectedServicesList.some((service: any) => 
+          service.quantity && service.quantity > 0
+        );
+        return hasValidService;
       case 4:
         return orderDetail?.first_name && orderDetail?.last_name && orderDetail?.email && orderDetail?.phone;
       case 5:
-        return true; // Payment validation will be in handlePaymentAndCreateOrder
+        // Basic validation for payment step
+        return elements !== null && stripe !== null;
       default:
         return false;
     }
@@ -548,7 +645,7 @@ export default function PlaceOrderPage() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className={`${isTablet ? 'col-span-2' : 'lg:col-span-2'}`}
+            className={`${isTablet ? 'col-span-2' : 'lg:col-span-2'} place-order-content`}
           >
             {/* Mobile Step Indicator */}
             {(isMobile || isTablet) && step < 6 && (
@@ -728,10 +825,14 @@ export default function PlaceOrderPage() {
               <div>
                 <div className="text-xs text-neutral-500 dark:text-neutral-400">Total</div>
                 <div className="font-bold text-lg text-primary-600 dark:text-primary-400">
-                  £{selectedServicesList.reduce((total: number, service: any) => {
-                    const price = typeof service.price === 'string' ? parseFloat(service.price) : service.price;
-                    return total + (price * (service.quantity || 1));
-                  }, 0).toFixed(2)}
+                  £{(selectedServicesList && selectedServicesList.length > 0 
+                    ? selectedServicesList.reduce((total: number, service: any) => {
+                        const price = typeof service.price === 'string' ? parseFloat(service.price) : service.price;
+                        const quantity = service.quantity || 0;
+                        return total + (price * quantity);
+                      }, 0)
+                    : 0
+                  ).toFixed(2)}
                 </div>
               </div>
               <div className="flex items-center gap-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -105,11 +105,16 @@ const sidebarItems: SidebarItem[] = [
 
 export default function AdminSidebar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
     const dispatch = useDispatch();
     const { user } = useSelector((state: RootState) => state.user);
     const { theme, setTheme } = useTheme();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleLogout = () => {
         if (user?._id) {
@@ -132,7 +137,7 @@ export default function AdminSidebar() {
             {/* Mobile Menu Button */}
             <button
                 onClick={toggleMobileMenu}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-card border border-border shadow-md hover:bg-muted transition-colors"
+                className="lg:hidden fixed top-6 left-4 z-50 p-2 rounded-lg bg-card border border-border shadow-md hover:bg-muted transition-colors"
                 aria-label="Toggle menu"
             >
                 {isMobileMenuOpen ? (
@@ -194,27 +199,29 @@ export default function AdminSidebar() {
                             </Button>
                         </div>
                         {/* User Info */}
-                        <div className="flex items-center gap-2">
-                            <div className="h-9 w-9 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center flex-shrink-0">
-                                <span className="text-sm font-semibold text-primary-700 dark:text-primary-300">
-                                    {user?.first_name?.[0] || "A"}
-                                </span>
+                        {mounted && (
+                            <div className="flex items-center gap-2">
+                                <div className="h-9 w-9 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center flex-shrink-0">
+                                    <span className="text-sm font-semibold text-primary-700 dark:text-primary-300">
+                                        {user?.first_name?.[0] || "A"}
+                                    </span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="text-xs font-semibold text-foreground truncate">
+                                        {user?.first_name || "Admin"} {user?.last_name || ""}
+                                    </h3>
+                                    <p className="text-[10px] text-muted-foreground truncate">
+                                        {user?.type === 'admin' ? 'Administrator' : 'Sub-Admin'}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <h3 className="text-xs font-semibold text-foreground truncate">
-                                    {user?.first_name} {user?.last_name}
-                                </h3>
-                                <p className="text-[10px] text-muted-foreground truncate">
-                                    {user?.type === 'admin' ? 'Administrator' : 'Sub-Admin'}
-                                </p>
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Navigation */}
                     <nav className="flex-1 overflow-y-auto p-3 sm:p-4">
                         <ul className="space-y-1">
-                            {sidebarItems.map((item) => {
+                            {mounted && sidebarItems.map((item) => {
                                 // Check permissions for sub-admins
                                 const isAdmin = user?.type === 'admin';
                                 const hasPermission = !item.permission || 
@@ -241,29 +248,29 @@ export default function AdminSidebar() {
                         flex items-center gap-2.5 sm:gap-3 px-2.5 sm:px-3 py-2.5 rounded-lg text-sm font-medium
                         transition-all duration-200 group
                         ${isActive
-                                                    ? "bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300"
-                                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                ? "bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300"
+                                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                            }
+                      `}
+                                    >
+                                        <span
+                                            className={`flex-shrink-0
+                        ${isActive
+                                                    ? "text-primary-700 dark:text-primary-300"
+                                                    : "text-muted-foreground group-hover:text-foreground"
                                                 }
                       `}
                                         >
-                                            <span
-                                                className={`flex-shrink-0
-                        ${isActive
-                                                        ? "text-primary-700 dark:text-primary-300"
-                                                        : "text-muted-foreground group-hover:text-foreground"
-                                                    }
-                      `}
-                                            >
-                                                {item.icon}
-                                            </span>
-                                            <span className="flex-1 truncate">{item.title}</span>
-                                            {isActive && (
-                                                <ChevronRight className="h-4 w-4 text-primary-700 dark:text-primary-300 flex-shrink-0" />
-                                            )}
-                                        </Link>
-                                    </li>
-                                );
-                            })}
+                                            {item.icon}
+                                        </span>
+                                        <span className="flex-1 truncate">{item.title}</span>
+                                        {isActive && (
+                                            <ChevronRight className="h-4 w-4 text-primary-700 dark:text-primary-300 flex-shrink-0" />
+                                        )}
+                                    </Link>
+                                </li>
+                            );
+                        })}
                         </ul>
                     </nav>
 

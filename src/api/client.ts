@@ -3,7 +3,7 @@ import { getCookie, clearCookie, setCookie } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 // Backend base URL
-const BASE_URL ='https://launderrenmendy-backend.onrender.com/api';
+const BASE_URL ='http://localhost:5000/api';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -93,6 +93,15 @@ apiClient.interceptors.response.use(
       if (status === 401) {
         const token = getCookie('user_token');
         const refreshToken = getCookie('refresh_token');
+        const isAuthEndpoint = error.config?.url?.includes('/log-in') || 
+                               error.config?.url?.includes('/sign-up') ||
+                               error.config?.url?.includes('/forgot-password') ||
+                               error.config?.url?.includes('/reset-password');
+        
+        // Don't redirect if it's an auth endpoint (login/signup)
+        if (isAuthEndpoint) {
+          return Promise.reject({ message: errorMessage || 'Authentication failed' });
+        }
         
         if (token && refreshToken && !isRefreshing) {
           isRefreshing = true;
@@ -107,7 +116,7 @@ apiClient.interceptors.response.use(
               
               // Retry the original request
               if (error.config && error.config.headers) {
-                error.config.headers.Authorization = `Bearer ${newToken}`;
+                error.config.headers.Authorization = `Bearer ${token}`;
               }
               return apiClient(error.config!);
             })
@@ -119,8 +128,18 @@ apiClient.interceptors.response.use(
               clearCookie('user_token');
               clearCookie('refresh_token');
               clearCookie('user');
-              toast.error('Session expired. Please login again.');
+              
+              // Dispatch logout event for Redux to update state
               if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('auth-logout'));
+              }
+              
+              toast.error('Session expired. Please login again.');
+              
+              // Only redirect if not already on login/signup page
+              if (typeof window !== 'undefined' && 
+                  !window.location.pathname.includes('/login') && 
+                  !window.location.pathname.includes('/signup')) {
                 window.location.href = '/login';
               }
               return Promise.reject(refreshError);
@@ -138,11 +157,22 @@ apiClient.interceptors.response.use(
             return Promise.reject(err);
           });
         } else {
+          // Clear all authentication data
           clearCookie('user_token');
           clearCookie('refresh_token');
           clearCookie('user');
-          toast.error('Session expired. Please login again.');
+          
+          // Dispatch logout event for Redux to update state
           if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('auth-logout'));
+          }
+          
+          toast.error('Session expired. Please login again.');
+          
+          // Only redirect if not already on login/signup page
+          if (typeof window !== 'undefined' && 
+              !window.location.pathname.includes('/login') && 
+              !window.location.pathname.includes('/signup')) {
             window.location.href = '/login';
           }
         }

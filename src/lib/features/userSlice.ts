@@ -132,6 +132,8 @@ const userSlice = createSlice({
       state.token = '';
       state.error = null;
       clearCookie('user_token');
+      clearCookie('refresh_token');
+      clearCookie('user');
     },
     clearError: (state) => {
       state.error = null;

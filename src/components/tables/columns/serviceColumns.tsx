@@ -69,22 +69,6 @@ export const getServiceColumns = (
     },
   },
   {
-    accessorKey: "total_orders",
-    header: "Orders",
-    cell: ({ row }) => {
-      const orders = row.getValue("total_orders") as number;
-      return <span className="font-medium">{orders}</span>;
-    },
-  },
-  {
-    accessorKey: "updated_at",
-    header: "Last Updated",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("updated_at"));
-      return <span className="text-sm text-muted-foreground">{date.toLocaleDateString()}</span>;
-    },
-  },
-  {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {

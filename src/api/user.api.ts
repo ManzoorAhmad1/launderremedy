@@ -70,17 +70,20 @@ const userApi:any = {
     return await apiClient.post('/user/v1/send-push-notification', payload);
   },
 
-  // Admin: Get all users (Note: Backend endpoint may need to be created)
-  // For now using mock data, but structure is ready for real API
+  // Admin: Get all users
   getAllUsers: async (params: {
     page?: number;
     itemPerPage?: number;
     searchText?: string;
     statusFilter?: string;
-  }) => {
-    // TODO: Backend endpoint needed - /user/v1/get-all-users
-    // For now, this will throw error if called, use mock data
-    return await apiClient.post('/user/v1/get-all-users', params);
+  } = {}) => {
+    const { page = 1, itemPerPage = 10, searchText = '', statusFilter = '' } = params;
+    return await apiClient.post('/user/v1/get-all-users', {
+      page,
+      itemPerPage,
+      searchText,
+      statusFilter
+    });
   },
 
   // Admin: Update user status

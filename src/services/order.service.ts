@@ -102,14 +102,17 @@ const orderService = {
   // Get collection time slots
   async getSelectionDetails(date: string) {
     try {
+      console.log('API Call: get-collection-slots with date:', date);
       const res = await Fetch.get(
         `${this._PREFIX}/get-collection-slots?date=${date}`
       );
+      console.log('Collection API response:', res);
       if (res.success) {
         return res;
       }
       throw new Error(res.message ?? 'Failed to get collection slots');
     } catch (error: any) {
+      console.error('Collection API error:', error);
       throw new Error(error.message ?? 'Something went wrong');
     }
   },
@@ -117,14 +120,17 @@ const orderService = {
   // Get delivery time slots
   async getDeliveryDetails(date: string) {
     try {
+      console.log('API Call: get-delivery-slots with date:', date);
       const res = await Fetch.get(
         `${this._PREFIX}/get-delivery-slots?date=${date}`
       );
+      console.log('Delivery API response:', res);
       if (res.success) {
         return res;
       }
       throw new Error(res.message ?? 'Failed to get delivery slots');
     } catch (error: any) {
+      console.error('Delivery API error:', error);
       throw new Error(error.message ?? 'Something went wrong');
     }
   },

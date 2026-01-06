@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Plus, Loader2 } from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Plus, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/tables/DataTable";
 import { getUserColumns } from "@/components/tables/columns/userColumns";
-import { orderApi, userApi } from "@/api";
+import { userApi } from "@/api";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import UserViewModal from "@/components/admin/UserViewModal";
 import toast from "react-hot-toast";
-import adminService from "@/services/admin.service";
+import { Input } from "@/components/ui/input";
 
 // Local User interface matching backend
 interface User {
@@ -37,54 +37,50 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const itemPerPage = 10;
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPage(1); // Reset to page 1 on new search
+      loadUsers(1, searchText);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchText]);
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+    loadUsers(page, searchText);
+  }, [page]);
 
-  const loadUsers = async () => {
+  const loadUsers = async (currentPage: number = page, search: string = searchText) => {
     try {
       setLoading(true);
       
-      // Get all orders to extract unique users (since backend getAllUsers API is not implemented)
-      const response = await orderApi.getAllOrders({ page: 1, itemPerPage: 10000 });
-      const ordersData = response?.data?.items || response?.data || [];
-      
-      // Extract unique users from orders
-      const userMap = new Map<string, User>();
-      
-      ordersData.forEach((order: any) => {
-        const userId = order.user_id || order.email;
-        if (!userMap.has(userId)) {
-          userMap.set(userId, {
-            _id: order.user_id || order._id,
-            first_name: order.first_name,
-            last_name: order.last_name,
-            email: order.email,
-            phone_number: order.phone_number || 'N/A',
-            role: order.user_type || 'user',
-            status: 'active',
-            created_at: order.createdAt || order.created_at || new Date().toISOString(),
-            total_orders: 0,
-            total_spent: 0,
-          });
-        }
-        
-        // Update order count and total spent
-        const user = userMap.get(userId)!;
-        user.total_orders = (user.total_orders || 0) + 1;
-        user.total_spent = (user.total_spent || 0) + (order.totalPrice || 0);
+      const response = await userApi.getAllUsers({
+        page: currentPage,
+        itemPerPage,
+        searchText: search,
       });
       
-      const usersData = Array.from(userMap.values());
-      setUsers(usersData);
-      
-      if (usersData.length === 0) {
-        toast.error("No users found. Users will appear when orders are placed.");
+      const data = response?.data;
+      if (data && data.items) {
+        setUsers(data.items);
+        setTotalUsers(data.total);
+        setTotalPages(data.totalPages);
+      } else {
+        setUsers([]);
+        setTotalUsers(0);
+        setTotalPages(1);
       }
     } catch (error) {
       toast.error("Failed to load users");
       console.error(error);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -123,18 +119,6 @@ export default function UsersPage() {
     }
   };
 
-  const handleStatusChange = async (user: User, newStatus: User['status']) => {
-    try {
-      // Using mock service for now, real API not implemented yet
-      await adminService.users.update(user._id, { status: newStatus });
-      toast.success(`User status updated to ${newStatus}`);
-      loadUsers();
-    } catch (error) {
-      toast.error("Failed to update user status");
-      console.error(error);
-    }
-  };
-
   const columns = getUserColumns(handleEdit, handleDelete, handleView);
 
   if (loading) {
@@ -166,7 +150,7 @@ export default function UsersPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-card rounded-lg border border-border p-4">
           <p className="text-sm text-muted-foreground">Total Users</p>
-          <p className="text-2xl font-bold text-foreground">{users.length}</p>
+          <p className="text-2xl font-bold text-foreground">{totalUsers}</p>
         </div>
         <div className="bg-card rounded-lg border border-border p-4">
           <p className="text-sm text-muted-foreground">Active</p>
@@ -190,12 +174,52 @@ export default function UsersPage() {
 
       {/* Users Table */}
       <div className="bg-card rounded-lg border border-border p-3 sm:p-4 md:p-6">
+        {/* Search Bar */}
+        <div className="mb-4 flex items-center gap-2">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by email or phone..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+
         <DataTable
           columns={columns}
           data={users as any}
           searchKey="email"
           searchPlaceholder="Search by email..."
         />
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Page {page} of {totalPages} ({totalUsers} total users)
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1 || loading}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages || loading}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

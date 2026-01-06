@@ -15,6 +15,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import CollectionTime from "./CollectionTime";
 import DeliveryTime from "./DeliveryTime";
 
@@ -55,7 +56,42 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
   const collection_day = useSelector((state: any) => state.order.collection_day);
   const delivery = useSelector((state: any) => state.order.delivery);
   const delivery_day = useSelector((state: any) => state.order.delivery_day);
-  const isLoading = useSelector((state: any) => state.order.isLoading);
+  const isCollectionLoading = useSelector((state: any) => state.order.isCollectionLoading);
+  const isDeliveryLoading = useSelector((state: any) => state.order.isDeliveryLoading);
+
+  // Restore saved collection/delivery data from localStorage on mount
+  useEffect(() => {
+    const savedOrderData = localStorage.getItem('order_in_progress');
+    if (savedOrderData) {
+      try {
+        const parsedData = JSON.parse(savedOrderData);
+        if (parsedData.orderDetail) {
+          // Restore collection/delivery selections if they exist
+          if (parsedData.orderDetail.collection_day) {
+            setFormState(prev => ({
+              ...prev,
+              collectionDay: { label: parsedData.orderDetail.collection_day, value: parsedData.orderDetail.collection_day, original: parsedData.orderDetail.collection_day },
+              collectionTime: parsedData.orderDetail.collection_time ? { label: parsedData.orderDetail.collection_time, value: parsedData.orderDetail.collection_time, original: parsedData.orderDetail.collection_time } : null,
+              collectionInstruction: parsedData.orderDetail.collection_instruction || ""
+            }));
+          }
+          if (parsedData.orderDetail.delivery_day) {
+            setFormState(prev => ({
+              ...prev,
+              deliveryDay: { label: parsedData.orderDetail.delivery_day, value: parsedData.orderDetail.delivery_day, original: parsedData.orderDetail.delivery_day },
+              deliveryTime: parsedData.orderDetail.delivery_time ? { label: parsedData.orderDetail.delivery_time, value: parsedData.orderDetail.delivery_time, original: parsedData.orderDetail.delivery_time } : null,
+              deliveryInstruction: parsedData.orderDetail.delivery_instruction || ""
+            }));
+          }
+          if (parsedData.orderDetail.frequency) {
+            setFormState(prev => ({ ...prev, frequency: parsedData.orderDetail.frequency }));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to restore collection/delivery data:', error);
+      }
+    }
+  }, []);
 
   // Handle timer countdown
   useEffect(() => {
@@ -77,6 +113,44 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
 
   // Validate form whenever form state changes
   useEffect(() => {
+    // Check if collection and delivery dates are same
+    if (formState.collectionDay && formState.deliveryDay) {
+      const collectionDate = formState.collectionDay.timestamp || formState.collectionDay.value;
+      const deliveryDate = formState.deliveryDay.timestamp || formState.deliveryDay.value;
+      
+      if (collectionDate === deliveryDate) {
+        toast.error('Collection and delivery dates cannot be the same', {
+          duration: 3000,
+          icon: '📅',
+        });
+        // Reset delivery date
+        setFormState(prev => ({
+          ...prev,
+          deliveryDay: null,
+          deliveryTime: null
+        }));
+        return;
+      }
+      
+      // Check if delivery date is before collection date
+      const collectionDateObj = new Date(collectionDate);
+      const deliveryDateObj = new Date(deliveryDate);
+      
+      if (deliveryDateObj < collectionDateObj) {
+        toast.error('Delivery date cannot be earlier than collection date', {
+          duration: 3000,
+          icon: '⚠️',
+        });
+        // Reset delivery date
+        setFormState(prev => ({
+          ...prev,
+          deliveryDay: null,
+          deliveryTime: null
+        }));
+        return;
+      }
+    }
+
     const isValid = 
       formState.collectionDay !== null &&
       formState.collectionTime !== null &&
@@ -119,13 +193,46 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
   }, []);
 
   const handleDeliveryChange = useCallback((day: any, time: any, instruction: string) => {
+    // Validate if collection date is selected
+    if (!formState.collectionDay) {
+      toast.error('Please select collection date first', {
+        duration: 2500,
+        icon: '📅',
+      });
+      return;
+    }
+
+    // Check if dates are same
+    const collectionDate = formState.collectionDay.timestamp || formState.collectionDay.value;
+    const deliveryDate = day?.timestamp || day?.value;
+    
+    if (collectionDate === deliveryDate) {
+      toast.error('Collection and delivery dates cannot be the same', {
+        duration: 3000,
+        icon: '📅',
+      });
+      return;
+    }
+    
+    // Check if delivery date is before collection date
+    const collectionDateObj = new Date(collectionDate);
+    const deliveryDateObj = new Date(deliveryDate);
+    
+    if (deliveryDateObj < collectionDateObj) {
+      toast.error('Delivery date cannot be earlier than collection date', {
+        duration: 3000,
+        icon: '⚠️',
+      });
+      return;
+    }
+
     setFormState(prev => ({
       ...prev,
       deliveryDay: day,
       deliveryTime: time,
       deliveryInstruction: instruction
     }));
-  }, []);
+  }, [formState.collectionDay]);
 
   const handleSpecialInstructionsChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormState(prev => ({ ...prev, specialInstructions: e.target.value }));

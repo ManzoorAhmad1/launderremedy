@@ -7,43 +7,43 @@ import { motion } from 'framer-motion'
 const features = [
   {
     icon: Clock,
-    title: "24h Turnaround Time",
-    description: "Get your laundry back fresh and clean within 24 hours. No need to plan weeks in advance.",
+    title: "24-Hour Turnaround",
+    description: "Rapid service guaranteed. Receive your freshly cleaned garments within 24 hours of collection, perfect for your busy lifestyle.",
     color: "text-blue-500",
     bgColor: "bg-blue-50 dark:bg-blue-950/20",
   },
   {
     icon: Truck,
-    title: "Free Collection & Delivery",
-    description: "We pick up and deliver your laundry right to your doorstep, completely free of charge.",
+    title: "Complimentary Collection & Delivery",
+    description: "Enjoy seamless doorstep service at no extra charge. We collect and deliver your laundry at your convenience across London.",
     color: "text-green-500",
     bgColor: "bg-green-50 dark:bg-green-950/20",
   },
   {
     icon: Headphones,
-    title: "Dedicated 24/7 Support",
-    description: "Our customer support team is available round the clock to assist you with any queries.",
+    title: "24/7 Customer Support",
+    description: "Our dedicated support team is always available to assist you. Reach us anytime via phone, email, or live chat.",
     color: "text-purple-500",
     bgColor: "bg-purple-50 dark:bg-purple-950/20",
   },
   {
     icon: Shield,
-    title: "Quality Guarantee",
-    description: "We guarantee the highest quality of cleaning and care for all your garments.",
+    title: "Premium Quality Assurance",
+    description: "Every garment undergoes meticulous inspection and care. We guarantee exceptional results with our quality-first approach.",
     color: "text-amber-500",
     bgColor: "bg-amber-50 dark:bg-amber-950/20",
   },
   {
     icon: Leaf,
-    title: "Eco-Friendly Process",
-    description: "Using biodegradable detergents and efficient water usage to protect our environment.",
+    title: "Eco-Conscious Cleaning",
+    description: "Committed to sustainability with biodegradable detergents, efficient water management, and environmentally responsible practices.",
     color: "text-emerald-500",
     bgColor: "bg-emerald-50 dark:bg-emerald-950/20",
   },
   {
     icon: RefreshCw,
-    title: "Easy Rescheduling",
-    description: "Change your pickup or delivery time with just a few clicks. Flexible and convenient.",
+    title: "Flexible Scheduling",
+    description: "Modify your collection or delivery times effortlessly through our app. Complete flexibility designed around your schedule.",
     color: "text-pink-500",
     bgColor: "bg-pink-50 dark:bg-pink-950/20",
   },
@@ -63,7 +63,8 @@ export default function FeaturesSection() {
             Why Choose <span className="text-primary">Launder Remedy</span>
           </h2>
           <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
-            Experience the future of laundry services with our premium offerings and exceptional customer care
+            Discover the perfect blend of professional expertise, cutting-edge technology, and personalized service 
+            that sets us apart in garment care excellence
           </p>
         </motion.div>
 

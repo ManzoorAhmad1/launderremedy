@@ -70,16 +70,6 @@ export default function AdminHeader() {
                             </div>
                         </div>
                     )}
-
-                    {/* Logout Button */}
-                    <Button
-                        variant="outline"
-                        onClick={handleLogout}
-                        className="gap-2 border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/30 h-9 sm:h-10 px-2.5 sm:px-4"
-                    >
-                        <LogOut className="h-4 w-4" />
-                        <span className="hidden sm:inline">Logout</span>
-                    </Button>
                 </div>
             </div>
         </header>

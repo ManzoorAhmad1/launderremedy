@@ -212,8 +212,17 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
         {/* Address */}
         {!isEdit && (
           <button
-            onClick={() => dispatch(setStepByValue(1))}
-            className="w-full text-left p-4 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors border border-neutral-100 dark:border-neutral-700"
+            onClick={() => {
+              if (step >= 1) {
+                dispatch(setStepByValue(1));
+              }
+            }}
+            disabled={step < 1}
+            className={`w-full text-left p-4 rounded-xl transition-colors border border-neutral-100 dark:border-neutral-700 ${
+              step >= 1 
+                ? 'hover:bg-neutral-50 dark:hover:bg-neutral-700/50 cursor-pointer' 
+                : 'cursor-not-allowed opacity-50'
+            }`}
           >
             <div className="flex items-start gap-3">
               <div className={`p-2 rounded-lg ${orderDetail?.address ? 'bg-accent-green/20 text-accent-green' : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400'}`}>
@@ -239,8 +248,17 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
         {/* Collection & Delivery Times */}
         {!isEdit && (
           <button
-            onClick={() => dispatch(setStepByValue(2))}
-            className="w-full text-left p-4 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors border border-neutral-100 dark:border-neutral-700"
+            onClick={() => {
+              if (step >= 2 || orderDetail?.address) {
+                dispatch(setStepByValue(2));
+              }
+            }}
+            disabled={step < 2 && !orderDetail?.address}
+            className={`w-full text-left p-4 rounded-xl transition-colors border border-neutral-100 dark:border-neutral-700 ${
+              step >= 2 || orderDetail?.address
+                ? 'hover:bg-neutral-50 dark:hover:bg-neutral-700/50 cursor-pointer' 
+                : 'cursor-not-allowed opacity-50'
+            }`}
           >
             <div className="flex items-start gap-3">
               <div className={`p-2 rounded-lg ${orderDetail?.collection_day ? 'bg-accent-green/20 text-accent-green' : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400'}`}>
@@ -270,8 +288,17 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
 
         {/* Selected Services */}
         <button
-          onClick={() => dispatch(setStepByValue(3))}
-          className="w-full text-left p-4 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors border border-neutral-100 dark:border-neutral-700"
+          onClick={() => {
+            if (step >= 3 || (orderDetail?.address && orderDetail?.collection_day)) {
+              dispatch(setStepByValue(3));
+            }
+          }}
+          disabled={step < 3 && !(orderDetail?.address && orderDetail?.collection_day)}
+          className={`w-full text-left p-4 rounded-xl transition-colors border border-neutral-100 dark:border-neutral-700 ${
+            step >= 3 || (orderDetail?.address && orderDetail?.collection_day)
+              ? 'hover:bg-neutral-50 dark:hover:bg-neutral-700/50 cursor-pointer' 
+              : 'cursor-not-allowed opacity-50'
+          }`}
         >
           <div className="flex items-start gap-3">
             <div className={`p-2 rounded-lg ${selectedServicesList?.length > 0 ? 'bg-accent-green/20 text-accent-green' : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400'}`}>
@@ -306,23 +333,30 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log('Decreasing quantity for:', service.title);
+                              if (step >= 3) {
+                                console.log('Decreasing quantity for:', service.title);
 
-                              // Create service data for minus operation
-                              const serviceData = {
-                                ...service,
-                                id: service._id || service.id,
-                                quantity: service.quantity || 1,
-                                price: service.price,
-                                categoryTitle: service.categoryTitle || service.category
-                              };
+                                // Create service data for minus operation
+                                const serviceData = {
+                                  ...service,
+                                  id: service._id || service.id,
+                                  quantity: service.quantity || 1,
+                                  price: service.price,
+                                  categoryTitle: service.categoryTitle || service.category
+                                };
 
-                              dispatch(setSelectedServicesList({
-                                data: serviceData,
-                                type: "-"  // MINUS operation
-                              }));
+                                dispatch(setSelectedServicesList({
+                                  data: serviceData,
+                                  type: "-"  // MINUS operation
+                                }));
+                              }
                             }}
-                            className="w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                            disabled={step < 3}
+                            className={`w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 transition-colors ${
+                              step >= 3 
+                                ? 'hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer' 
+                                : 'cursor-not-allowed opacity-50'
+                            }`}
                           >
                             <Minus className="w-3 h-3" />
                           </button>
@@ -335,23 +369,30 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log('Increasing quantity for:', service.title);
+                              if (step >= 3) {
+                                console.log('Increasing quantity for:', service.title);
 
-                              // Create service data for plus operation
-                              const serviceData = {
-                                ...service,
-                                id: service._id || service.id,
-                                quantity: service.quantity || 1,
-                                price: service.price,
-                                categoryTitle: service.categoryTitle || service.category
-                              };
+                                // Create service data for plus operation
+                                const serviceData = {
+                                  ...service,
+                                  id: service._id || service.id,
+                                  quantity: service.quantity || 1,
+                                  price: service.price,
+                                  categoryTitle: service.categoryTitle || service.category
+                                };
 
-                              dispatch(setSelectedServicesList({
-                                data: serviceData,
-                                type: "+"  // PLUS operation
-                              }));
+                                dispatch(setSelectedServicesList({
+                                  data: serviceData,
+                                  type: "+"  // PLUS operation
+                                }));
+                              }
                             }}
-                            className="w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                            disabled={step < 3}
+                            className={`w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 transition-colors ${
+                              step >= 3 
+                                ? 'hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer' 
+                                : 'cursor-not-allowed opacity-50'
+                            }`}
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -376,8 +417,26 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
         {/* Contact Info */}
         {!isEdit && (
           <button
-            onClick={() => dispatch(setStepByValue(4))}
-            className="w-full text-left p-4 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors border border-neutral-100 dark:border-neutral-700"
+            onClick={() => {
+              // Only allow navigation if step 4 is reached OR all previous steps are completed
+              if (step >= 4) {
+                dispatch(setStepByValue(4));
+              } else if (orderDetail?.address && orderDetail?.collection_day && selectedServicesList?.length > 0) {
+                // Check if at least one service has quantity > 0
+                const hasValidService = selectedServicesList.some((service: any) => 
+                  service.quantity && service.quantity > 0
+                );
+                if (hasValidService) {
+                  dispatch(setStepByValue(4));
+                }
+              }
+            }}
+            disabled={step < 4 && !(orderDetail?.address && orderDetail?.collection_day && selectedServicesList?.length > 0 && selectedServicesList.some((s: any) => s.quantity > 0))}
+            className={`w-full text-left p-4 rounded-xl transition-colors border border-neutral-100 dark:border-neutral-700 ${
+              (step >= 4 || (orderDetail?.address && orderDetail?.collection_day && selectedServicesList?.length > 0 && selectedServicesList.some((s: any) => s.quantity > 0)))
+                ? 'hover:bg-neutral-50 dark:hover:bg-neutral-700/50 cursor-pointer' 
+                : 'cursor-not-allowed opacity-50'
+            }`}
           >
             <div className="flex items-start gap-3">
               <div className={`p-2 rounded-lg ${orderDetail?.email ? 'bg-accent-green/20 text-accent-green' : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400'}`}>
@@ -403,8 +462,49 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
         {/* Payment */}
         {!isEdit && (
           <button
-            onClick={() => dispatch(setStepByValue(5))}
-            className="w-full text-left p-4 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors border border-neutral-100 dark:border-neutral-700"
+            onClick={() => {
+              // Only allow navigation if step 5 is reached OR all previous steps including contact info are completed
+              if (step >= 5) {
+                dispatch(setStepByValue(5));
+              } else if (
+                orderDetail?.address && 
+                orderDetail?.collection_day && 
+                selectedServicesList?.length > 0 && 
+                selectedServicesList.some((s: any) => s.quantity > 0) &&
+                orderDetail?.first_name && 
+                orderDetail?.last_name && 
+                orderDetail?.email && 
+                orderDetail?.phone
+              ) {
+                dispatch(setStepByValue(5));
+              }
+            }}
+            disabled={
+              step < 5 && !(
+                orderDetail?.address && 
+                orderDetail?.collection_day && 
+                selectedServicesList?.length > 0 && 
+                selectedServicesList.some((s: any) => s.quantity > 0) &&
+                orderDetail?.first_name && 
+                orderDetail?.last_name && 
+                orderDetail?.email && 
+                orderDetail?.phone
+              )
+            }
+            className={`w-full text-left p-4 rounded-xl transition-colors border border-neutral-100 dark:border-neutral-700 ${
+              (step >= 5 || (
+                orderDetail?.address && 
+                orderDetail?.collection_day && 
+                selectedServicesList?.length > 0 && 
+                selectedServicesList.some((s: any) => s.quantity > 0) &&
+                orderDetail?.first_name && 
+                orderDetail?.last_name && 
+                orderDetail?.email && 
+                orderDetail?.phone
+              ))
+                ? 'hover:bg-neutral-50 dark:hover:bg-neutral-700/50 cursor-pointer' 
+                : 'cursor-not-allowed opacity-50'
+            }`}
           >
             <div className="flex items-start gap-3">
               <div className={`p-2 rounded-lg ${orderDetail?.payment ? 'bg-accent-green/20 text-accent-green' : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400'}`}>

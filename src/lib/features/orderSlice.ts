@@ -39,18 +39,32 @@ const initialState: OrderState = {
 // Async thunk for getting collection slots
 export const getSelectionDetails = createAsyncThunk(
   'order/getSelectionDetails',
-  async (date: string) => {
-    const response = await orderService.getSelectionDetails(date);
-    return response;
+  async (date: string, { rejectWithValue }) => {
+    try {
+      console.log('Fetching collection slots for date:', date);
+      const response = await orderService.getSelectionDetails(date);
+      console.log('Collection slots response:', response);
+      return response;
+    } catch (error: any) {
+      console.error('Error fetching collection slots:', error);
+      return rejectWithValue(error.message);
+    }
   }
 );
 
 // Async thunk for getting delivery slots
 export const getDeliveryDetails = createAsyncThunk(
   'order/getDeliveryDetails',
-  async (date: string) => {
-    const response = await orderService.getDeliveryDetails(date);
-    return response;
+  async (date: string, { rejectWithValue }) => {
+    try {
+      console.log('Fetching delivery slots for date:', date);
+      const response = await orderService.getDeliveryDetails(date);
+      console.log('Delivery slots response:', response);
+      return response;
+    } catch (error: any) {
+      console.error('Error fetching delivery slots:', error);
+      return rejectWithValue(error.message);
+    }
   }
 );
 
@@ -186,16 +200,24 @@ const orderSlice = createSlice({
       })
       .addCase(getSelectionDetails.fulfilled, (state, action) => {
         state.isCollectionLoading = false;
-        state.collection_day = action.payload.data
-          .map((ele: any) => {
-            return { label: ele.label, value: ele.timestamp };
-          })
-          .sort((a: any, b: any) => new Date(a.value).getTime() - new Date(b.value).getTime());
-        state.collection = action.payload.data;
+        console.log('Collection data received:', action.payload);
+        if (action.payload && action.payload.data && Array.isArray(action.payload.data)) {
+          state.collection_day = action.payload.data
+            .map((ele: any) => {
+              return { label: ele.label, value: ele.timestamp };
+            })
+            .sort((a: any, b: any) => new Date(a.value).getTime() - new Date(b.value).getTime());
+          state.collection = action.payload.data;
+          console.log('Collection days set:', state.collection_day);
+        } else {
+          console.error('Invalid collection data format:', action.payload);
+          toast.error('Invalid collection data received');
+        }
       })
-      .addCase(getSelectionDetails.rejected, (state) => {
+      .addCase(getSelectionDetails.rejected, (state, action) => {
         state.isCollectionLoading = false;
-        toast.error('Failed to load collection slots');
+        console.error('Collection slots rejected:', action.payload || action.error);
+        toast.error('Failed to load collection slots. Please refresh the page.');
       })
       // Get delivery details cases
       .addCase(getDeliveryDetails.pending, (state) => {
@@ -203,16 +225,24 @@ const orderSlice = createSlice({
       })
       .addCase(getDeliveryDetails.fulfilled, (state, action) => {
         state.isDeliveryLoading = false;
-        state.delivery_day = action.payload.data
-          .map((ele: any) => {
-            return { label: ele.label, value: ele.timestamp };
-          })
-          .sort((a: any, b: any) => new Date(a.value).getTime() - new Date(b.value).getTime());
-        state.delivery = action.payload.data;
+        console.log('Delivery data received:', action.payload);
+        if (action.payload && action.payload.data && Array.isArray(action.payload.data)) {
+          state.delivery_day = action.payload.data
+            .map((ele: any) => {
+              return { label: ele.label, value: ele.timestamp };
+            })
+            .sort((a: any, b: any) => new Date(a.value).getTime() - new Date(b.value).getTime());
+          state.delivery = action.payload.data;
+          console.log('Delivery days set:', state.delivery_day);
+        } else {
+          console.error('Invalid delivery data format:', action.payload);
+          toast.error('Invalid delivery data received');
+        }
       })
-      .addCase(getDeliveryDetails.rejected, (state) => {
+      .addCase(getDeliveryDetails.rejected, (state, action) => {
         state.isDeliveryLoading = false;
-        toast.error('Failed to load delivery slots');
+        console.error('Delivery slots rejected:', action.payload || action.error);
+        toast.error('Failed to load delivery slots. Please refresh the page.');
       })
       // Get all orders cases
       .addCase(getAllOrdersOfUser.pending, (state) => {

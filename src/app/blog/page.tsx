@@ -12,12 +12,13 @@ export default function BlogPage() {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     loadBlogs();
-  }, [currentPage, searchText]);
+  }, [currentPage, searchText, categoryFilter]);
 
   const loadBlogs = async () => {
     try {
@@ -28,7 +29,9 @@ export default function BlogPage() {
         searchText,
       });
       
-      setBlogs(response.data.items || []);
+      // Filter out blogs without valid slug or _id
+      const validBlogs = (response.data.items || []).filter((blog: any) => blog.slug || blog._id);
+      setBlogs(validBlogs);
       setTotalPages(response.data.lastPage || 1);
     } catch (error: any) {
       console.error("Failed to load blogs:", error);
@@ -76,7 +79,7 @@ export default function BlogPage() {
             transition={{ delay: 0.2 }}
             className="max-w-xl mx-auto"
           >
-            <div className="relative">
+            <div className="relative mb-4">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="text"
@@ -88,6 +91,75 @@ export default function BlogPage() {
                 }}
                 className="w-full pl-12 pr-4 py-3 rounded-full border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2 justify-center">
+              <button
+                onClick={() => {
+                  setCategoryFilter("");
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  categoryFilter === ""
+                    ? "bg-primary text-white"
+                    : "bg-card text-foreground border border-border hover:bg-muted"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => {
+                  setCategoryFilter("laundry-tips");
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  categoryFilter === "laundry-tips"
+                    ? "bg-primary text-white"
+                    : "bg-card text-foreground border border-border hover:bg-muted"
+                }`}
+              >
+                Laundry Tips
+              </button>
+              <button
+                onClick={() => {
+                  setCategoryFilter("how-to-guides");
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  categoryFilter === "how-to-guides"
+                    ? "bg-primary text-white"
+                    : "bg-card text-foreground border border-border hover:bg-muted"
+                }`}
+              >
+                How-To Guides
+              </button>
+              <button
+                onClick={() => {
+                  setCategoryFilter("news");
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  categoryFilter === "news"
+                    ? "bg-primary text-white"
+                    : "bg-card text-foreground border border-border hover:bg-muted"
+                }`}
+              >
+                News
+              </button>
+              <button
+                onClick={() => {
+                  setCategoryFilter("industry-insights");
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  categoryFilter === "industry-insights"
+                    ? "bg-primary text-white"
+                    : "bg-card text-foreground border border-border hover:bg-muted"
+                }`}
+              >
+                Industry Insights
+              </button>
             </div>
           </motion.div>
         </div>
@@ -119,15 +191,19 @@ export default function BlogPage() {
               animate={{ opacity: 1 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
-              {blogs.map((blog, index) => (
-                <motion.article
-                  key={blog._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-card rounded-2xl overflow-hidden border border-border hover:shadow-xl transition-all duration-300 group"
-                >
-                  <Link href={`/blog/${blog.slug}`}>
+              {blogs.map((blog, index) => {
+                const blogId = blog.slug || blog._id;
+                if (!blogId) return null;
+                
+                return (
+                  <motion.article
+                    key={blog._id || index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-card rounded-2xl overflow-hidden border border-border hover:shadow-xl transition-all duration-300 group"
+                  >
+                    <Link href={`/blog/${blogId}`}>
                     {/* Featured Image */}
                     <div className="relative h-48 overflow-hidden bg-muted">
                       {blog.featured_image ? (
@@ -146,6 +222,13 @@ export default function BlogPage() {
 
                     {/* Content */}
                     <div className="p-6">
+                      {/* Category Badge */}
+                      {blog.category && (
+                        <span className="inline-block px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 text-xs font-medium mb-3">
+                          {blog.category.replace("-", " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                        </span>
+                      )}
+
                       {/* Meta */}
                       <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                         <span className="flex items-center gap-1">
@@ -199,7 +282,8 @@ export default function BlogPage() {
                     </div>
                   </Link>
                 </motion.article>
-              ))}
+                );
+              })}
             </motion.div>
           )}
 

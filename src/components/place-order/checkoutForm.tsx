@@ -20,12 +20,15 @@ const CardForm = ({ setElements, setStripe }: any) => {
     cardCvc: false
   });
 
-  const handleChange = (field: string, event: any) => {
+  // Set stripe and elements when component mounts
+  React.useEffect(() => {
     if (stripe && elements) {
-      setElements(elements);
       setStripe(stripe);
+      setElements(elements);
     }
-    
+  }, [stripe, elements, setStripe, setElements]);
+
+  const handleChange = (field: string, event: any) => {
     if (event.error) {
       setError(event.error.message);
     } else {

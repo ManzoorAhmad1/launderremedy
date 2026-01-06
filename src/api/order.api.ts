@@ -76,6 +76,12 @@ const orderApi = {
     );
   },
 
+  // Approve order and charge payment
+  approveOrder: async (orderId: string) => {
+    const response = await client.put(`/order/v1/approve-order/${orderId}`);
+    return response;
+  },
+
   // Get all orders (admin)
   getAllOrders: async (params: GetOrdersParams = {}) => {
     const { page = 1, itemPerPage = 10, status = '', searchText = '' } = params;

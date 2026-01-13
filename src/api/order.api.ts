@@ -78,7 +78,7 @@ const orderApi = {
 
   // Approve order and charge payment
   approveOrder: async (orderId: string) => {
-    const response = await client.put(`/order/v1/approve-order/${orderId}`);
+    const response = await apiClient.put(`/order/v1/approve-order/${orderId}`);
     return response;
   },
 

@@ -320,26 +320,29 @@ export default function PricingPage() {
     });
   };
 
-  // Filter services
-  const filteredServices = services.filter(service => {
-    if (selectedCategory !== 'all' && service.category !== selectedCategory) return false;
-    if (searchQuery.trim() !== '') {
-      const query = searchQuery.toLowerCase();
-      return (
-        service.name.toLowerCase().includes(query) ||
-        service.description?.toLowerCase().includes(query) ||
-        service.category.toLowerCase().includes(query)
-      );
-    }
-    return true;
-  });
+// Your existing filter logic
+const sortedAndFilteredServices = services.filter(service => {
+  if (selectedCategory !== 'all' && service.category !== selectedCategory) return false;
+  if (searchQuery.trim() !== '') {
+    const query = searchQuery.toLowerCase();
+    return (
+      service.name.toLowerCase().includes(query) ||
+      service.description?.toLowerCase().includes(query) ||
+      service.category.toLowerCase().includes(query)
+    );
+  }
+  return true;
+});
 
+// Add sorting by price (low to high)
+const filteredServices = [...sortedAndFilteredServices].sort((a, b) => a.price - b.price);
   // Totals
   const cartTotal = cart.reduce((sum: number, item: any) => sum + (item.price * (item.quantity || 1)), 0);
   const cartCount = cart.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
 
   // Format price
   const formatPrice = (price: number) => `£${price.toFixed(2)}`;
+
 
   // Get service icon
   const getServiceIcon = (type?: string) => {

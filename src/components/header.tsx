@@ -160,7 +160,7 @@ export default function Header() {
                     : 'text-neutral-600 hover:text-primary'
                 }`}
               >
-                Categories
+                Services
                 <ChevronDown className={`w-4 h-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
                 <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full ${
                   pathname.startsWith('/category') ? 'w-full' : ''

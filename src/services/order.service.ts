@@ -147,6 +147,19 @@ const orderService = {
       throw new Error(error.message ?? 'Something went wrong');
     }
   },
+
+  // Submit order feedback
+  async submitFeedback(orderId: string, feedback: { rating: number; comment: string }) {
+    try {
+      const res = await Fetch.post(`${this._PREFIX}/submit-feedback/${orderId}`, feedback);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to submit feedback');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
 };
 
 export default orderService;

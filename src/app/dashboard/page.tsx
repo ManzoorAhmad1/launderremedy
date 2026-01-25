@@ -22,11 +22,13 @@ import {
   DollarSign,
   Award,
   Sparkles,
-  Plus
+  Plus,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import FeedbackModal from "@/components/FeedbackModal";
 import orderService from "@/services/order.service";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -51,6 +53,8 @@ export default function UserDashboard() {
   const isLogin = useSelector((state: any) => state.user.isLogin);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [stats, setStats] = useState({
     totalOrders: 0,
     totalSpent: 0,
@@ -406,9 +410,25 @@ export default function UserDashboard() {
                             {formatPrice(order.totalPrice)}
                           </p>
                         </div>
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          {order.status.toLowerCase() === 'completed' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setShowFeedbackModal(true);
+                              }}
+                              className="flex items-center gap-1 text-primary-600 hover:text-primary-700"
+                            >
+                              <MessageSquare className="w-4 h-4" />
+                              <span className="hidden sm:inline">Feedback</span>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -418,6 +438,20 @@ export default function UserDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Feedback Modal */}
+      {selectedOrder && (
+        <FeedbackModal
+          isOpen={showFeedbackModal}
+          onClose={() => {
+            setShowFeedbackModal(false);
+            setSelectedOrder(null);
+          }}
+          orderId={selectedOrder._id}
+          orderNumber={selectedOrder.order_number}
+          onSuccess={() => loadUserOrders()}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Sparkles } from 'lucide-react'
+import PaymentMethods from './PaymentMethods'
 
 const footerLinks = {
     services: [
@@ -166,6 +167,11 @@ export default function Footer() {
 
                 {/* Bottom Bar */}
                 <div className="border-t border-neutral-800 mt-8 pt-8">
+                    {/* Payment Methods */}
+                    <div className="mb-8">
+                        <PaymentMethods />
+                    </div>
+                    
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-neutral-500 text-sm sm:text-base text-center md:text-left">
                             © {new Date().getFullYear()} Launder Remedy. All rights reserved.

@@ -9,6 +9,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import CheckoutForm from "./checkoutForm";
+import PaymentMethods from "../PaymentMethods";
 
 
 const PaymentForm = ({ setElements, setStripe }:any) => {
@@ -139,6 +140,11 @@ const PaymentForm = ({ setElements, setStripe }:any) => {
               );
             })}
           </div>
+        </div>
+
+        {/* Payment Methods */}
+        <div className="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-700">
+          <PaymentMethods />
         </div>
       </motion.div>
     </motion.div>

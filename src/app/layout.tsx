@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
 import ProgressBar from '@/components/ProgressBar'
+import WhatsAppButton from '@/components/WhatsAppButton'
 import { Toaster } from 'react-hot-toast'
 import { StoreProvider } from '@/providers/StoreProvider'
 import { usePathname } from 'next/navigation'
@@ -49,6 +50,7 @@ export default function RootLayout({
                   <main className="flex-1">{children}</main>
                 </RoleGuard>
                 <Footer />
+                <WhatsAppButton />
                 <Toaster position="bottom-right" />
               </div>
             )}

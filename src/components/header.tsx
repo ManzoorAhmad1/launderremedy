@@ -204,6 +204,12 @@ export default function Header() {
             {/* User Actions */}
             {isLogin ? (
               <>
+                <Link href="/dashboard" onClick={closeMenu}>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   onClick={handleLogout}
@@ -314,6 +320,12 @@ export default function Header() {
               <div className="pt-4 border-t border-neutral-200 flex flex-col space-y-3">
                 {isLogin ? (
                   <>
+                    <Link href="/dashboard" onClick={closeMenu}>
+                      <Button variant="ghost" className="w-full flex items-center justify-center gap-2">
+                        <User className="h-4 w-4" />
+                        Dashboard
+                      </Button>
+                    </Link>
                     <Button
                       variant="destructive"
                       onClick={() => {
@@ -333,8 +345,7 @@ export default function Header() {
                   </Link>
                 )}
 
-                <Link href="#" onClick={closeMenu}>
-                {/* <Link href="/place-order" onClick={closeMenu}> */}
+                <Link href="/place-order" onClick={closeMenu}>
                   <Button className="w-full bg-primary hover:bg-primary-700 text-white">
                     Place Order
                   </Button>

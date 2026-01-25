@@ -8,6 +8,7 @@ import { getUserColumns } from "@/components/tables/columns/userColumns";
 import { userApi } from "@/api";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import UserViewModal from "@/components/admin/UserViewModal";
+import AddUserModal from "@/components/admin/AddUserModal";
 import toast from "react-hot-toast";
 import { Input } from "@/components/ui/input";
 
@@ -37,6 +38,7 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -139,7 +141,7 @@ export default function UsersPage() {
             Manage your platform users and their accounts
           </p>
         </div>
-        <Button className="gap-2 w-full sm:w-auto">
+        <Button className="gap-2 w-full sm:w-auto" onClick={() => setShowAddModal(true)}>
           <Plus className="h-4 w-4" />
           <span className="hidden xs:inline">Add User</span>
           <span className="xs:hidden">Add</span>
@@ -240,6 +242,13 @@ export default function UsersPage() {
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
         user={selectedUser as any}
+      />
+
+      {/* Add User Modal */}
+      <AddUserModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSuccess={() => loadUsers()}
       />
     </div>
   );

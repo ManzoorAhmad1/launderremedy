@@ -134,6 +134,19 @@ const orderService = {
       throw new Error(error.message ?? 'Something went wrong');
     }
   },
+
+  // Get user orders
+  async getUserOrders(userId: string) {
+    try {
+      const res = await Fetch.get(`${this._PREFIX}/get-user-orders/${userId}`);
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to get user orders');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
 };
 
 export default orderService;

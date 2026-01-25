@@ -41,6 +41,19 @@ const userService = {
     }
   },
 
+  // Get all users (admin only)
+  getAllUsers: async () => {
+    try {
+      const res = await Fetch.post(`${userService._PREFIX}/get-all-users`, {});
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to get users');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
+
   // Delete account (uses auth service)
   deleteAccount: async (userId: string) => {
     return await authService.deleteAccount(userId);

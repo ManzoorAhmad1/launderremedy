@@ -46,6 +46,13 @@ const sidebarItems: SidebarItem[] = [
         // Dashboard is always visible
     },
     {
+        id: "my-users",
+        title: "My Users",
+        href: "/admin/my-users",
+        icon: <Users className="h-5 w-5" />,
+        // Only subadmins can see this, handled separately
+    },
+    {
         id: "users",
         title: "Users",
         href: "/admin/users",
@@ -224,9 +231,15 @@ export default function AdminSidebar() {
                             {mounted && sidebarItems.map((item) => {
                                 // Check permissions for sub-admins
                                 const isAdmin = user?.type === 'admin';
+                                const isSubAdmin = user?.type === 'subadmin';
                                 const hasPermission = !item.permission || 
                                     isAdmin || 
                                     (user?.permissions && user.permissions.includes(item.permission));
+                                
+                                // My Users page only for subadmins
+                                if (item.id === 'my-users' && !isSubAdmin) {
+                                    return null;
+                                }
                                 
                                 // Sub-admins page only for admins
                                 if (item.id === 'subadmins' && !isAdmin) {

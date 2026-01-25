@@ -18,12 +18,39 @@ export default function AdminHeader() {
     const router = useRouter();
     const dispatch = useDispatch();
     const { user } = useSelector((state: RootState) => state.user);
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleLogout = () => {
         localStorage.removeItem("user");
         window.location.href = "/";
         toast.success("Logged out successfully");
     };
+
+    if (!mounted) {
+        return (
+            <header className="fixed top-0 left-0 right-0 z-40 bg-background border-b border-border">
+                <div className="h-16 px-3 sm:px-4 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+                    <Link href="/admin/dashboard" className="flex items-center gap-2 flex-shrink-0">
+                        <Image
+                            src={logo}
+                            alt="Launder Remedy"
+                            width={180}
+                            height={40}
+                            className="h-6 sm:h-7 md:h-8 w-auto"
+                            priority
+                        />
+                    </Link>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="h-9 w-9 sm:h-10 sm:w-10"></div>
+                    </div>
+                </div>
+            </header>
+        );
+    }
 
     return (
         <header className="fixed top-0 left-0 right-0 z-40 bg-background border-b border-border">
@@ -70,6 +97,17 @@ export default function AdminHeader() {
                             </div>
                         </div>
                     )}
+
+                    {/* Logout Button */}
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleLogout}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                        <LogOut className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Logout</span>
+                    </Button>
                 </div>
             </div>
         </header>

@@ -12,7 +12,8 @@ import {
   Leaf,
   CheckCircle,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -55,6 +56,23 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
     });
 
     return totalPrice < 20 ? 20 : totalPrice;
+  };
+
+  // Calculate discount for first-time users
+  const getDiscountInfo = () => {
+    const isFirstTimeUser = !user?.first_order_discount_used;
+    const totalPrice = getTotalPrice();
+    const discountPercentage = isFirstTimeUser ? 25 : 0;
+    const discountAmount = isFirstTimeUser ? (totalPrice * 0.25) : 0;
+    const finalPrice = isFirstTimeUser ? (totalPrice - discountAmount) : totalPrice;
+
+    return {
+      isFirstTimeUser,
+      discountPercentage,
+      discountAmount,
+      finalPrice,
+      originalPrice: totalPrice
+    };
   };
 
   // Handle service quantity updates
@@ -532,10 +550,25 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
       {step === 5 && (
         <div className="p-6 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50">
           <div className="space-y-3">
+            {/* First Time User Discount Banner */}
+            {getDiscountInfo().isFirstTimeUser && (
+              <div className="mb-4 p-4 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-white/20 backdrop-blur">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg">🎉 First Order Special!</p>
+                    <p className="text-sm text-white/90">You're getting 25% off your first order</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <span className="text-neutral-600 dark:text-neutral-400">Order Total</span>
-              <span className="font-semibold text-neutral-900 dark:text-white">
-                £{getTotalPrice().toFixed(2)}
+              <span className={`font-semibold ${getDiscountInfo().isFirstTimeUser ? 'line-through text-neutral-500 dark:text-neutral-500' : 'text-neutral-900 dark:text-white'}`}>
+                £{getDiscountInfo().originalPrice.toFixed(2)}
               </span>
             </div>
 
@@ -543,6 +576,18 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
               <span className="text-neutral-600 dark:text-neutral-400">Delivery</span>
               <span className="text-accent-green font-medium">FREE</span>
             </div>
+
+            {getDiscountInfo().isFirstTimeUser && (
+              <div className="flex items-center justify-between text-green-600 dark:text-green-400">
+                <span className="font-medium flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4" />
+                  First Order Discount (25%)
+                </span>
+                <span className="font-bold">
+                  -£{getDiscountInfo().discountAmount.toFixed(2)}
+                </span>
+              </div>
+            )}
 
             {getTotalPrice() < 20 && (
               <div className="flex items-center justify-between pt-2 border-t border-neutral-200 dark:border-neutral-700">
@@ -554,10 +599,17 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
             )}
 
             <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-700">
-              <span className="text-lg font-bold text-neutral-900 dark:text-white">Total</span>
-              <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                £{getTotalPrice().toFixed(2)}
-              </span>
+              <span className="text-lg font-bold text-neutral-900 dark:text-white">Total to Pay</span>
+              <div className="text-right">
+                <span className="text-2xl font-bold text-primary-600 dark:text-primary-400 block">
+                  £{getDiscountInfo().finalPrice.toFixed(2)}
+                </span>
+                {getDiscountInfo().isFirstTimeUser && (
+                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                    You saved £{getDiscountInfo().discountAmount.toFixed(2)}!
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>

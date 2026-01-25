@@ -319,11 +319,20 @@ export default function PlaceOrderPage() {
 
       const totalPrice = orderPrice < 20 ? 20 : orderPrice;
 
+      // Check if user is eligible for first-time 25% discount
+      const isFirstTimeUser = !user?.first_order_discount_used;
+      const discountPercentage = isFirstTimeUser ? 25 : 0;
+      const discountAmount = isFirstTimeUser ? (totalPrice * 0.25) : 0;
+      const finalTotalPrice = isFirstTimeUser ? (totalPrice - discountAmount) : totalPrice;
+
       // Prepare order data
       const orderData = {
         ...orderDetail,
-        totalPrice,
-        orderPrice: totalPrice,
+        totalPrice: finalTotalPrice.toFixed(2),
+        orderPrice: totalPrice.toFixed(2),
+        discount: discountAmount.toFixed(2),
+        discountPercentage,
+        isFirstOrder: isFirstTimeUser,
         serviceFee,
         bundles: prepaidBundles,
         payment_done: false,
@@ -358,8 +367,8 @@ export default function PlaceOrderPage() {
         if (prepaidBundles.length === 0 || orderPrice > 0) {
           try {
             const paymentResponse:any = await paymentApi.createPaymentIntent({
-              amount: Math.round(totalPrice * 100), // Convert to pence
-              description: `Order payment for ${selectedServicesList.length} items`,
+              amount: Math.round(finalTotalPrice * 100), // Convert to pence with discount applied
+              description: `Order payment for ${selectedServicesList.length} items${isFirstTimeUser ? ' (25% First Order Discount)' : ''}`,
               payment_method_id: paymentToken,
               user_id: user._id,
               id: orderId,
@@ -414,7 +423,7 @@ export default function PlaceOrderPage() {
       case 1:
         return state?.address || orderDetail?.address;
       case 2:
-        return orderDetail?.collection_day && orderDetail?.delivery_day;
+        return state?.collection_day && state?.delivery_day;
       case 3:
         // Ensure at least one service is selected with quantity > 0
         if (!selectedServicesList || selectedServicesList.length === 0) {
@@ -426,7 +435,7 @@ export default function PlaceOrderPage() {
         );
         return hasValidService;
       case 4:
-        return orderDetail?.first_name && orderDetail?.last_name && orderDetail?.email && orderDetail?.phone;
+        return state?.first_name && state?.last_name && state?.email && state?.phone;
       case 5:
         // Basic validation for payment step
         return elements !== null && stripe !== null;

@@ -161,9 +161,20 @@ export default function PricingPage() {
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [categoriesList, setCategoriesList] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [mounted, setMounted] = useState<boolean>(false);
   const router = useRouter()
   const dispatch = useDispatch();
   const cart = useSelector((state: any) => state.order.selectedServicesList || []);
+  const user = useSelector((state: any) => state.user.user);
+  
+  // Check if user is eligible for first-time discount
+  const isFirstTimeUser = user && !user?.first_order_discount_used;
+  
+  // Handle client-side mounting
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
   // Load data from API
   useEffect(() => {
     getAllServicesApi();
@@ -407,6 +418,43 @@ const filteredServices = [...sortedAndFilteredServices].sort((a, b) => a.price -
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
+          {/* First Time User Discount Banner - Client side only to avoid hydration errors */}
+          {mounted && isFirstTimeUser && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-r from-green-500 via-emerald-600 to-green-500 rounded-2xl p-6 md:p-8 text-white mb-6 shadow-lg overflow-hidden relative"
+            >
+              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+              <div className="relative z-10 max-w-3xl mx-auto text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring" }}
+                  className="inline-block mb-4"
+                >
+                  <div className="w-16 h-16 mx-auto bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                </motion.div>
+                <h2 className="text-2xl md:text-4xl font-bold mb-3">🎉 Welcome! Get 25% Off Your First Order</h2>
+                <p className="text-white/90 text-lg mb-4">
+                  As a first-time customer, enjoy an exclusive 25% discount on your entire first order!
+                </p>
+                <div className="flex flex-wrap justify-center gap-3 text-sm">
+                  <div className="flex items-center bg-white/20 backdrop-blur px-4 py-2 rounded-full">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    <span>Applies Automatically</span>
+                  </div>
+                  <div className="flex items-center bg-white/20 backdrop-blur px-4 py-2 rounded-full">
+                    <Clock className="w-4 h-4 mr-2" />
+                    <span>Limited Time Offer</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+          
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl p-6 md:p-8 text-white mb-6 shadow-lg">
             <div className="max-w-2xl">
@@ -525,7 +573,7 @@ const filteredServices = [...sortedAndFilteredServices].sort((a, b) => a.price -
 
             {/* Services Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {filteredServices.map((service) => {
+              {filteredServices.map((service, index) => {
                 const ServiceIcon = getServiceIcon(service.type);
                 const isSelected = isServiceSelected(service._id || service.id);
                 const selectedQuantity = getSelectedServiceQuantity(service._id || service.id);
@@ -533,7 +581,7 @@ const filteredServices = [...sortedAndFilteredServices].sort((a, b) => a.price -
 
                 return (
                   <motion.div
-                    key={service._id || service.id}
+                    key={`${service._id || service.id}-${index}`}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}

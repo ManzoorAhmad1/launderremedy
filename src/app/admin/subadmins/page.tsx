@@ -119,6 +119,8 @@ export default function AdminSubAdminsPage() {
     try {
       setLoading(true);
       const response = await subadminService.getAllSubAdmins();
+      console.log("SubAdmins Response:", response);
+      console.log("SubAdmins Data:", response.data);
       setSubAdmins(response.data || []);
     } catch (error: any) {
       console.error("Failed to load sub-admins:", error);
@@ -130,8 +132,13 @@ export default function AdminSubAdminsPage() {
 
   const handleOpenModal = (subAdmin: any = null) => {
     if (subAdmin) {
+      console.log("Opening modal for SubAdmin:", subAdmin);
+      console.log("SubAdmin assigned_users:", subAdmin.assigned_users);
+      
       setEditingSubAdmin(subAdmin);
       const assignedUserIds = subAdmin.assigned_users?.map((u: any) => u._id || u) || [];
+      console.log("Extracted User IDs:", assignedUserIds);
+      
       setFormData({
         email: subAdmin.email,
         password: "",
@@ -145,6 +152,8 @@ export default function AdminSubAdminsPage() {
       // Store assigned users in allUsers state so they can be displayed
       if (subAdmin.assigned_users && Array.isArray(subAdmin.assigned_users)) {
         const assignedUsersArray = subAdmin.assigned_users.filter((u: any) => u && u._id);
+        console.log("Assigned Users Array:", assignedUsersArray);
+        
         setAllUsers((prev) => {
           // Merge existing users with assigned users, avoiding duplicates
           const existingIds = new Set(prev.map((u) => u._id));
@@ -195,6 +204,9 @@ export default function AdminSubAdminsPage() {
           updatePayload.password = formData.password;
         }
         
+        console.log("Update Payload:", updatePayload);
+        console.log("Assigned Users IDs:", formData.assigned_users);
+        
         await subadminService.updateSubAdmin(editingSubAdmin._id, updatePayload);
         toast.success("Sub-admin updated successfully!");
       } else {
@@ -202,7 +214,12 @@ export default function AdminSubAdminsPage() {
           toast.error("Password is required for new sub-admin");
           return;
         }
-        await subadminService.createSubAdmin(formData);
+        
+        const createPayload = { ...formData };
+        console.log("Create Payload:", createPayload);
+        console.log("Assigned Users IDs:", formData.assigned_users);
+        
+        await subadminService.createSubAdmin(createPayload);
         toast.success("Sub-admin created successfully!");
       }
       
@@ -332,6 +349,7 @@ export default function AdminSubAdminsPage() {
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm text-foreground">
+                          {console.log("SubAdmin:", subAdmin.email, "Assigned Users:", subAdmin.assigned_users)}
                           {subAdmin.assigned_users?.length || 0} user{subAdmin.assigned_users?.length !== 1 ? 's' : ''}
                         </span>
                       </div>

@@ -12,7 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import StatCard from "@/components/admin/StatCard";
-import { orderApi, serviceApi } from "@/api";
+import { orderApi, serviceApi, userApi } from "@/api";
 import toast from "react-hot-toast";
 
 interface DashboardStats {
@@ -52,12 +52,18 @@ export default function AdminDashboard() {
         itemPerPage: 5,
       });
 
+      // Fetch users count
+      const usersCountResponse = await userApi.getUsersCount();
+      
+      // Fetch total revenue
+      const revenueResponse = await orderApi.getTotalRevenue();
+
       // Calculate stats from orders count
       const ordersData = ordersCountResponse?.data || [];
       const statsData: DashboardStats = {
-        totalUsers: 0, // Would need separate users API endpoint
+        totalUsers: usersCountResponse?.data?.totalUsers || 0,
         totalOrders: ordersData.reduce((sum: number, item: any) => sum + item.count, 0),
-        totalRevenue: 0, // Would need separate revenue calculation
+        totalRevenue: revenueResponse?.data?.totalRevenue || 0,
         activeServices: servicesResponse?.data?.length || 0,
         pendingOrders: ordersData.find((item: any) => item.status === 'pending')?.count || 0,
         processingOrders: ordersData.find((item: any) => item.status === 'processing')?.count || 0,

@@ -56,9 +56,18 @@ export const formatTimeRange = (start: string, end: string): string => {
 };
 
 /**
- * Get next available date (excluding today)
+ * Get next available date (including today if current time allows)
  */
 export const getNextAvailableDate = (): Date => {
+  const now = new Date();
+  const currentHour = now.getHours();
+  
+  // If it's before 8 PM, allow today, otherwise start from tomorrow
+  if (currentHour < 20) {
+    now.setHours(0, 0, 0, 0);
+    return now;
+  }
+  
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
@@ -86,18 +95,28 @@ export const isValidDate = (date: Date | string): boolean => {
 };
 
 /**
- * Generate time slots for a day
+ * Generate time slots for a day with 3-hour intervals
  */
 export const generateTimeSlots = (
   startHour: number = 8,
   endHour: number = 20,
-  intervalMinutes: number = 60
+  intervalMinutes: number = 180 // 3 hours = 180 minutes
 ): TimeSlot[] => {
   const slots: TimeSlot[] = [];
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
   
-  for (let hour = startHour; hour < endHour; hour++) {
+  // Determine effective start hour (skip past slots for today)
+  const isToday = true; // This will be checked per date
+  const effectiveStartHour = isToday && currentHour >= startHour 
+    ? Math.ceil((currentHour + 1) / 3) * 3 // Next 3-hour block
+    : startHour;
+  
+  for (let hour = Math.max(effectiveStartHour, startHour); hour < endHour; hour += 3) {
     const start = `${hour.toString().padStart(2, '0')}:00`;
-    const endTime = hour + 1;
+    const endTime = Math.min(hour + 3, endHour);
     const end = `${endTime.toString().padStart(2, '0')}:00`;
     
     slots.push({

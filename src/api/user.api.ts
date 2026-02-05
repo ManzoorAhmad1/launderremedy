@@ -86,6 +86,11 @@ const userApi:any = {
     });
   },
 
+  // Admin: Get users count
+  getUsersCount: async () => {
+    return await apiClient.get('/user/v1/get-users-count');
+  },
+
   // Admin: Update user status
   updateUserStatus: async (userId: string, status: 'active' | 'inactive' | 'suspended') => {
     // TODO: Backend endpoint needed - /user/v1/update-user-status/:id

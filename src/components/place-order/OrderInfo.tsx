@@ -348,7 +348,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
                           {/* MINUS BUTTON - Should decrease quantity */}
-                          <button
+                          <div
                             onClick={(e) => {
                               e.stopPropagation();
                               if (step >= 3) {
@@ -369,7 +369,6 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                                 }));
                               }
                             }}
-                            disabled={step < 3}
                             className={`w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 transition-colors ${
                               step >= 3 
                                 ? 'hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer' 
@@ -377,14 +376,14 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                             }`}
                           >
                             <Minus className="w-3 h-3" />
-                          </button>
+                          </div>
 
                           <span className="w-6 text-center text-sm font-medium text-neutral-900 dark:text-white">
                             {service.quantity}
                           </span>
 
                           {/* PLUS BUTTON - Should increase quantity */}
-                          <button
+                          <div
                             onClick={(e) => {
                               e.stopPropagation();
                               if (step >= 3) {
@@ -405,7 +404,6 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                                 }));
                               }
                             }}
-                            disabled={step < 3}
                             className={`w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 transition-colors ${
                               step >= 3 
                                 ? 'hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer' 
@@ -413,7 +411,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                             }`}
                           >
                             <Plus className="w-3 h-3" />
-                          </button>
+                          </div>
                         </div>
 
                         <span className="font-semibold text-primary-600 dark:text-primary-400 text-sm min-w-[60px] text-right">

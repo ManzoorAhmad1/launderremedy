@@ -95,6 +95,11 @@ const orderApi = {
     return await apiClient.get('/order/v1/get-orders-count');
   },
 
+  // Get total revenue
+  getTotalRevenue: async () => {
+    return await apiClient.get('/order/v1/get-total-revenue');
+  },
+
   // Get collection time slots
   getCollectionSlots: async (date: string) => {
     return await apiClient.get(`/order/v1/get-collection-slots?date=${date}`);

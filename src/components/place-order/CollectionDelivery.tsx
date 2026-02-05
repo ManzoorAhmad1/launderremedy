@@ -395,25 +395,25 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
             <div className="grid md:grid-cols-2 gap-4">
               <SummaryCard
                 title="Collection Day"
-                value={formState.collectionDay?.label}
+                value={typeof formState.collectionDay === 'string' ? formState.collectionDay : formState.collectionDay?.label || formState.collectionDay?.value || ""}
                 icon={Calendar}
                 color="bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
               />
               <SummaryCard
                 title="Collection Time"
-                value={formState.collectionTime?.label}
+                value={typeof formState.collectionTime === 'string' ? formState.collectionTime : formState.collectionTime?.label || formState.collectionTime?.value || ""}
                 icon={Clock}
                 color="bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
               />
               <SummaryCard
                 title="Delivery Day"
-                value={formState.deliveryDay?.label}
+                value={typeof formState.deliveryDay === 'string' ? formState.deliveryDay : formState.deliveryDay?.label || formState.deliveryDay?.value || ""}
                 icon={Calendar}
                 color="bg-accent-green/20 text-accent-green"
               />
               <SummaryCard
                 title="Delivery Time"
-                value={formState.deliveryTime?.label}
+                value={typeof formState.deliveryTime === 'string' ? formState.deliveryTime : formState.deliveryTime?.label || formState.deliveryTime?.value || ""}
                 icon={Clock}
                 color="bg-accent-green/20 text-accent-green"
               />

@@ -154,7 +154,7 @@ export default function HeroSection() {
                                     <div className="p-3 bg-neutral-50 dark:bg-neutral-700/30 rounded-lg border border-neutral-200 dark:border-neutral-700">
                                         <div className="flex items-center justify-between mb-2">
                                             <div className="font-medium text-sm sm:text-base">Servicing BSX</div>
-                                            <div className="text-primary font-bold text-sm sm:text-base">$100 - $500</div>
+                                            <div className="text-primary font-bold text-sm sm:text-base">£100 - £500</div>
                                         </div>
                                         <div className="flex items-center text-xs sm:text-sm text-neutral-500">
                                             <CheckCircle className="w-3 h-3 mr-1 flex-shrink-0" />
@@ -164,7 +164,7 @@ export default function HeroSection() {
                                     <div className="p-3 bg-neutral-50 dark:bg-neutral-700/30 rounded-lg border border-neutral-200 dark:border-neutral-700">
                                         <div className="flex items-center justify-between mb-2">
                                             <div className="font-medium text-sm sm:text-base">Servicing BSX</div>
-                                            <div className="text-primary font-bold text-sm sm:text-base">$100 - $300</div>
+                                            <div className="text-primary font-bold text-sm sm:text-base">£100 - £300</div>
                                         </div>
                                         <div className="flex items-center text-xs sm:text-sm text-neutral-500">
                                             <CheckCircle className="w-3 h-3 mr-1 flex-shrink-0" />

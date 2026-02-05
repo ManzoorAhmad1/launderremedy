@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Sparkles } from 'lucide-react'
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Sparkles, Music } from 'lucide-react'
 import PaymentMethods from './PaymentMethods'
 
 const footerLinks = {
@@ -51,14 +51,16 @@ export default function Footer() {
                         {/* Social Links */}
                         <div className="flex flex-wrap gap-3">
                             {[
-                                { Icon: Facebook, label: "Facebook" },
-                                { Icon: Twitter, label: "Twitter" },
-                                { Icon: Instagram, label: "Instagram" },
-                                { Icon: Linkedin, label: "LinkedIn" }
+                                { Icon: Facebook, label: "Facebook", href: "https://www.facebook.com/share/19JyZLYC47/?mibextid=wwXIfr" },
+                                { Icon: Music, label: "TikTok", href: "https://www.tiktok.com/@laundetarrc?_r=1&_t=ZN-93f9HN1QJuQ" },
+                                { Icon: Instagram, label: "Instagram", href: "https://www.instagram.com/launderremedyltd?igsh=ZTE0M3JsamswdHZz&utm_source=qr" },
+                                { Icon: Linkedin, label: "LinkedIn", href: "#" }
                             ].map((social, index) => (
                                 <a
                                     key={index}
-                                    href="#"
+                                    href={social.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary-600 transition-all duration-300 hover:scale-105"
                                     aria-label={social.label}
                                 >
@@ -104,8 +106,8 @@ export default function Footer() {
                                     </div>
                                     <div>
                                         <p className="text-neutral-400 text-sm">Phone Number</p>
-                                        <a href="tel:+442071234567" className="text-white hover:text-primary-400 transition-colors">
-                                            +44 20 7123 4567
+                                        <a href="tel:+447442716396" className="text-white hover:text-primary-400 transition-colors">
+                                            +44 7442 716396
                                         </a>
                                     </div>
                                 </div>

@@ -41,6 +41,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
   const router = useRouter()
@@ -48,6 +49,11 @@ export default function Header() {
   const categoriesRef = useRef<HTMLDivElement>(null)
 
   const { isLogin, user } = useSelector((state: any) => state.user)
+
+  // Prevent hydration mismatch for theme
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Listen for auth-logout event from API client
   useEffect(() => {
@@ -193,11 +199,16 @@ export default function Header() {
               size="icon"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="rounded-full"
+              suppressHydrationWarning
             >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5" />
+              {mounted ? (
+                theme === 'dark' ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )
               ) : (
-                <Moon className="h-5 w-5" />
+                <Sun className="h-5 w-5" />
               )}
             </Button> 
 

@@ -12,14 +12,14 @@ export const categoryData: Record<string, {
 }> = {
   'laundry-services': {
     title: 'Premium Laundry Services',
-    subtitle: 'Professional Care for Your Everyday Garments',
+    subtitle: 'Professional Care for Your Everyday Gardrobe',
     description: 'Experience exceptional laundry service with our comprehensive cleaning solutions. We handle everything from delicate fabrics to everyday wear with precision and care.',
-    heroImage: 'https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?w=1200&q=80',
+    heroImage: '/website imagesv/what-are-the-5-stages-of-laundry-process.jpg',
     sections: [
       {
         title: 'Complete Washing Solutions',
         description: 'Our state-of-the-art laundry facilities use premium detergents and advanced washing techniques to ensure your clothes are impeccably clean and fresh. Every load receives individual attention with customized wash cycles.',
-        image: 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=800&q=80',
+        image: '/website imagesv/commercial-laundrymachines-r.jpeg',
         features: [
           'Temperature-controlled washing for fabric preservation',
           'Hypoallergenic detergent options available',
@@ -31,7 +31,7 @@ export const categoryData: Record<string, {
       {
         title: 'Expert Drying & Folding',
         description: 'Every garment is carefully dried at optimal temperatures and professionally folded to maintain quality and prevent wrinkles. Our expert team ensures your clothes look pristine and ready to wear.',
-        image: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=800&q=80',
+        image: '/website imagesv/folding-clothes.png',
         features: [
           'Low-heat drying to prevent shrinkage',
           'Meticulous folding techniques',
@@ -43,7 +43,7 @@ export const categoryData: Record<string, {
       {
         title: 'Same-Day Express Service',
         description: 'Need your laundry fast? Our express service ensures your clothes are cleaned, dried, and ready within hours. Perfect for busy professionals and urgent situations.',
-        image: 'https://images.unsplash.com/photo-1521656693074-0ef32e80a5d5?w=800&q=80',
+        image: '/website imagesv/PickUp-Laundry-and-Delivery-Service-1024x683.jpg',
         features: [
           '24-hour standard turnaround',
           'Express 12-hour service available',
@@ -55,7 +55,7 @@ export const categoryData: Record<string, {
       {
         title: 'Sustainable Practices',
         description: 'We\'re committed to environmental responsibility with eco-friendly detergents and efficient water management systems. Our green approach doesn\'t compromise on cleaning quality.',
-        image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&q=80',
+        image: '/website imagesv/Eco-5.png',
         features: [
           'Biodegradable cleaning products',
           'Water-saving washing technology',
@@ -67,7 +67,7 @@ export const categoryData: Record<string, {
       {
         title: 'Fabric Care Specialists',
         description: 'Our trained specialists understand different fabric types and their unique care requirements. From cotton to synthetic blends, we provide expert treatment for all materials.',
-        image: 'https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=800&q=80',
+        image: '/website imagesv/Header-clean-fabric.jpg',
         features: [
           'Cotton and linen expertise',
           'Synthetic blend handling',
@@ -79,7 +79,7 @@ export const categoryData: Record<string, {
       {
         title: 'Quality Inspection Process',
         description: 'Every item undergoes thorough inspection before and after cleaning. We check for stains, damage, and ensure perfect results before delivery to your doorstep.',
-        image: 'https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?w=800&q=80',
+        image: '/website imagesv/services-Dry-Cleaning.jpg',
         features: [
           'Pre-wash inspection and tagging',
           'Post-wash quality verification',
@@ -91,7 +91,7 @@ export const categoryData: Record<string, {
       {
         title: 'Convenient Collection & Delivery',
         description: 'Enjoy hassle-free service with our complimentary collection and delivery across London. Schedule pickups at your convenience and receive your fresh laundry at your doorstep.',
-        image: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=800&q=80',
+        image: '/website imagesv/laundry_service_cerritos_ca.webp',
         features: [
           'Free pickup and delivery service',
           'Flexible scheduling options',
@@ -106,12 +106,12 @@ export const categoryData: Record<string, {
     title: 'Shirts & Tops Care',
     subtitle: 'Specialized Care for Your Professional Wardrobe',
     description: 'Keep your shirts and tops looking pristine with our expert cleaning and pressing services. Perfect for business professionals who demand excellence.',
-    heroImage: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1200&q=80',
+    heroImage: '/website imagesv/hanging_up_a_tapered_fit_shirt_1024x1024.webp',
     sections: [
       {
         title: 'Professional Shirt Service',
         description: 'Our specialized shirt service includes expert cleaning, precise pressing, and presentation on hangers for a perfectly professional appearance. Each shirt receives individual attention from our experienced team.',
-        image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80',
+        image: '/website imagesv/1724417885ironing-services-abu-dhabi.webp',
         features: [
           'Professional collar and cuff treatment',
           'Precision steam pressing technology',
@@ -123,7 +123,7 @@ export const categoryData: Record<string, {
       {
         title: 'Delicate Fabric Expertise',
         description: 'From silk blouses to linen shirts, we have the expertise to handle all fabric types with appropriate care techniques. Our specialists are trained in treating premium and designer fabrics.',
-        image: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=800&q=80',
+        image: '/website imagesv/fp_02_00_00_fabric-care-solutions-models-occasionwear-0883-16x9_glo-1024x576.jpg.webp',
         features: [
           'Hand-washing for delicate materials',
           'Specialized treatment for silk and satin',
@@ -135,7 +135,7 @@ export const categoryData: Record<string, {
       {
         title: 'Stain & Spot Treatment',
         description: 'Expert removal of common shirt stains including collar rings, underarm marks, and food stains without fabric damage. Our advanced stain removal techniques ensure pristine results.',
-        image: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=800&q=80',
+        image: '/website imagesv/wool-garment-care-strategies-different-fabrics-pressing.webp',
         features: [
           'Pre-treatment of stubborn stains',
           'Oil and grease stain removal',
@@ -147,7 +147,7 @@ export const categoryData: Record<string, {
       {
         title: 'Premium Finishing',
         description: 'Every shirt receives meticulous finishing touches including button inspection, loose thread removal, and quality assurance. We ensure perfection in every detail.',
-        image: 'https://images.unsplash.com/photo-1594938291221-94f18cbb5660?w=800&q=80',
+        image: '/website imagesv/cleanly-bags.webp',
         features: [
           'Button tightening and replacement',
           'Wrinkle-free guarantee',
@@ -159,7 +159,7 @@ export const categoryData: Record<string, {
       {
         title: 'Business Shirt Packages',
         description: 'Exclusive packages for professionals who need regular shirt cleaning. Save time and money with our subscription services designed for busy executives.',
-        image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&q=80',
+        image: '/website imagesv/shutterstock-238643320-cropped-1521537943-scaled.jpg',
         features: [
           'Weekly and monthly packages available',
           'Priority service for members',
@@ -171,7 +171,7 @@ export const categoryData: Record<string, {
       {
         title: 'White Shirt Specialists',
         description: 'White shirts require special care to maintain their brightness and prevent yellowing. Our specialized white shirt treatment keeps your whites looking new.',
-        image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80',
+        image: '/website imagesv/shutterstock_730137010.jpg',
         features: [
           'Optical brightening treatments',
           'Yellowing prevention methods',
@@ -183,7 +183,7 @@ export const categoryData: Record<string, {
       {
         title: 'Express Shirt Service',
         description: 'Need your shirts cleaned urgently? Our express service guarantees same-day turnaround for professionals on tight schedules. Perfect for last-minute meetings and travel.',
-        image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80',
+        image: '/website imagesv/restaurant-laundry-service-london.jpeg',
         features: [
           'Same-day service available',
           '4-hour express option',
@@ -198,12 +198,12 @@ export const categoryData: Record<string, {
     title: 'Elegant Suits Care',
     subtitle: 'Luxury Treatment for Your Finest Formal Wear',
     description: 'Trust your valuable suits to our expert care. We provide premium dry cleaning and pressing services that preserve the quality and appearance of your formal attire.',
-    heroImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=80',
+    heroImage: '/website imagesv/suit-dry-cleaning.jpg',
     sections: [
       {
         title: 'Expert Dry Cleaning',
         description: 'Our professional dry cleaning process uses gentle, eco-friendly solvents that effectively clean without compromising fabric integrity. Each suit receives personalized treatment based on fabric type and construction.',
-        image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80',
+        image: '/website imagesv/how-often-to-dry-clean-suit.webp',
         features: [
           'Premium solvent-based cleaning',
           'Fabric structure preservation',
@@ -215,7 +215,7 @@ export const categoryData: Record<string, {
       {
         title: 'Precision Pressing',
         description: 'Master craftsmen ensure every suit is pressed to perfection with attention to lapels, creases, and overall presentation. Using traditional hand-finishing techniques combined with modern technology.',
-        image: 'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=800&q=80',
+        image: '/website imagesv/images (1).jpg',
         features: [
           'Hand-finished pressing techniques',
           'Sharp crease maintenance',
@@ -227,7 +227,7 @@ export const categoryData: Record<string, {
       {
         title: 'Fabric Care Excellence',
         description: 'Specialized care for wool, cashmere, silk, and blended fabrics ensures your suits maintain their luxurious feel and appearance. Our experts understand the unique needs of premium materials.',
-        image: 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=800&q=80',
+        image: '/website imagesv/images (2).jpg',
         features: [
           'Wool and cashmere specialists',
           'Lining care and repair',
@@ -239,7 +239,7 @@ export const categoryData: Record<string, {
       {
         title: 'Premium Storage & Delivery',
         description: 'Your suits are returned on premium hangers with protective coverings, ready to hang in your wardrobe. White-glove service ensures your investment is protected.',
-        image: 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=800&q=80',
+        image: '/website imagesv/Cotton-Fabric-Suit-Hanger-Garment-Bag-with-Handles-for-Mens-and-Womens.avif',
         features: [
           'Wooden hanger presentation',
           'Breathable garment bags',
@@ -251,7 +251,7 @@ export const categoryData: Record<string, {
       {
         title: 'Stain Removal Specialists',
         description: 'Complex stain removal for suits requires expertise and precision. Our specialists can handle everything from wine spills to oil stains without damaging the fabric.',
-        image: 'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=800&q=80',
+        image: '/website imagesv/images (3).jpg',
         features: [
           'Expert stain identification',
           'Pre-treatment for tough stains',
@@ -263,7 +263,7 @@ export const categoryData: Record<string, {
       {
         title: 'Suit Maintenance Program',
         description: 'Our exclusive maintenance program keeps your suits in pristine condition year-round. Perfect for professionals who wear suits daily.',
-        image: 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=800&q=80',
+        image: '/website imagesv/images (4).jpg',
         features: [
           'Regular cleaning schedule',
           'Priority service access',
@@ -275,7 +275,7 @@ export const categoryData: Record<string, {
       {
         title: 'Express Suit Service',
         description: 'Need your suit cleaned urgently for an important meeting or event? Our express service delivers impeccable results in record time.',
-        image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80',
+        image: '/website imagesv/images (5).jpg',
         features: [
           'Same-day service available',
           '24-hour turnaround guaranteed',
@@ -290,12 +290,12 @@ export const categoryData: Record<string, {
     title: 'Dresses & Skirts Care',
     subtitle: 'Delicate Handling for Your Elegant Attire',
     description: 'From cocktail dresses to evening gowns, our specialized cleaning services ensure your dresses and skirts look stunning for every occasion.',
-    heroImage: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1200&q=80',
+    heroImage: '/website imagesv/For-Wedding-Dress-Dry-Cleaning-Orange-County-Seek-Out-The-Best.jpg',
     sections: [
       {
         title: 'Gentle Cleaning Methods',
         description: 'Our expert team employs gentle cleaning techniques specifically designed for delicate fabrics and intricate designs. Each piece is treated with the utmost care to preserve its beauty.',
-        image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80',
+        image: '/website imagesv/twgp_wedding_dress_4.webp',
         features: [
           'Hand-washing for delicate pieces',
           'Gentle machine cycles available',
@@ -307,7 +307,7 @@ export const categoryData: Record<string, {
       {
         title: 'Special Occasion Expertise',
         description: 'Wedding dresses, formal gowns, and special occasion wear receive the highest level of care and attention. Our specialists understand the sentimental value of these garments.',
-        image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800&q=80',
+        image: '/website imagesv/images (6).jpg',
         features: [
           'Bridal gown specialists',
           'Beadwork and sequin care',
@@ -319,7 +319,7 @@ export const categoryData: Record<string, {
       {
         title: 'Fabric-Specific Treatment',
         description: 'Each fabric type receives customized care, from delicate chiffon to structured taffeta. Our knowledge ensures perfect results for every material.',
-        image: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800&q=80',
+        image: '/website imagesv/silk-care-hand-washing-in-basin.jpeg',
         features: [
           'Silk and satin care',
           'Lace preservation techniques',
@@ -331,7 +331,7 @@ export const categoryData: Record<string, {
       {
         title: 'Perfect Finishing',
         description: 'Professional steaming and pressing ensure your dresses hang beautifully and are ready to wear. We restore the original shape and drape of each garment.',
-        image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80',
+        image: '/website imagesv/images (7).jpg',
         features: [
           'Gentle steam finishing',
           'Wrinkle removal without damage',
@@ -343,7 +343,7 @@ export const categoryData: Record<string, {
       {
         title: 'Evening Wear Specialists',
         description: 'Cocktail dresses, evening gowns, and formal wear require special expertise. Our team ensures your elegant attire maintains its glamorous appearance.',
-        image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80',
+        image: '/website imagesv/images (8).jpg',
         features: [
           'Formal gown cleaning',
           'Cocktail dress care',
@@ -355,7 +355,7 @@ export const categoryData: Record<string, {
       {
         title: 'Stain & Spot Treatment',
         description: 'Expert removal of makeup, food, and beverage stains from delicate dress fabrics. We use specialized techniques that won\'t harm embellishments or delicate materials.',
-        image: 'https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?w=800&q=80',
+        image: '/website imagesv/images (9).jpg',
         features: [
           'Makeup stain removal',
           'Food and wine stain treatment',
@@ -367,7 +367,7 @@ export const categoryData: Record<string, {
       {
         title: 'Designer Dress Care',
         description: 'High-end designer dresses deserve exceptional care. Our specialists are trained in handling luxury brands and understand their specific care requirements.',
-        image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80',
+        image: '/website imagesv/images (10).jpg',
         features: [
           'Luxury brand expertise',
           'Hand-finished care',
@@ -382,12 +382,12 @@ export const categoryData: Record<string, {
     title: 'Trousers Care',
     subtitle: 'Sharp Creases and Impeccable Finish',
     description: 'Professional cleaning and pressing services for all types of trousers, from casual chinos to formal dress pants.',
-    heroImage: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=1200&q=80',
+    heroImage: '/website imagesv/unrecognizable-man-ironing-shirts-laundry-home.webp',
     sections: [
       {
         title: 'Professional Cleaning',
         description: 'Our cleaning process removes dirt, stains, and odors while preserving the fabric quality and color vibrancy. Deep cleaning technology ensures thorough results.',
-        image: 'https://images.unsplash.com/photo-1598522325074-042db73aa4e6?w=800&q=80',
+        image: '/website imagesv/images (11).jpg',
         features: [
           'Deep cleaning technology',
           'Stain pre-treatment',
@@ -399,7 +399,7 @@ export const categoryData: Record<string, {
       {
         title: 'Perfect Crease Lines',
         description: 'Expert pressing creates sharp, professional crease lines that last longer and look better. Military-precision techniques ensure consistent results.',
-        image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800&q=80',
+        image: '/website imagesv/images (12).jpg',
         features: [
           'Military-grade creases',
           'Side seam alignment',
@@ -411,7 +411,7 @@ export const categoryData: Record<string, {
       {
         title: 'Material Expertise',
         description: 'From wool dress pants to cotton chinos and synthetic blends, we know how to care for every material. Each fabric type receives specialized treatment.',
-        image: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=800&q=80',
+        image: '/website imagesv/images (13).jpg',
         features: [
           'Wool and worsted care',
           'Cotton and linen treatment',
@@ -423,7 +423,7 @@ export const categoryData: Record<string, {
       {
         title: 'Minor Repairs Included',
         description: 'We fix loose hems, replace missing buttons, and perform minor repairs at no extra charge. Keeping your trousers in perfect condition is our priority.',
-        image: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?w=800&q=80',
+        image: '/website imagesv/Sewing-and-Tailoring.jpg',
         features: [
           'Button replacement',
           'Hem repair service',
@@ -435,7 +435,7 @@ export const categoryData: Record<string, {
       {
         title: 'Chinos & Casual Trousers',
         description: 'Casual trousers require different care than formal pants. We adjust our cleaning and pressing techniques to suit the style and fabric.',
-        image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800&q=80',
+        image: '/website imagesv/istockphoto-1410284251-612x612.jpg',
         features: [
           'Casual press finish',
           'Color retention methods',
@@ -447,7 +447,7 @@ export const categoryData: Record<string, {
       {
         title: 'Dress Pants Perfection',
         description: 'Formal dress pants demand perfection. Our specialists ensure razor-sharp creases and impeccable presentation for business and formal occasions.',
-        image: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=800&q=80',
+        image: '/website imagesv/istockphoto-673596392-612x612.jpg',
         features: [
           'Professional business finish',
           'Sharp front creases',
@@ -459,7 +459,7 @@ export const categoryData: Record<string, {
       {
         title: 'Trouser Care Packages',
         description: 'Regular trouser wearers benefit from our package deals. Save money and ensure your pants always look their best with our subscription services.',
-        image: 'https://images.unsplash.com/photo-1598522325074-042db73aa4e6?w=800&q=80',
+        image: '/website imagesv/Alice-Archer-slide-7KKC-articleLarge.webp',
         features: [
           'Monthly package discounts',
           'Priority service access',
@@ -474,12 +474,12 @@ export const categoryData: Record<string, {
     title: 'Outdoor Clothing',
     subtitle: 'Technical Care for Performance Wear',
     description: 'Specialized cleaning for outdoor gear, jackets, and activewear that maintains water resistance and breathability.',
-    heroImage: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=1200&q=80',
+    heroImage: '/website imagesv/Women_Leather_Jackets.webp',
     sections: [
       {
         title: 'Technical Fabric Care',
         description: 'Our specialized process maintains the technical properties of outdoor clothing including water resistance and breathability. We understand the science behind performance fabrics.',
-        image: 'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=800&q=80',
+        image: '/website imagesv/april2020-01.jpg',
         features: [
           'Gore-tex and waterproof membrane care',
           'DWR coating restoration',
@@ -491,7 +491,7 @@ export const categoryData: Record<string, {
       {
         title: 'Down & Insulated Garments',
         description: 'Expert cleaning of down jackets and insulated wear that maintains loft and warmth. Specialized drying techniques prevent clumping and restore original insulation properties.',
-        image: 'https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&q=80',
+        image: '/website imagesv/175590-2_1.webp',
         features: [
           'Down feather care',
           'Synthetic insulation cleaning',
@@ -503,7 +503,7 @@ export const categoryData: Record<string, {
       {
         title: 'Sportswear & Activewear',
         description: 'Remove sweat stains and odors from activewear while maintaining fabric elasticity and moisture-wicking properties. Perfect for gym clothes and yoga wear.',
-        image: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=800&q=80',
+        image: '/website imagesv/180111251_293725672280952_118691429083853802_n.webp',
         features: [
           'Odor elimination treatment',
           'Elasticity preservation',
@@ -515,7 +515,7 @@ export const categoryData: Record<string, {
       {
         title: 'Waterproofing Services',
         description: 'Professional re-waterproofing services restore your outdoor gear to peak performance. Our DWR treatments ensure maximum protection in harsh weather.',
-        image: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=80',
+        image: '/website imagesv/2150773373-jpg.webp',
         features: [
           'DWR reapplication',
           'Seam sealing services',
@@ -527,7 +527,7 @@ export const categoryData: Record<string, {
       {
         title: 'Hiking & Trail Gear',
         description: 'Specialized care for hiking boots, backpacks, and trail gear. We clean and maintain outdoor equipment to extend its lifespan and performance.',
-        image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80',
+        image: '/website imagesv/6342ba_fa5d5420d1654b62a49edcc8b02ae575~mv2.avif',
         features: [
           'Backpack cleaning and deodorizing',
           'Trail gear maintenance',
@@ -539,7 +539,7 @@ export const categoryData: Record<string, {
       {
         title: 'Ski & Snow Wear',
         description: 'Expert care for ski jackets, snow pants, and winter sports gear. Maintaining warmth and weatherproofing while removing salt stains and odors.',
-        image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80',
+        image: '/website imagesv/ae4537e3-8975-4d08-9b7d-bbfc13bd7803.jpg',
         features: [
           'Ski jacket specialist cleaning',
           'Snow pant care',
@@ -551,7 +551,7 @@ export const categoryData: Record<string, {
       {
         title: 'Performance Testing',
         description: 'After cleaning, we test your gear to ensure all technical properties are maintained. Quality assurance for performance outdoor clothing.',
-        image: 'https://images.unsplash.com/photo-1527933053326-89d1746b76b9?w=800&q=80',
+        image: '/website imagesv/Deluxe_wortel2.webp',
         features: [
           'Water resistance testing',
           'Breathability verification',
@@ -566,12 +566,12 @@ export const categoryData: Record<string, {
     title: 'Home Textile Services',
     subtitle: 'Premium Care for Your Bedding & Linens',
     description: 'Professional cleaning for bedding, curtains, and household textiles using specialized equipment and techniques.',
-    heroImage: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
+    heroImage: '/website imagesv/Curtain-Cleaning-Services-in-Dubai.webp',
     sections: [
       {
         title: 'Bedding & Duvet Cleaning',
         description: 'Deep cleaning for duvets, comforters, and bedding that removes allergens and restores freshness. Our industrial equipment can handle even king-sized items with care.',
-        image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',
+        image: '/website imagesv/bed-sheet-laundry-service.jpeg',
         features: [
           'Large-capacity cleaning equipment',
           'Allergen removal treatment',
@@ -583,7 +583,7 @@ export const categoryData: Record<string, {
       {
         title: 'Curtain Care',
         description: 'Professional cleaning and pressing for all types of curtains and drapes, including delicate fabrics. We can handle everything from sheer voiles to heavy velvet drapes.',
-        image: 'https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?w=800&q=80',
+        image: '/website imagesv/IMG_1924.webp',
         features: [
           'Hanging or re-hanging service',
           'Pleat preservation',
@@ -595,7 +595,7 @@ export const categoryData: Record<string, {
       {
         title: 'Table Linens & Napkins',
         description: 'Expert cleaning and pressing of tablecloths, napkins, and decorative linens for special occasions. Perfect for events, weddings, and fine dining.',
-        image: 'https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&q=80',
+        image: '/website imagesv/table-linen-cleaning-service.jpg',
         features: [
           'Stain removal expertise',
           'Crease-free finishing',
@@ -607,7 +607,7 @@ export const categoryData: Record<string, {
       {
         title: 'Blankets & Throws',
         description: 'Gentle cleaning for all types of blankets, from fleece throws to wool blankets and quilts. We preserve the softness and warmth of your favorite blankets.',
-        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80',
+        image: '/website imagesv/blanket-dry-cleaning-service.png',
         features: [
           'Wool and cashmere blanket care',
           'Quilt cleaning and repair',
@@ -619,7 +619,7 @@ export const categoryData: Record<string, {
       {
         title: 'Pillow Cleaning & Care',
         description: 'Specialized cleaning for all types of pillows including down, synthetic, and memory foam. Remove allergens and restore fluffiness for better sleep.',
-        image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80',
+        image: '/website imagesv/s-l1200.jpg',
         features: [
           'Down and feather pillow care',
           'Memory foam cleaning',
@@ -631,7 +631,7 @@ export const categoryData: Record<string, {
       {
         title: 'Seasonal Storage Solutions',
         description: 'Clean and store your seasonal textiles with our professional storage service. Protect your items from dust, moths, and damage during off-season months.',
-        image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80',
+        image: '/website imagesv/sofa-dry-cleaning-services-500x500.webp',
         features: [
           'Professional cleaning before storage',
           'Climate-controlled facilities',
@@ -643,7 +643,7 @@ export const categoryData: Record<string, {
       {
         title: 'Upholstery & Cushion Cleaning',
         description: 'Expert cleaning for cushion covers, chair pads, and removable upholstery. Refresh your home furnishings with our specialized techniques.',
-        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80',
+        image: '/website imagesv/Couch-Cushions-washing-cleaning.jpg',
         features: [
           'Cushion cover cleaning',
           'Sofa cushion care',
@@ -658,12 +658,12 @@ export const categoryData: Record<string, {
     title: 'Ironing Services',
     subtitle: 'Professional Pressing for Crisp, Fresh Garments',
     description: 'Expert ironing services for all your garments. Drop off your clean clothes and we\'ll return them perfectly pressed.',
-    heroImage: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=1200&q=80',
+    heroImage: '/website imagesv/Ironing_Wash_And_Fold_Service-1024x576.webp',
     sections: [
       {
         title: 'Expert Steam Pressing',
         description: 'Professional steam pressing that removes wrinkles and creases without damaging delicate fabrics. Our industrial steam equipment delivers superior results.',
-        image: 'https://images.unsplash.com/photo-1599669454699-248893623440?w=800&q=80',
+        image: '/website imagesv/hq720.jpg',
         features: [
           'Industrial steam equipment',
           'Temperature-controlled pressing',
@@ -675,7 +675,7 @@ export const categoryData: Record<string, {
       {
         title: 'Shirt Pressing Perfection',
         description: 'Specialized shirt pressing service that delivers crisp collars, smooth fronts, and professional appearance. Perfect for business professionals.',
-        image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80',
+        image: '/website imagesv/images.jpg',
         features: [
           'Collar and cuff precision',
           'Button area care',
@@ -687,7 +687,7 @@ export const categoryData: Record<string, {
       {
         title: 'Delicate Fabric Handling',
         description: 'Gentle ironing techniques for silk, linen, and other delicate materials that require special care. Low-temperature pressing preserves fabric integrity.',
-        image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80',
+        image: '/website imagesv/db023ba5e6-cobblers-1-5c0af.avif',
         features: [
           'Low-temperature pressing',
           'Pressing cloth protection',
@@ -699,7 +699,7 @@ export const categoryData: Record<string, {
       {
         title: 'Bulk Ironing Service',
         description: 'Efficient bulk ironing services for large quantities, perfect for events or after vacation laundry. Volume discounts available.',
-        image: 'https://images.unsplash.com/photo-1521656693074-0ef32e80a5d5?w=800&q=80',
+        image: '/website imagesv/hanging_up_a_tapered_fit_shirt_1024x1024.webp',
         features: [
           'Volume discount rates',
           'Quick turnaround available',
@@ -711,7 +711,7 @@ export const categoryData: Record<string, {
       {
         title: 'Household Linen Pressing',
         description: 'Professional ironing for bedsheets, tablecloths, and household linens. Create a luxurious feel in your home with crisp, hotel-quality linens.',
-        image: 'https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&q=80',
+        image: '/website imagesv/suit-dry-cleaning.jpg',
         features: [
           'Bedsheet and pillowcase pressing',
           'Tablecloth finishing',
@@ -723,7 +723,7 @@ export const categoryData: Record<string, {
       {
         title: 'Express Ironing',
         description: 'Need something pressed urgently? Our express ironing service can handle last-minute requests for important meetings or events.',
-        image: 'https://images.unsplash.com/photo-1599669454699-248893623440?w=800&q=80',
+        image: '/website imagesv/Screen-Shot-2018-02-22-at-4.webp',
         features: [
           'Same-day service',
           '2-hour express option',
@@ -735,7 +735,7 @@ export const categoryData: Record<string, {
       {
         title: 'Ironing Subscription Service',
         description: 'Regular ironing needs? Our subscription service offers convenience and savings with scheduled pickups and deliveries.',
-        image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80',
+        image: '/website imagesv/Te+grote+schouders+aangepast.webp',
         features: [
           'Weekly or monthly packages',
           'Discounted subscription rates',
@@ -750,12 +750,12 @@ export const categoryData: Record<string, {
     title: 'Alterations',
     subtitle: 'Expert Tailoring for the Perfect Fit',
     description: 'Professional alteration services from simple hems to complex restructuring. Our skilled tailors ensure your garments fit perfectly.',
-    heroImage: 'https://images.unsplash.com/photo-1595341888016-a392ef81b7de?w=1200&q=80',
+    heroImage: '/website imagesv/Sewing-and-Tailoring.jpg',
     sections: [
       {
         title: 'Basic Alterations',
         description: 'Common alterations including hemming, taking in, and letting out garments for a better fit. Fast turnaround and precise workmanship guaranteed.',
-        image: 'https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?w=800&q=80',
+        image: '/website imagesv/0014401_abeeha_700.jpeg',
         features: [
           'Trouser hemming',
           'Waist adjustments',
@@ -767,7 +767,7 @@ export const categoryData: Record<string, {
       {
         title: 'Advanced Tailoring',
         description: 'Complex alterations for suits, jackets, and formal wear requiring expert tailoring skills. Our master tailors bring decades of experience.',
-        image: 'https://images.unsplash.com/photo-1558769132-cb1aea1f1ba5?w=800&q=80',
+        image: '/website imagesv/how-to-fix-a-busted-hem-4.jpg.webp',
         features: [
           'Jacket restructuring',
           'Shoulder adjustments',
@@ -779,7 +779,7 @@ export const categoryData: Record<string, {
       {
         title: 'Repairs & Restorations',
         description: 'Repair services for tears, holes, broken zippers, and other damage to extend garment life. Expert invisible repairs preserve garment appearance.',
-        image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?w=800&q=80',
+        image: '/website imagesv/textile-solution.webp',
         features: [
           'Zipper replacement',
           'Tear and rip repair',
@@ -791,7 +791,7 @@ export const categoryData: Record<string, {
       {
         title: 'Custom Modifications',
         description: 'Transform garments with custom modifications including style changes and embellishments. Create unique pieces from existing garments.',
-        image: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&q=80',
+        image: '/website imagesv/unrecognizable-man-ironing-shirts-laundry-home.webp',
         features: [
           'Style modifications',
           'Custom embroidery',
@@ -803,7 +803,7 @@ export const categoryData: Record<string, {
       {
         title: 'Wedding & Bridal Alterations',
         description: 'Specialized alterations for wedding dresses and bridal party attire. Multiple fittings ensure perfect results for your special day.',
-        image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800&q=80',
+        image: '/website imagesv/For-Wedding-Dress-Dry-Cleaning-Orange-County-Seek-Out-The-Best.jpg',
         features: [
           'Bridal gown alterations',
           'Bridesmaid dress fitting',
@@ -815,7 +815,7 @@ export const categoryData: Record<string, {
       {
         title: 'Leather & Suede Alterations',
         description: 'Expert alterations for leather jackets, suede garments, and leather goods. Specialized equipment and techniques for leather work.',
-        image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&q=80',
+        image: '/website imagesv/Women_Leather_Jackets.webp',
         features: [
           'Leather jacket alterations',
           'Suede garment modifications',
@@ -827,7 +827,7 @@ export const categoryData: Record<string, {
       {
         title: 'Designer Garment Specialists',
         description: 'Trusted with high-end designer pieces, our master tailors understand luxury garment construction and preserve brand integrity.',
-        image: 'https://images.unsplash.com/photo-1595341888016-a392ef81b7de?w=800&q=80',
+        image: '/website imagesv/1713439923-anti-allergy-duvet-1.avif',
         features: [
           'Luxury brand expertise',
           'Original label preservation',
@@ -842,12 +842,12 @@ export const categoryData: Record<string, {
     title: 'Shoe Repair & Care',
     subtitle: 'Expert Cobbler Services',
     description: 'Professional shoe repair and restoration services to extend the life of your favorite footwear. From designer heels to everyday boots.',
-    heroImage: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1200&q=80',
+    heroImage: '/website imagesv/db023ba5e6-cobblers-1-5c0af.avif',
     sections: [
       {
         title: 'Sole Replacement',
         description: 'Complete sole replacement for all types of footwear using quality materials that match original specifications. Restore worn soles to like-new condition.',
-        image: 'https://images.unsplash.com/photo-1605408499391-6368c628ef42?w=800&q=80',
+        image: '/website imagesv/saphir-shoe-polish-overview.jpg',
         features: [
           'Leather sole replacement',
           'Rubber sole options',
@@ -859,7 +859,7 @@ export const categoryData: Record<string, {
       {
         title: 'Heel Repairs',
         description: 'Expert heel replacement and repair for stilettos, block heels, and dress shoes. Quick turnaround and quality materials ensure lasting results.',
-        image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&q=80',
+        image: '/website imagesv/how-does-self-service-laundry-work-4.jpg',
         features: [
           'Heel cap replacement',
           'Heel height adjustments',
@@ -871,7 +871,7 @@ export const categoryData: Record<string, {
       {
         title: 'Cleaning & Conditioning',
         description: 'Professional shoe cleaning and leather conditioning services to maintain appearance and extend life. Specialized treatments for different materials.',
-        image: 'https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=800&q=80',
+        image: '/website imagesv/what-are-the-5-stages-of-laundry-process.jpg',
         features: [
           'Deep leather cleaning',
           'Conditioning treatment',
@@ -883,7 +883,7 @@ export const categoryData: Record<string, {
       {
         title: 'Specialized Repairs',
         description: 'Expert repairs for zippers, buckles, straps, and other shoe components. Preserve your favorite footwear with professional restoration.',
-        image: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=800&q=80',
+        image: '/website imagesv/dwr2024-2.webp',
         features: [
           'Boot zipper replacement',
           'Stitching and seam repair',
@@ -895,7 +895,7 @@ export const categoryData: Record<string, {
       {
         title: 'Boot Services',
         description: 'Comprehensive boot repair and maintenance including resoling, zipper replacement, and leather restoration. Keep your boots in top condition.',
-        image: 'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=800&q=80',
+        image: '/website imagesv/MicrosoftTeams-image-14.jpg',
         features: [
           'Boot resoling',
           'Zipper replacement',
@@ -907,7 +907,7 @@ export const categoryData: Record<string, {
       {
         title: 'Designer Shoe Care',
         description: 'Specialized care for luxury and designer footwear. Our experts understand high-end shoe construction and use premium materials.',
-        image: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=800&q=80',
+        image: '/website imagesv/download.jpg',
         features: [
           'Luxury brand expertise',
           'Premium materials only',
@@ -919,7 +919,7 @@ export const categoryData: Record<string, {
       {
         title: 'Shoe Maintenance Programs',
         description: 'Regular maintenance packages to keep your shoe collection in pristine condition. Preventive care extends shoe life significantly.',
-        image: 'https://images.unsplash.com/photo-1605408499391-6368c628ef42?w=800&q=80',
+        image: '/website imagesv/Curtain-Cleaning-Services-in-Dubai.webp',
         features: [
           'Seasonal care packages',
           'Monthly maintenance plans',

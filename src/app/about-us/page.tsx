@@ -48,7 +48,7 @@ const AboutPage = () => {
       description: "Get your clothes back within 24 hours",
       color: "text-primary-600",
       bg: "bg-primary-50 dark:bg-primary-900/20",
-      image: "/img17.png"
+      image: "/website imagesv/how-often-to-dry-clean-suit.webp"
     },
     {
       icon: Truck,
@@ -56,7 +56,7 @@ const AboutPage = () => {
       description: "We pick up and deliver at your doorstep",
       color: "text-secondary-600",
       bg: "bg-secondary-50 dark:bg-secondary-900/20",
-      image: "/img18.png"
+      image: "/website imagesv/PickUp-Laundry-and-Delivery-Service-1024x683.jpg"
     },
     {
       icon: Headphones,
@@ -64,15 +64,15 @@ const AboutPage = () => {
       description: "Round-the-clock customer service",
       color: "text-accent-yellow",
       bg: "bg-accent-yellow/10 dark:bg-accent-yellow/20",
-      image: "/img19.png"
+      image: "/website imagesv/Curtain-Cleaning-Services-in-Dubai.webp"
     },
   ];
 
   const values = [
-    { icon: Shield, title: "Quality", description: "Never compromise on quality", image: "/img20.png" },
-    { icon: Leaf, title: "Eco-friendly", description: "Sustainable cleaning solutions", image: "/img17.png" },
-    { icon: Sparkles, title: "Innovation", description: "Constantly improving our process", image: "/img11.jpg" },
-    { icon: Users, title: "Community", description: "Supporting local businesses", image: "/img15.png" },
+    { icon: Shield, title: "Quality", description: "Never compromise on quality", image: "/website imagesv/services-Dry-Cleaning.jpg" },
+    { icon: Leaf, title: "Eco-friendly", description: "Sustainable cleaning solutions", image: "/website imagesv/Eco-5.png" },
+    { icon: Sparkles, title: "Innovation", description: "Constantly improving our process", image: "/website imagesv/commercial-laundrymachines-r.jpeg" },
+    { icon: Users, title: "Community", description: "Supporting local businesses", image: "/website imagesv/MicrosoftTeams-image-14.jpg" },
   ];
 
   const stats = [
@@ -240,7 +240,7 @@ const AboutPage = () => {
                 {/* Image with overlay */}
                 <div className="relative w-full h-full">
                   <Image
-                    src="/img16.jpg"
+                    src="/website imagesv/laundry_service_cerritos_ca.webp"
                     alt="Launder Remedy professional team"
                     fill
                     className="object-cover"
@@ -430,7 +430,7 @@ const AboutPage = () => {
               <div className="aspect-video rounded-2xl overflow-hidden shadow-primary-lg border border-neutral-200 dark:border-neutral-700">
                 <div className="relative w-full h-full">
                   <Image
-                    src="/img11.jpg"
+                    src="/website imagesv/suit-dry-cleaning.jpg"
                     alt="Premium laundry care process"
                     fill
                     className="object-cover"

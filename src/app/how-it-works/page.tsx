@@ -31,7 +31,7 @@ const steps = [
     subtitle: "FLEXIBLE",
     icon: Calendar,
     color: "from-primary-500 to-primary-600",
-    image: "/img13.png", // Fixed: Remove "../../../public/"
+    image: "/website imagesv/how-does-self-service-laundry-work-4.jpg",
     description: "Streamline your day effortlessly. Pick a collection and delivery time that suits your schedule.",
     features: [
       {
@@ -51,7 +51,7 @@ const steps = [
     subtitle: "QUICK & EASY",
     icon: Package,
     color: "from-accent-green to-green-600",
-    image: "/img14.png", // Fixed: Remove "../../../public/"
+    image: "/website imagesv/cleanly-bags.webp",
     description: "Use one bag per order. Our driver swaps it for a cool Launder Remedy bag – yours to keep for next time!",
     features: [
       {
@@ -71,7 +71,7 @@ const steps = [
     subtitle: "TRANSPARENT",
     icon: Truck,
     color: "from-secondary-500 to-secondary-600",
-    image: "/img15.png", // Fixed: Remove "../../../public/"
+    image: "/website imagesv/PickUp-Laundry-and-Delivery-Service-1024x683.jpg",
     description: "You'll receive a notification when our driver is nearby. They will collect your bags and take them to your local cleaning facility.",
     features: [
       {
@@ -91,7 +91,7 @@ const steps = [
     subtitle: "CONVENIENT",
     icon: Shield,
     color: "from-accent-yellow to-amber-600",
-    image: "/img17.png", // Fixed: Remove "../../../public/"
+    image: "/website imagesv/what-are-the-5-stages-of-laundry-process.jpg",
     description: "Your local partner facility will clean your items with utmost care. Our driver will then deliver them back to you whenever you like.",
     features: [
       {

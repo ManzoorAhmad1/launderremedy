@@ -135,7 +135,7 @@ export default function CTASection() {
               {/* Main Image */}
               <div className="relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-6">
                 <Image
-                  src="https://images.unsplash.com/photo-1610633389918-7d5a98a9f0fd?w=800&q=80"
+                  src="/website imagesv/folding-clothes.png"
                   alt="Professional laundry service - Fresh clean clothes delivered to your doorstep"
                   fill
                   className="object-cover"

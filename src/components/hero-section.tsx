@@ -44,13 +44,13 @@ export default function HeroSection() {
                             <div className="absolute inset-3 md:inset-4 bg-white/90 dark:bg-neutral-800/90 rounded-xl md:rounded-2xl" />
 
                             {/* Image Container */}
-                            <div className="relative aspect-square md:aspect-[4/5] w-full flex items-center justify-center p-4 md:p-6 lg:p-8">
-                                <div className="relative w-full h-full max-w-sm md:max-w-md">
+                            <div className="relative aspect-square md:aspect-[4/5] w-full">
+                                <div className="relative w-full h-full">
                                     <Image
-                                        src="https://www.launderremedy.com/_next/static/media/img01.cfed031c.png"
+                                        src="/website imagesv/laundry_service_cerritos_ca.webp"
                                         alt="Professional laundry and dry cleaning services in London - Quick laundry service, dry cleaning, ironing with free pickup and delivery"
                                         fill
-                                        className="object-contain object-center"
+                                        className="object-cover object-center"
                                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
                                         priority
                                         quality={100}

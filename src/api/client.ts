@@ -3,8 +3,8 @@ import { getCookie, clearCookie, setCookie } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 // Backend base URL
-// const BASE_URL ='https://yellow-cormorant-354758.hostingersite.com/api';
-const BASE_URL ='http://localhost:5000/api';
+const BASE_URL ='https://yellow-cormorant-354758.hostingersite.com/api';
+// const BASE_URL ='http://localhost:5000/api';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

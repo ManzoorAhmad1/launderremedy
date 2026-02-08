@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { 
-  MapPin, 
-  Home, 
-  Briefcase, 
-  Hotel, 
+import {
+  MapPin,
+  Home,
+  Briefcase,
+  Hotel,
   Navigation,
   ExternalLink,
   CheckCircle,
@@ -22,7 +22,7 @@ import "leaflet/dist/leaflet.css";
 // Dynamically import the map component to avoid SSR issues
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { 
+  {
     ssr: false,
     loading: () => (
       <div className="h-[300px] md:h-[400px] rounded-xl md:rounded-2xl bg-neutral-100 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
@@ -63,24 +63,24 @@ interface FindAddressProps {
 // Create wrapper components for hooks
 const MapUpdater = ({ center, zoom }: { center: [number, number]; zoom: number }) => {
   if (typeof window === 'undefined') return null;
-  
+
   const { useMap } = require('react-leaflet');
   const map = useMap();
-  
+
   useEffect(() => {
     if (map) {
       map.setView(center, zoom);
     }
   }, [center, zoom, map]);
-  
+
   return null;
 };
 
 const MapClickHandler = ({ onClick }: { onClick: (latlng: [number, number]) => void }) => {
   if (typeof window === 'undefined') return null;
-  
+
   const { useMapEvents } = require('react-leaflet');
-  
+
   useMapEvents({
     click(e: any) {
       onClick([e.latlng.lat, e.latlng.lng]);
@@ -198,20 +198,20 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
 
   const handleSelectAddress = useCallback((suggestion: any) => {
     const latlng: [number, number] = [suggestion.lat, suggestion.lon];
-    
+
     setMarker(latlng);
     setMapCenter(latlng);
     setSearchQuery(suggestion.display_name);
     setSuggestions([]);
-    
-    setState((prev: any) => ({ 
-      ...prev, 
+
+    setState((prev: any) => ({
+      ...prev,
       address: {
         formatted_address: suggestion.display_name,
         latlng: { lat: suggestion.lat, lng: suggestion.lon },
         value: suggestion.display_name
       },
-      addressType 
+      addressType
     }));
 
     toast.success("Address selected successfully");
@@ -220,7 +220,7 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
   const handleMapClick = useCallback(async (latlng: [number, number]) => {
     setMarker(latlng);
     setMapCenter(latlng);
-    
+
     try {
       const response = await axios.get(
         `https://nominatim.openstreetmap.org/reverse`,
@@ -233,30 +233,26 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
           },
         }
       );
-      
+
       const address = response.data.display_name;
-      
-      setState((prev: any) => ({ 
-        ...prev, 
+
+      setState((prev: any) => ({
+        ...prev,
         address: {
           formatted_address: address,
           latlng: { lat: latlng[0], lng: latlng[1] },
           value: address
         },
-        addressType 
+        addressType
       }));
-      
+
       setSearchQuery(address);
-      
-      Toast({
-        type: "success",
-        message: "Location selected!",
-      });
+
+      toast.success(
+        "Location selected!",
+      );
     } catch (error) {
-      Toast({
-        type: "warning",
-        message: "Could not get address details",
-      });
+      toast.error("Could not get address details");
     }
   }, [setState, addressType]);
 
@@ -304,7 +300,7 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                 </div>
               )}
             </div>
-            
+
             {suggestions.length > 0 && (
               <div className="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-lg max-h-60 overflow-y-auto">
                 {suggestions.map((item, index) => (
@@ -337,7 +333,7 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
             {addressTypes.map((type) => {
               const Icon = type.icon;
               const isSelected = addressType === type.value;
-              
+
               return (
                 <button
                   key={type.value}
@@ -388,9 +384,9 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                   name="hotel_room_number"
                   placeholder="Enter your room number"
                   className="w-full px-4 py-3 rounded-lg md:rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm md:text-base"
-                  onChange={(e) => setState((prev: any) => ({ 
-                    ...prev, 
-                    hotel_room_number: e.target.value 
+                  onChange={(e) => setState((prev: any) => ({
+                    ...prev,
+                    hotel_room_number: e.target.value
                   }))}
                 />
               </div>
@@ -404,9 +400,9 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                   name="address_detail"
                   placeholder="Apartment number, floor, building name, etc."
                   className="w-full px-4 py-3 rounded-lg md:rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm md:text-base"
-                  onChange={(e) => setState((prev: any) => ({ 
-                    ...prev, 
-                    address_detail: e.target.value 
+                  onChange={(e) => setState((prev: any) => ({
+                    ...prev,
+                    address_detail: e.target.value
                   }))}
                 />
               </div>
@@ -424,7 +420,7 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                   </div>
                 )}
               </div>
-              
+
               <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-lg">
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-10">
                   <button
@@ -441,7 +437,7 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                       <ChevronDown className="w-3.5 h-3.5 md:w-4 md:h-4 ml-1.5 md:ml-2" />
                     )}
                   </button>
-                  
+
                   {showMapTips && (
                     <div className="absolute top-full left-0 mt-2 w-64 md:w-72 p-3 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 z-20">
                       <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-300">
@@ -456,7 +452,7 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                     </div>
                   )}
                 </div>
-                
+
                 {isClient && mapLoaded ? (
                   <MapContainer
                     center={mapCenter}
@@ -471,9 +467,9 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    
+
                     {marker && <Marker position={marker} />}
-                    
+
                     <MapUpdater center={mapCenter} zoom={15} />
                     <MapClickHandler onClick={handleMapClick} />
                   </MapContainer>

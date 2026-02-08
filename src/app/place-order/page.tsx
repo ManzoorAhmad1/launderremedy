@@ -41,10 +41,15 @@ import { getCookie } from "@/utils/helpers";
 import toast from "react-hot-toast";
 import { CardNumberElement } from "@stripe/react-stripe-js";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+// Lazily resolve Stripe publishable key from env or backend config
+let initialStripePromise: any = null;
+if (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+  initialStripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
+}
 
 export default function PlaceOrderPage() {
   const [state, setState] = useState<any>({});
+  const [stripePromise, setStripePromise] = useState<any>(initialStripePromise);
   const [stripe, setStripe] = useState<any>(null);
   const [elements, setElements] = useState<any>(null);
   const [counters, setCounters] = useState<number[]>([]);
@@ -65,6 +70,23 @@ export default function PlaceOrderPage() {
 
   // Check device type
   useEffect(() => {
+    // Resolve Stripe key if not provided via env
+    (async () => {
+      try {
+        if (!stripePromise) {
+          const cfg:any = await paymentApi.getStripeConfig();
+          const pk = (cfg && (cfg.publishableKey || cfg.data?.publishableKey)) as string | undefined;
+          if (pk) {
+            const sp = await loadStripe(pk);
+            setStripePromise(sp);
+          } else {
+            toast.error("Stripe is not configured. Please add a publishable key.");
+          }
+        }
+      } catch (err) {
+        toast.error("Unable to load Stripe configuration.");
+      }
+    })();
     const checkDevice = () => {
       const width = window.innerWidth;
       setIsMobile(width < 768);
@@ -203,7 +225,6 @@ export default function PlaceOrderPage() {
           selectedServicesList,
           step: 4
         }));
-        router.push('/login?redirect=/place-order');
         return;
       }
     }
@@ -233,7 +254,6 @@ export default function PlaceOrderPage() {
       // Recheck user login
       if (!user || !user._id) {
         toast.error('Please login to complete your order');
-        router.push('/login?redirect=/place-order');
         return;
       }
 
@@ -475,12 +495,26 @@ export default function PlaceOrderPage() {
       case 3:
         return <CategoryList state={state} setState={setState} />;
       case 4:
+        // If user is logged in, auto-skip to payment
+        if (user && user._id) {
+          dispatch(setStepByValue(5));
+          return null;
+        }
         return <ContactInfoForm state={state} setState={setState} />;
       case 5:
-        return (
+        return stripePromise ? (
           <Elements stripe={stripePromise}>
             <PaymentForm setElements={setElements} setStripe={setStripe} />
           </Elements>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-10"
+          >
+            <h3 className="text-xl font-semibold">Payment temporarily unavailable</h3>
+            <p className="text-neutral-600 dark:text-neutral-400 mt-2">Stripe configuration missing. Please try again later.</p>
+          </motion.div>
         );
       case 6:
         return (

@@ -12,6 +12,7 @@ import Image from 'next/image'
 import logo from '../../public/logo-02.png'
 import {Button} from './ui/button'
 import { logOutUser, logout } from '@/lib/features/userSlice'
+import { getCookie, clearCookie } from '@/utils/helpers'
 
 const NavData = [
   { id: 1, title: "Home", path: "/", live: true },
@@ -54,6 +55,17 @@ export default function Header() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // If persisted state says logged-in but no auth cookies remain, force local logout to avoid showing Log Out.
+  useEffect(() => {
+    const token = getCookie('user_token')
+    if (!token && isLogin) {
+      dispatch(logout())
+      dispatch(clearData())
+      clearCookie('refresh_token')
+      clearCookie('user')
+    }
+  }, [dispatch, isLogin])
 
   // Listen for auth-logout event from API client
   useEffect(() => {

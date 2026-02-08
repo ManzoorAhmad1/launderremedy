@@ -98,6 +98,9 @@ apiClient.interceptors.response.use(
                                error.config?.url?.includes('/sign-up') ||
                                error.config?.url?.includes('/forgot-password') ||
                                error.config?.url?.includes('/reset-password');
+
+        // For payment flow we don't want forced redirect; just surface the error
+        const isPaymentFlow = error.config?.url?.includes('/payment/');
         
         // Don't redirect if it's an auth endpoint (login/signup)
         if (isAuthEndpoint) {
@@ -169,9 +172,9 @@ apiClient.interceptors.response.use(
           }
           
           toast.error('Session expired. Please login again.');
-          
-          // Only redirect if not already on login/signup page
-          if (typeof window !== 'undefined' && 
+
+          // Skip redirect for payment flow to avoid bouncing user off checkout
+          if (!isPaymentFlow && typeof window !== 'undefined' && 
               !window.location.pathname.includes('/login') && 
               !window.location.pathname.includes('/signup')) {
             window.location.href = '/login';

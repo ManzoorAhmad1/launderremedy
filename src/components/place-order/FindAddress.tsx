@@ -15,7 +15,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import axios from "axios";
-import Toast from "../ui/Toast";
+import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 
@@ -182,10 +182,7 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
 
       setSuggestions(results);
     } catch (error) {
-      Toast({
-        type: "error",
-        message: "Failed to search address",
-      });
+      toast.error("Failed to search address");
     } finally {
       setIsSearching(false);
     }
@@ -216,11 +213,8 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
       },
       addressType 
     }));
-    
-    Toast({
-      type: "success",
-      message: "Address selected successfully",
-    });
+
+    toast.success("Address selected successfully");
   }, [setState, addressType]);
 
   const handleMapClick = useCallback(async (latlng: [number, number]) => {

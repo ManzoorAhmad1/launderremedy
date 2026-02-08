@@ -21,6 +21,7 @@ import toast from "react-hot-toast";
 
 import authService from "@/services/auth.service";
 import { setLoader, setUser } from "@/lib/features/userSlice";
+import { setStepByValue } from "@/lib/features/orderSlice";
 import { Button } from "../ui/button";
 import { setCookie } from "@/utils/helpers";
 
@@ -58,6 +59,13 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
     }
   }, [user, isLogin, type, setState]);
 
+  // Auto-advance to payment step when logged in (immediately)
+  useEffect(() => {
+    if (isLogin && user && type !== "profile") {
+      dispatch(setStepByValue(5));
+    }
+  }, [isLogin, user, type, dispatch]);
+
   // Check if email exists when user types
   useEffect(() => {
     const checkEmail = async () => {
@@ -65,7 +73,8 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
         setCheckingEmail(true);
         try {
           const response = await authService.isEmailTaken({ email: state?.email });
-          if (response?.data?.exists) {
+          // Backend returns { success: true } when email IS taken
+          if (response?.success === true) {
             setEmailExists(true);
             setAuthMode('login');
             toast.success('Email found! Please enter your password to login.', {
@@ -104,8 +113,8 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       });
 
       if (response.success) {
-        const userData = response.data.user;
-        const token = response.data.token;
+        const userData = response.user;
+        const token = response.token;
 
         // Save token
         setCookie('user_token', token, 30);
@@ -125,6 +134,11 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
           icon: '✅',
           duration: 2000,
         });
+
+        // Move to payment step after short delay
+        setTimeout(() => {
+          dispatch(setStepByValue(5));
+        }, 1000);
       }
     } catch (error: any) {
       toast.error(error.message || 'Login failed');
@@ -140,6 +154,28 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       return;
     }
 
+    // Safety check: if email already exists, switch to login flow
+    try {
+      if (emailExists === null) {
+        const check = await authService.isEmailTaken({ email: state.email });
+        // Backend returns { success: true } when email IS taken
+        const exists = check?.success === true;
+        setEmailExists(exists);
+        if (exists) {
+          setAuthMode('login');
+          toast.error('This email already has an account. Please enter your password to login.');
+          return;
+        }
+      } else if (emailExists) {
+        setAuthMode('login');
+        toast.error('This email already has an account. Please enter your password to login.');
+        return;
+      }
+    } catch (err) {
+      // If the check fails, fall back to existing behavior
+      console.error('Email existence check failed:', err);
+    }
+
     setIsSubmitting(true);
     dispatch(setLoader(true));
 
@@ -153,8 +189,8 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       });
 
       if (response.success) {
-        const userData = response.data.user;
-        const token = response.data.token;
+        const userData = response.user;
+        const token = response.token;
 
         // Save token
         setCookie('user_token', token, 30);
@@ -166,6 +202,11 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
           icon: '🎉',
           duration: 2000,
         });
+
+        // Move to payment step after short delay
+        setTimeout(() => {
+          dispatch(setStepByValue(5));
+        }, 1000);
       }
     } catch (error: any) {
       toast.error(error.message || 'Signup failed');
@@ -265,7 +306,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
                 setAuthMode('email');
                 setEmailExists(null);
               }}
-              disabled={authMode !== 'email' || checkingEmail}
+              disabled={isLogin || checkingEmail}
             />
             <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
             {checkingEmail && (

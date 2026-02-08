@@ -274,23 +274,55 @@ export default function PlaceOrderPage() {
         return;
       }
 
-      // Create payment token
-      let paymentToken = '';
+      // Create SetupIntent for saving card (Auth now, Charge later)
+      let paymentMethodId = '';
+      let setupIntentResponse: any = null;
+
       if (elements && stripe) {
-        const cardElement = elements.getElement(CardNumberElement);
-        if (cardElement) {
-          dispatch(setLoader(true));
-          const { token, error } = await stripe.createToken(cardElement);
+        dispatch(setLoader(true));
+        
+        // 1. Get SetupIntent Secret from Backend
+        try {
+          setupIntentResponse = await paymentApi.createSetupIntent();
+        } catch (error) {
+           console.error('Setup Intent Error:', error);
+           dispatch(setLoader(false));
+           toast.error('Failed to initialize payment setup');
+           return;
+        }
+
+        if (setupIntentResponse?.success && setupIntentResponse?.client_secret) {
+          const cardElement = elements.getElement(CardNumberElement);
+          if (!cardElement) {
+             dispatch(setLoader(false));
+             return;
+          }
+          
+          // 2. Confirm Card Setup with Stripe (Frontend side)
+          const { setupIntent, error } = await stripe.confirmCardSetup(
+            setupIntentResponse.client_secret,
+            {
+              payment_method: {
+                card: cardElement,
+                billing_details: {
+                  name: `${orderDetail?.first_name} ${orderDetail?.last_name}`,
+                  email: orderDetail?.email
+                }
+              }
+            }
+          );
+          
           if (error) {
             dispatch(setLoader(false));
-            toast.error(error.message || 'Payment failed');
+            toast.error(error.message || 'Card setup failed');
             return;
           }
-          paymentToken = token.id;
+          
+          paymentMethodId = setupIntent.payment_method as string;
         }
       }
 
-      if (!paymentToken) {
+      if (!paymentMethodId) {
         toast.error('Please enter valid payment details');
         return;
       }
@@ -356,6 +388,8 @@ export default function PlaceOrderPage() {
         serviceFee,
         bundles: prepaidBundles,
         payment_done: false,
+        payment_method_id: paymentMethodId,
+        stripe_customer_id: setupIntentResponse?.customer_id || null,
         address: orderDetail?.address,
         postcode: orderDetail?.address?.postal_code || orderDetail?.postcode || '',
         frequency: orderDetail?.frequency?.toLowerCase() || 'just once',
@@ -383,27 +417,9 @@ export default function PlaceOrderPage() {
       if (response?.success && response?.data) {
         const orderId = response.data._id || response.data.orderId;
         
-        // Process payment if not prepaid
-        if (prepaidBundles.length === 0 || orderPrice > 0) {
-          try {
-            const paymentResponse:any = await paymentApi.createPaymentIntent({
-              amount: Math.round(finalTotalPrice * 100), // Convert to pence with discount applied
-              description: `Order payment for ${selectedServicesList.length} items${isFirstTimeUser ? ' (25% First Order Discount)' : ''}`,
-              payment_method_id: paymentToken,
-              user_id: user._id,
-              id: orderId,
-              type: prepaidBundles.length > 0 ? 'prepaid' : 'payment',
-            });
-
-            if (!paymentResponse?.success) {
-              throw new Error('Payment processing failed');
-            }
-          } catch (paymentError: any) {
-            dispatch(setLoader(false));
-            toast.error(paymentError?.message || 'Payment failed');
-            return;
-          }
-        }
+        // Card is already saved via SetupIntent above.
+        // Payment will be processed by Admin later using the saved payment_method_id.
+        // No immediate charge here.
 
         // Update user in Redux if backend sent updated user
         if (response?.updatedUser) {

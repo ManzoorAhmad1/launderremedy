@@ -166,15 +166,15 @@ export default function PricingPage() {
   const dispatch = useDispatch();
   const cart = useSelector((state: any) => state.order.selectedServicesList || []);
   const user = useSelector((state: any) => state.user.user);
-  
+
   // Check if user is eligible for first-time discount
   const isFirstTimeUser = user && !user?.first_order_discount_used;
-  
+
   // Handle client-side mounting
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   // Load data from API
   useEffect(() => {
     getAllServicesApi();
@@ -331,22 +331,22 @@ export default function PricingPage() {
     });
   };
 
-// Your existing filter logic
-const sortedAndFilteredServices = services.filter(service => {
-  if (selectedCategory !== 'all' && service.category !== selectedCategory) return false;
-  if (searchQuery.trim() !== '') {
-    const query = searchQuery.toLowerCase();
-    return (
-      service.name.toLowerCase().includes(query) ||
-      service.description?.toLowerCase().includes(query) ||
-      service.category.toLowerCase().includes(query)
-    );
-  }
-  return true;
-});
+  // Your existing filter logic
+  const sortedAndFilteredServices = services.filter(service => {
+    if (selectedCategory !== 'all' && service.category !== selectedCategory) return false;
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase();
+      return (
+        service.name.toLowerCase().includes(query) ||
+        service.description?.toLowerCase().includes(query) ||
+        service.category.toLowerCase().includes(query)
+      );
+    }
+    return true;
+  });
 
-// Add sorting by price (low to high)
-const filteredServices = [...sortedAndFilteredServices].sort((a, b) => a.price - b.price);
+  // Add sorting by price (low to high)
+  const filteredServices = [...sortedAndFilteredServices].sort((a, b) => a.price - b.price);
   // Totals
   const cartTotal = cart.reduce((sum: number, item: any) => sum + (item.price * (item.quantity || 1)), 0);
   const cartCount = cart.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
@@ -420,7 +420,7 @@ const filteredServices = [...sortedAndFilteredServices].sort((a, b) => a.price -
         <div className="mb-8">
           {/* First Time User Discount Banner - Client side only to avoid hydration errors */}
           {mounted && isFirstTimeUser && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-gradient-to-r from-green-500 via-emerald-600 to-green-500 rounded-2xl p-6 md:p-8 text-white mb-6 shadow-lg overflow-hidden relative"
@@ -454,7 +454,7 @@ const filteredServices = [...sortedAndFilteredServices].sort((a, b) => a.price -
               </div>
             </motion.div>
           )}
-          
+
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl p-6 md:p-8 text-white mb-6 shadow-lg">
             <div className="max-w-2xl">
@@ -929,10 +929,11 @@ const filteredServices = [...sortedAndFilteredServices].sort((a, b) => a.price -
             <h3 className="text-xl font-bold mb-2">Ready to Get Started?</h3>
             <p className="text-primary-200 mb-6">Schedule a pickup or visit our location</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button className="bg-white text-primary-900 hover:bg-primary-100">
+              <Button className="bg-white text-primary-900 hover:bg-primary-100" onClick={() => router.push('/place-order')}>
                 Schedule Pickup
               </Button>
-              <Button variant="outline" className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:bg-white hover:text-primary-900">
+              <Button variant="outline" className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:bg-white hover:text-primary-900"
+                onClick={() => router.push('/contact')}>
                 Contact Us
               </Button>
             </div>

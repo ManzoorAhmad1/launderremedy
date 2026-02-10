@@ -18,10 +18,11 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import Image from 'next/image';
+import { useRouter } from "next/navigation";
 
 const AboutPage = () => {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-
+  const router=useRouter()
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -140,11 +141,13 @@ const AboutPage = () => {
               transition={{ delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <button className="btn-primary px-8 py-4 rounded-full text-lg font-semibold flex items-center gap-2 group">
+              <button className="btn-primary px-8 py-4 rounded-full text-lg font-semibold flex items-center gap-2 group"
+              onClick={() => router.push('/place-order')}>
                 BOOK TODAY
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="btn-outline-primary px-8 py-4 rounded-full text-lg font-semibold">
+              <button className="btn-outline-primary px-8 py-4 rounded-full text-lg font-semibold"
+              onClick={() => router.push('/pricing')}>
                 LEARN MORE
               </button>
             </motion.div>

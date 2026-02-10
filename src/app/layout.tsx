@@ -2,6 +2,7 @@
 
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import './nprogress.css'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -28,6 +29,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-CVR66N02WT"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-CVR66N02WT');
+          `}
+        </Script>
         <StoreProvider>
           <ThemeProvider
             attribute="class"

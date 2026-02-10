@@ -20,11 +20,12 @@ import {
   ShieldCheck,
   Package
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const FAQPage = () => {
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
-
+  const router=useRouter()
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index);
   };
@@ -371,7 +372,8 @@ Note: Service availability varies by location. Check your area's specific offeri
               <p className="opacity-90 mb-6">
                 Visit our comprehensive help center for detailed guides, tutorials, and additional resources.
               </p>
-              <button className="bg-white text-primary-600 hover:bg-neutral-100 px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-colors group">
+              <button className="bg-white text-primary-600 hover:bg-neutral-100 px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-colors group"
+              onClick={()=>router.push('/contact')}>
                 Visit our help center
                 <ChevronDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
               </button>

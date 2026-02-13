@@ -20,8 +20,8 @@ import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 
 // Dynamically import the map component to avoid SSR issues
-const MapContainer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
+const MapComponent = dynamic(
+  () => import('./MapComponent'),
   {
     ssr: false,
     loading: () => (
@@ -34,101 +34,17 @@ const MapContainer = dynamic(
     )
   }
 );
-const TileLayer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-const Marker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Marker),
-  { ssr: false }
-);
-
-// Fix leaflet default markers
-if (typeof window !== 'undefined') {
-  import('leaflet').then((L) => {
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    });
-  });
-}
 
 interface FindAddressProps {
   state: any;
   setState: React.Dispatch<React.SetStateAction<any>>;
 }
 
-// Create wrapper components for hooks
-const MapUpdater = ({ center, zoom }: { center: [number, number]; zoom: number }) => {
-  if (typeof window === 'undefined') return null;
+// Remove these separate component definitions as they are now handled in MapComponent
+// const MapUpdater = ({ center, zoom }: { center: [number, number]; zoom: number }) => { ... };
+// const MapClickHandler = ({ onClick }: { onClick: (latlng: [number, number]) => void }) => { ... };
 
-  const { useMap } = require('react-leaflet');
-  const map = useMap();
-
-  useEffect(() => {
-    if (map) {
-      map.setView(center, zoom);
-    }
-  }, [center, zoom, map]);
-
-  return null;
-};
-
-const MapClickHandler = ({ onClick }: { onClick: (latlng: [number, number]) => void }) => {
-  if (typeof window === 'undefined') return null;
-
-  const { useMapEvents } = require('react-leaflet');
-
-  useMapEvents({
-    click(e: any) {
-      onClick([e.latlng.lat, e.latlng.lng]);
-    },
-    locationfound(e: any) {
-      onClick([e.latlng.lat, e.latlng.lng]);
-    },
-  });
-  return null;
-};
-
-const CustomMapControl = ({ onLocate }: { onLocate: () => void }) => {
-  if (typeof window === 'undefined') return null;
-  const { useMap } = require('react-leaflet');
-  const map = useMap();
-  
-  // Prevent click propagation to the map
-  useEffect(() => {
-    if (!map) return;
-    const L = require('leaflet');
-    const control = L.Control.extend({
-      onAdd: () => {
-        const div = L.DomUtil.create('div', '');
-        L.DomEvent.disableClickPropagation(div);
-        return div;
-      }
-    });
-  }, [map]);
-
-  return (
-    <div className="leaflet-bottom leaflet-right" style={{ bottom: '20px', right: '10px' }}>
-      <div className="leaflet-control">
-        <button
-          className="bg-white hover:bg-neutral-50 border border-neutral-300 w-10 h-10 flex items-center justify-center cursor-pointer text-neutral-600 hover:text-primary-600 transition-colors rounded shadow-sm"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onLocate();
-          }}
-          title="Show my location"
-          style={{ pointerEvents: 'auto' }}
-        >
-          <Navigation className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
-  );
-};
+const CustomMapControl = () => null;
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 
@@ -274,7 +190,11 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
         }
       );
 
-      const address = response.data.features?.[0]?.place_name || "Unknown location";
+      const features = response.data.features || [];
+      // Prioritize features that are specific addresses
+      const addressFeature = features.find((f: any) => f.place_type.includes('address'));
+      const bestFeature = addressFeature || features[0];
+      const address = bestFeature?.place_name || "Unknown location";
 
       setState((prev: any) => ({
         ...prev,
@@ -346,7 +266,8 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                       },
                       (error) => {
                         toast.error("Could not get your location");
-                      }
+                      },
+                      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                     );
                   } else {
                     toast.error("Geolocation is not supported by your browser");
@@ -484,7 +405,7 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                 )}
               </div>
 
-              <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-lg">
+              <div className="relative h-[300px] md:h-[400px] rounded-xl md:rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-lg">
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-10">
                   <button
                     onClick={() => setShowMapTips(!showMapTips)}
@@ -517,43 +438,31 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                 </div>
 
                 {isClient && mapLoaded ? (
-                  <MapContainer
+                  <MapComponent
                     center={mapCenter}
                     zoom={15}
-                    style={{ width: "100%", height: "300px", borderRadius: "8px" }}
-                    className="md:h-[400px] md:rounded-xl"
-                    ref={mapRef}
-                    touchZoom={true}
-                    scrollWheelZoom={true}
-                    dragging={true}
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-
-                    {marker && <Marker position={marker} />}
-
-                    <MapUpdater center={mapCenter} zoom={15} />
-                    <MapClickHandler onClick={handleMapClick} />
-                    <CustomMapControl onLocate={() => {
-                       if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                          (position) => {
-                            const { latitude, longitude } = position.coords;
-                            const latlng: [number, number] = [latitude, longitude];
-                            handleMapClick(latlng);
-                          },
-                          (error) => {
-                            toast.error("Could not get your location");
-                          }
-                        );
-                      } else {
-                        toast.error("Geolocation is not supported by your browser");
-                      }
-                    }} />
-                  </MapContainer>
+                    marker={marker}
+                    onMapClick={handleMapClick}                    onLocate={() => {
+                        if (navigator.geolocation) {
+                         navigator.geolocation.getCurrentPosition(
+                           (position) => {
+                             const { latitude, longitude } = position.coords;
+                             const latlng: [number, number] = [latitude, longitude];
+                             handleMapClick(latlng);
+                           },
+                           (error) => {
+                             toast.error("Could not get your location");
+                           },
+                           { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                         );
+                       } else {
+                         toast.error("Geolocation is not supported by your browser");
+                       }
+                     }}                  >
+                    {/* Additional children can go here if passed to MapComponent */}
+                  </MapComponent>
                 ) : (
-                  <div className="h-[300px] md:h-[400px] rounded-xl md:rounded-2xl bg-neutral-100 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
+                  <div className="h-full w-full rounded-xl md:rounded-2xl bg-neutral-100 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
                     <div className="text-center">
                       <div className="inline-block animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-primary-600 mb-2"></div>
                       <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-400">Loading map...</p>

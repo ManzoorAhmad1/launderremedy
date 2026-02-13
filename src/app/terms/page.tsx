@@ -44,14 +44,9 @@ export default function TermsPage() {
       content: "Payment is required at the time of order placement. We accept major credit cards and debit cards through our secure payment processor. Prices are subject to change but will be confirmed before you complete your order."
     },
     {
-      icon: AlertCircle,
-      title: "5. Cancellation & Refunds",
-      content: "Orders can be cancelled up to 2 hours before the scheduled collection time for a full refund. Cancellations after this time may incur a cancellation fee. Refunds for service issues are handled on a case-by-case basis."
-    },
-    {
       icon: Database,
       title: "6. Liability",
-      content: "While we take utmost care of your items, Launder Remedy is not liable for damage to items that are not suitable for our cleaning processes, pre-existing damage, or items valued over £500 unless specifically declared. Maximum liability is limited to 10x the cleaning charge."
+      content: "While we take utmost care of your items, Launder Remedy is not liable for damage to items that are not suitable for our cleaning processes, pre-existing damage, or items valued over £100 unless specifically declared. Maximum liability is limited to 2x the cleaning charge."
     },
     {
       icon: Eye,
@@ -61,7 +56,7 @@ export default function TermsPage() {
     {
       icon: CheckCircle,
       title: "8. Quality Guarantee",
-      content: "We guarantee the quality of our work. If you're not satisfied with the cleaning results, contact us within 48 hours of delivery and we will re-clean the item free of charge or provide a refund."
+      content: "We guarantee the quality of our work. If you're not satisfied with the cleaning results, contact us within 48 hours of delivery and we will re-clean the item free of charge."
     }
   ];
 

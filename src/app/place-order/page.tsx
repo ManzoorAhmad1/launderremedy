@@ -43,8 +43,9 @@ import { CardNumberElement } from "@stripe/react-stripe-js";
 
 // Lazily resolve Stripe publishable key from env or backend config
 let initialStripePromise: any = null;
-if (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-  initialStripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
+const envKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+if (envKey && !envKey.includes('REPLACE_ME')) {
+  initialStripePromise = loadStripe(envKey);
 }
 
 export default function PlaceOrderPage() {
@@ -299,14 +300,20 @@ export default function PlaceOrderPage() {
           }
           
           // 2. Confirm Card Setup with Stripe (Frontend side)
+          // Construct billing details with fallbacks
+          const firstName = orderDetail?.first_name || user?.first_name || state?.first_name || '';
+          const lastName = orderDetail?.last_name || user?.last_name || state?.last_name || '';
+          const email = orderDetail?.email || user?.email || state?.email || '';
+          const fullName = (firstName && lastName) ? `${firstName} ${lastName}` : (user?.name || 'Valued Customer');
+
           const { setupIntent, error } = await stripe.confirmCardSetup(
             setupIntentResponse.client_secret,
             {
               payment_method: {
                 card: cardElement,
                 billing_details: {
-                  name: `${orderDetail?.first_name} ${orderDetail?.last_name}`,
-                  email: orderDetail?.email
+                  name: fullName,
+                  email: email
                 }
               }
             }

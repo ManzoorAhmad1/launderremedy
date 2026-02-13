@@ -85,9 +85,52 @@ const MapClickHandler = ({ onClick }: { onClick: (latlng: [number, number]) => v
     click(e: any) {
       onClick([e.latlng.lat, e.latlng.lng]);
     },
+    locationfound(e: any) {
+      onClick([e.latlng.lat, e.latlng.lng]);
+    },
   });
   return null;
 };
+
+const CustomMapControl = ({ onLocate }: { onLocate: () => void }) => {
+  if (typeof window === 'undefined') return null;
+  const { useMap } = require('react-leaflet');
+  const map = useMap();
+  
+  // Prevent click propagation to the map
+  useEffect(() => {
+    if (!map) return;
+    const L = require('leaflet');
+    const control = L.Control.extend({
+      onAdd: () => {
+        const div = L.DomUtil.create('div', '');
+        L.DomEvent.disableClickPropagation(div);
+        return div;
+      }
+    });
+  }, [map]);
+
+  return (
+    <div className="leaflet-bottom leaflet-right" style={{ bottom: '20px', right: '10px' }}>
+      <div className="leaflet-control">
+        <button
+          className="bg-white hover:bg-neutral-50 border border-neutral-300 w-10 h-10 flex items-center justify-center cursor-pointer text-neutral-600 hover:text-primary-600 transition-colors rounded shadow-sm"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onLocate();
+          }}
+          title="Show my location"
+          style={{ pointerEvents: 'auto' }}
+        >
+          <Navigation className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 
 const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
   const [addressType, setAddressType] = useState<"home" | "office" | "hotel">("home");
@@ -162,22 +205,21 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
     setIsSearching(true);
     try {
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search`,
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`,
         {
           params: {
-            q: query,
-            format: "json",
-            countrycodes: "gb",
+            access_token: MAPBOX_TOKEN,
+            types: 'address,poi,place,locality,neighborhood',
             limit: 5,
-            "accept-language": "en",
+            language: 'en',
           },
         }
       );
 
-      const results = response.data.map((item: any) => ({
-        display_name: item.display_name,
-        lat: parseFloat(item.lat),
-        lon: parseFloat(item.lon),
+      const results = response.data.features.map((item: any) => ({
+        display_name: item.place_name,
+        lat: item.center[1],
+        lon: item.center[0],
       }));
 
       setSuggestions(results);
@@ -223,18 +265,16 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
 
     try {
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse`,
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${latlng[1]},${latlng[0]}.json`,
         {
           params: {
-            lat: latlng[0],
-            lon: latlng[1],
-            format: "json",
-            "accept-language": "en",
+            access_token: MAPBOX_TOKEN,
+            language: 'en',
           },
         }
       );
 
-      const address = response.data.display_name;
+      const address = response.data.features?.[0]?.place_name || "Unknown location";
 
       setState((prev: any) => ({
         ...prev,
@@ -294,8 +334,31 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
                 className="w-full px-4 py-3 pl-11 pr-10 md:pl-12 rounded-lg md:rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm md:text-base"
               />
               <Search className="absolute left-3.5 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-neutral-400" />
+              <button
+                type="button"
+                onClick={() => {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      (position) => {
+                        const { latitude, longitude } = position.coords;
+                        const latlng: [number, number] = [latitude, longitude];
+                        handleMapClick(latlng);
+                      },
+                      (error) => {
+                        toast.error("Could not get your location");
+                      }
+                    );
+                  } else {
+                    toast.error("Geolocation is not supported by your browser");
+                  }
+                }}
+                className="absolute right-3.5 md:right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-400 hover:text-primary-600 transition-colors"
+                title="Use current location"
+              >
+                <Navigation className="w-4 h-4 md:w-5 md:h-5" />
+              </button>
               {isSearching && (
-                <div className="absolute right-3.5 md:right-4 top-1/2 transform -translate-y-1/2">
+                <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-500"></div>
                 </div>
               )}
@@ -472,6 +535,22 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
 
                     <MapUpdater center={mapCenter} zoom={15} />
                     <MapClickHandler onClick={handleMapClick} />
+                    <CustomMapControl onLocate={() => {
+                       if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                          (position) => {
+                            const { latitude, longitude } = position.coords;
+                            const latlng: [number, number] = [latitude, longitude];
+                            handleMapClick(latlng);
+                          },
+                          (error) => {
+                            toast.error("Could not get your location");
+                          }
+                        );
+                      } else {
+                        toast.error("Geolocation is not supported by your browser");
+                      }
+                    }} />
                   </MapContainer>
                 ) : (
                   <div className="h-[300px] md:h-[400px] rounded-xl md:rounded-2xl bg-neutral-100 dark:bg-neutral-800 animate-pulse flex items-center justify-center">

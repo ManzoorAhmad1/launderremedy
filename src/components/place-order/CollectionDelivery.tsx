@@ -395,25 +395,50 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
             <div className="grid md:grid-cols-2 gap-4">
               <SummaryCard
                 title="Collection Day"
-                value={typeof formState.collectionDay === 'string' ? formState.collectionDay : formState.collectionDay?.label || formState.collectionDay?.value || ""}
+                value={(() => {
+                  const item = formState?.collectionDay;
+                  if (!item) return "";
+                  if (typeof item === 'string') return item;
+                  // Handle potential nested objects from localStorage restore
+                  if (item.label && typeof item.label === 'object') return item.label.label || "";
+                  return item.label || item.value || "";
+                })()}
                 icon={Calendar}
                 color="bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
               />
               <SummaryCard
                 title="Collection Time"
-                value={typeof formState.collectionTime === 'string' ? formState.collectionTime : formState.collectionTime?.label || formState.collectionTime?.value || ""}
+                value={(() => {
+                  const item = formState?.collectionTime;
+                  if (!item) return "";
+                  if (typeof item === 'string') return item;
+                  if (item.label && typeof item.label === 'object') return item.label.label || "";
+                  return item.label || item.value || "";
+                })()}
                 icon={Clock}
                 color="bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
               />
               <SummaryCard
                 title="Delivery Day"
-                value={typeof formState.deliveryDay === 'string' ? formState.deliveryDay : formState.deliveryDay?.label || formState.deliveryDay?.value || ""}
+                value={(() => {
+                  const item = formState?.deliveryDay;
+                  if (!item) return "";
+                  if (typeof item === 'string') return item;
+                  if (item.label && typeof item.label === 'object') return item.label.label || "";
+                  return item.label || item.value || "";
+                })()}
                 icon={Calendar}
                 color="bg-accent-green/20 text-accent-green"
               />
               <SummaryCard
                 title="Delivery Time"
-                value={typeof formState.deliveryTime === 'string' ? formState.deliveryTime : formState.deliveryTime?.label || formState.deliveryTime?.value || ""}
+                value={(() => {
+                  const item = formState?.deliveryTime;
+                  if (!item) return "";
+                  if (typeof item === 'string') return item;
+                  if (item.label && typeof item.label === 'object') return item.label.label || "";
+                  return item.label || item.value || "";
+                })()}
                 icon={Clock}
                 color="bg-accent-green/20 text-accent-green"
               />

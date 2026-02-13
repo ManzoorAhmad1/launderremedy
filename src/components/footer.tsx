@@ -131,8 +131,7 @@ export default function Footer() {
                                     <div>
                                         <p className="text-neutral-400 text-sm">Location</p>
                                         <span className="text-white">
-                                            123 Laundry Street,<br />London EC1A 1BB,<br />United Kingdom
-                                        </span>
+                                            London                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -173,7 +172,7 @@ export default function Footer() {
                     <div className="mb-8">
                         <PaymentMethods />
                     </div>
-                    
+
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-neutral-500 text-sm sm:text-base text-center md:text-left">
                             © {new Date().getFullYear()} Launder Remedy. All rights reserved.

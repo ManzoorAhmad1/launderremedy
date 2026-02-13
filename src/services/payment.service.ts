@@ -35,6 +35,19 @@ const paymentService = {
       throw new Error(error.message ?? 'Something went wrong');
     }
   },
+
+  // Create setup intent
+  createSetupIntent: async () => {
+    try {
+      const res = await Fetch.post(`${paymentService._PREFIX}/create-setup-intent`, {});
+      if (res.success) {
+        return res;
+      }
+      throw new Error(res.message ?? 'Failed to create setup intent');
+    } catch (error: any) {
+      throw new Error(error.message ?? 'Something went wrong');
+    }
+  },
 };
 
 export default paymentService;

@@ -158,7 +158,7 @@ export default function HeroSection() {
                                         </div>
                                         <div className="flex items-center text-xs sm:text-sm text-neutral-500">
                                             <CheckCircle className="w-3 h-3 mr-1 flex-shrink-0" />
-                                            <span>Central London Area</span>
+                                            <span>UK London </span>
                                         </div>
                                     </div>
                                     <div className="p-3 bg-neutral-50 dark:bg-neutral-700/30 rounded-lg border border-neutral-200 dark:border-neutral-700">
@@ -168,7 +168,7 @@ export default function HeroSection() {
                                         </div>
                                         <div className="flex items-center text-xs sm:text-sm text-neutral-500">
                                             <CheckCircle className="w-3 h-3 mr-1 flex-shrink-0" />
-                                            <span>West London Area</span>
+                                            <span>UK London</span>
                                         </div>
                                     </div>
                                 </div>

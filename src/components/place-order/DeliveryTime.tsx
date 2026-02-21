@@ -133,7 +133,8 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
       ...base,
       borderRadius: "12px",
       overflow: "hidden",
-      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)"
+      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
+      marginTop: 0
     }),
     option: (base: any, state: any) => ({
       ...base,
@@ -180,7 +181,8 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
       borderRadius: "12px",
       overflow: "hidden",
       backgroundColor: "#1f2937",
-      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3)"
+      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3)",
+      marginTop: 0
     }),
     option: (base: any, state: any) => ({
       ...base,

@@ -60,26 +60,48 @@ const PlacesAutoComplete: React.FC<PlacesAutoCompleteProps> = ({
     if (!autocompleteRef.current) return;
 
     setIsLoading(true);
-    
-    const request = {
+
+    // If input looks like a postal code (starts with digit or short alphanum), skip country restriction
+    const looksLikePostcode = /^[\d]/.test(input.trim()) || /^[a-zA-Z]{1,2}\d/.test(input.trim());
+
+    const request: any = {
       input,
-      componentRestrictions: restrictions,
-      types: ['address'],
+      types: ['geocode'],
     };
 
-    autocompleteRef.current.getPlacePredictions(
-      request,
-      (predictions: any[], status: string) => {
+    // Only apply country restriction for regular address searches
+    if (!looksLikePostcode) {
+      request.componentRestrictions = restrictions;
+    }
+
+    const handlePredictions = (predictions: any[], status: string) => {
+      if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions?.length) {
         setIsLoading(false);
-        if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-          setSuggestions(predictions);
-          setShowSuggestions(true);
-        } else {
-          setSuggestions([]);
-          setShowSuggestions(false);
-        }
+        setSuggestions(predictions);
+        setShowSuggestions(true);
+      } else if (looksLikePostcode) {
+        // Fallback: try without any restriction if postcode search returned nothing
+        autocompleteRef.current.getPlacePredictions(
+          { input, types: ['geocode'] },
+          (p2: any[], s2: string) => {
+            setIsLoading(false);
+            if (s2 === window.google.maps.places.PlacesServiceStatus.OK && p2?.length) {
+              setSuggestions(p2);
+              setShowSuggestions(true);
+            } else {
+              setSuggestions([]);
+              setShowSuggestions(false);
+            }
+          }
+        );
+      } else {
+        setIsLoading(false);
+        setSuggestions([]);
+        setShowSuggestions(false);
       }
-    );
+    };
+
+    autocompleteRef.current.getPlacePredictions(request, handlePredictions);
   };
 
   const handleSelect = (place: any) => {

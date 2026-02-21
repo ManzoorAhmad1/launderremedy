@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MockOrder } from "@/lib/mockData/orders";
+import { Button } from "@/components/ui/button";
+import { MockOrder } from "@/lib/mockData/orders"; 
 import { 
   Calendar, 
   DollarSign, 
@@ -19,8 +20,10 @@ import {
   Mail,
   Phone,
   Clock,
-  Truck
+  Truck,
+  FileText
 } from "lucide-react";
+import ReceiptModal from "@/components/admin/ReceiptModal";
 
 interface OrderViewModalProps {
   isOpen: boolean;
@@ -49,16 +52,30 @@ export default function OrderViewModal({
   onClose,
   order,
 }: OrderViewModalProps) {
+  const [showReceipt, setShowReceipt] = useState(false);
   if (!order) return null;
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Order #{order.order_number}</DialogTitle>
-          <DialogDescription>
-            Complete order details and customer information
-          </DialogDescription>
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <DialogTitle className="text-2xl">Order #{order.order_number}</DialogTitle>
+              <DialogDescription>
+                Complete order details and customer information
+              </DialogDescription>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="shrink-0 mt-1"
+              onClick={() => setShowReceipt(true)}
+            >
+              <FileText className="h-4 w-4 mr-1" /> Receipt
+            </Button>
+          </div>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
@@ -230,5 +247,11 @@ export default function OrderViewModal({
         </div>
       </DialogContent>
     </Dialog>
+    <ReceiptModal
+      isOpen={showReceipt}
+      onClose={() => setShowReceipt(false)}
+      order={order}
+    />
+    </>
   );
 }

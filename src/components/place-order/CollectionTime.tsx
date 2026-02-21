@@ -134,7 +134,8 @@ const CollectionTime = ({ onCollectionChange }: { onCollectionChange: (day: any,
       ...base,
       borderRadius: "12px",
       overflow: "hidden",
-      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)"
+      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
+      marginTop: 0
     }),
     option: (base: any, state: any) => ({
       ...base,
@@ -182,7 +183,8 @@ const CollectionTime = ({ onCollectionChange }: { onCollectionChange: (day: any,
       borderRadius: "12px",
       overflow: "hidden",
       backgroundColor: "#1f2937",
-      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3)"
+      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3)",
+      marginTop: 0
     }),
     option: (base: any, state: any) => ({
       ...base,
@@ -370,7 +372,7 @@ const CollectionTime = ({ onCollectionChange }: { onCollectionChange: (day: any,
               </li>
               <li className="flex items-start">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary-500 mt-1.5 mr-2 flex-shrink-0" />
-                Time slots are 2-hour windows (e.g., 9-11 AM)
+                Time slots are 3-hour windows (e.g., 8-11 AM)
               </li>
               <li className="flex items-start">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary-500 mt-1.5 mr-2 flex-shrink-0" />

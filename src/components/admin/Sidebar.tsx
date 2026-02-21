@@ -18,6 +18,7 @@ import {
     User,
     FileText,
     Shield,
+    MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -100,6 +101,13 @@ const sidebarItems: SidebarItem[] = [
         href: "/admin/reports",
         icon: <BarChart3 className="h-5 w-5" />,
         permission: "reports",
+    },
+    {
+        id: "areas",
+        title: "Service Areas",
+        href: "/admin/areas",
+        icon: <MapPin className="h-5 w-5" />,
+        permission: "settings",
     },
     {
         id: "settings",

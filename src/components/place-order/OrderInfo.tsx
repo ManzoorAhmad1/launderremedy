@@ -29,9 +29,10 @@ interface OrderInfoProps {
   counters: number[];
   setCounters: (counters: number[]) => void;
   isEdit?: boolean;
+  onPlaceOrder?: () => void;
 }
 
-const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isEdit = false }) => {
+const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isEdit = false, onPlaceOrder }) => {
   const dispatch = useDispatch();
 
   const step = useSelector((state: any) => state.order.step);
@@ -631,6 +632,8 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
           onClick={() => {
             if (step <= 4) {
               dispatch(setStepByValue(step + 1));
+            } else if (step === 5 && onPlaceOrder) {
+              onPlaceOrder();
             }
           }}
           disabled={step > 5 || (step > 4 && !isChecked)}

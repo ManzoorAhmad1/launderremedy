@@ -36,6 +36,7 @@ import ContactInfoForm from "@/components/place-order/ContactInfoForm";
 import PaymentForm from "@/components/place-order/PaymentForm";
 import OrderInfo from "@/components/place-order/OrderInfo";
 import FindAddress from "@/components/place-order/FindAddress";
+import CheckboxWithTerms from "@/components/ui/acceptTerms";
 import { orderApi, paymentApi } from "@/api";
 import { getCookie } from "@/utils/helpers";
 import toast from "react-hot-toast";
@@ -59,6 +60,7 @@ export default function PlaceOrderPage() {
   const [isTablet, setIsTablet] = useState(false);
   const [showMobileStepper, setShowMobileStepper] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const [mobileTermsChecked, setMobileTermsChecked] = useState(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -481,6 +483,7 @@ export default function PlaceOrderPage() {
         return state?.first_name && state?.last_name && state?.email && state?.phone;
       case 5:
         // Basic validation for payment step
+        if (isMobile && !mobileTermsChecked) return false;
         return elements !== null && stripe !== null;
       default:
         return false;
@@ -772,20 +775,23 @@ export default function PlaceOrderPage() {
                     <div></div>
                   )}
 
-                  <button
-                    onClick={handleNext}
-                    disabled={!canProceed()}
-                    className={`
-                      inline-flex items-center gap-1.5 md:gap-2 px-4 py-2.5 md:px-6 md:py-3 lg:px-8 lg:py-3 rounded-lg md:rounded-xl font-semibold transition-all text-sm md:text-base whitespace-nowrap
-                      ${canProceed()
-                        ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40'
-                        : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'
-                      }
-                    `}
-                  >
-                    {step === 5 ? 'Place Order' : 'Continue'}
-                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
-                  </button>
+                  {/* Hide Continue/Place Order on desktop step 5 — sidebar button handles it */}
+                  {(step < 5 || isMobile || isTablet) && (
+                    <button
+                      onClick={handleNext}
+                      disabled={!canProceed()}
+                      className={`
+                        inline-flex items-center gap-1.5 md:gap-2 px-4 py-2.5 md:px-6 md:py-3 lg:px-8 lg:py-3 rounded-lg md:rounded-xl font-semibold transition-all text-sm md:text-base whitespace-nowrap
+                        ${canProceed()
+                          ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40'
+                          : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'
+                        }
+                      `}
+                    >
+                      {step === 5 ? 'Place Order' : 'Continue'}
+                      <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+                    </button>
+                  )}
                 </motion.div>
               )}
             </div>
@@ -847,6 +853,7 @@ export default function PlaceOrderPage() {
                 state={state}
                 counters={counters}
                 setCounters={setCounters}
+                onPlaceOrder={handleNext}
               />
             </motion.div>
           )}
@@ -886,12 +893,25 @@ export default function PlaceOrderPage() {
 
         {/* Mobile Bottom Bar */}
         {isMobile && step < 6 && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 p-3 shadow-2xl z-50">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-xs text-neutral-500 dark:text-neutral-400">Total</div>
-                <div className="font-bold text-lg text-primary-600 dark:text-primary-400">
-                  £{(selectedServicesList && selectedServicesList.length > 0 
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 shadow-2xl z-50">
+            {/* Terms checkbox — only at payment step */}
+            {step === 5 && (
+              <div className="px-4 pt-3 pb-1">
+                <CheckboxWithTerms
+                  type="terms"
+                  handleCheckboxChange={() => setMobileTermsChecked(!mobileTermsChecked)}
+                  isChecked={mobileTermsChecked}
+                />
+              </div>
+            )}
+            {/* Price row */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-100 dark:border-neutral-700">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-neutral-500 dark:text-neutral-400">Order Total</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-base text-primary-600 dark:text-primary-400">
+                  £{(selectedServicesList && selectedServicesList.length > 0
                     ? selectedServicesList.reduce((total: number, service: any) => {
                         const price = typeof service.price === 'string' ? parseFloat(service.price) : service.price;
                         const quantity = service.quantity || 0;
@@ -899,29 +919,38 @@ export default function PlaceOrderPage() {
                       }, 0)
                     : 0
                   ).toFixed(2)}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
+                </span>
                 <button
                   onClick={() => setShowOrderSummary(true)}
-                  className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400"
+                  className="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400"
                 >
-                  <Package className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={handleNext}
-                  disabled={!canProceed()}
-                  className={`
-                    px-5 py-2.5 rounded-xl font-semibold transition-all text-sm min-w-[120px]
-                    ${canProceed()
-                      ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-lg'
-                      : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'
-                    }
-                  `}
-                >
-                  {step === 5 ? 'Place Order' : 'Continue'}
+                  <Package className="w-4 h-4" />
                 </button>
               </div>
+            </div>
+            {/* Action row */}
+            <div className="flex items-center gap-2 px-4 py-3">
+              {step > 1 && (
+                <button
+                  onClick={() => dispatch(setStepByValue(step - 1))}
+                  className="flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 font-medium text-sm shrink-0"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back
+                </button>
+              )}
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className={`
+                  flex-1 py-2.5 rounded-xl font-semibold transition-all text-sm
+                  ${canProceed()
+                    ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-lg'
+                    : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'
+                  }
+                `}
+              >
+                {step === 5 ? 'Place Order' : 'Continue'}
+              </button>
             </div>
           </div>
         )}

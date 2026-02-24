@@ -3,7 +3,7 @@ import { getCookie, clearCookie, setCookie } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 // Backend base URL
-const BASE_URL ='https://lightyellow-echidna-431500.hostingersite.com/api'
+const BASE_URL ='https://plum-cat-226610.hostingersite.com/api'
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

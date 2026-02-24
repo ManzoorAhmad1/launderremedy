@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'ax
 import { getCookie, clearCookie } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
-const BASE_URL ='https://lightyellow-echidna-431500.hostingersite.com/api'
+const BASE_URL ='https://plum-cat-226610.hostingersite.com/api'
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

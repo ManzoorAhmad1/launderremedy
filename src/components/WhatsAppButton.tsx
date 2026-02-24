@@ -6,7 +6,7 @@ import { MessageCircle, X } from "lucide-react";
 
 export default function WhatsAppButton() {
   const [isHovered, setIsHovered] = useState(false);
-  const whatsappNumber = "442071234567"; // +44 20 7123 4567
+  const whatsappNumber = "447442716396"; // +44 7442 716396
   const whatsappMessage = encodeURIComponent("Hi! I need help with my laundry order.");
 
   const handleClick = () => {

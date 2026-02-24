@@ -4,7 +4,6 @@ import toast from 'react-hot-toast';
 
 // Backend base URL
 const BASE_URL ='https://lightyellow-echidna-431500.hostingersite.com/api'
-// const BASE_URL0='http://localhost:5000/api';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

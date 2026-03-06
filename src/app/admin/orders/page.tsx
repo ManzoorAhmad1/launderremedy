@@ -222,6 +222,7 @@ export default function OrdersPage() {
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
         order={selectedOrder as any}
+        onOrderUpdated={() => loadOrders()}
       />
 
       {/* Update Status Modal */}
@@ -230,6 +231,7 @@ export default function OrdersPage() {
         onClose={() => setShowStatusModal(false)}
         onSubmit={handleStatusSubmit as any}
         order={selectedOrder as any}
+        onOrderUpdated={() => loadOrders()}
       />
     </div>
   );

@@ -66,8 +66,8 @@ const LoginPage = () => {
 
         const isAdmin = response.user.type === 'admin' || response.user.type === 'subadmin';
         // Admins always get 30-day cookie so refresh token survives across sessions
-        const cookieDays = isAdmin ? 30 : (formData.rememberMe ? 30 : 1);
-        const refreshDays = isAdmin ? 30 : (formData.rememberMe ? 30 : 7);
+        const cookieDays = isAdmin ? 30 : (formData.rememberMe ? 30 : 7);
+        const refreshDays = isAdmin ? 30 : (formData.rememberMe ? 30 : 30);
 
         // Store tokens in cookies
         setCookie('user_token', response.token, cookieDays);

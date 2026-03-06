@@ -46,7 +46,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
     let totalPrice = 0;
 
     selectedServicesList?.forEach((item: any) => {
-      totalPrice += item?.price * item?.quantity;
+      totalPrice += parseFloat(String(item?.price || 0)) * (item?.quantity || 1);
     });
 
     const bundles = isEdit ? state?.bundles : user?.bundles;
@@ -416,7 +416,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ state, counters, setCounters, isE
                         </div>
 
                         <span className="font-semibold text-primary-600 dark:text-primary-400 text-sm min-w-[60px] text-right">
-                          £{(service.price * service.quantity).toFixed(2)}
+                          £{(parseFloat(String(service.price || 0)) * (service.quantity || 1)).toFixed(2)}
                         </span>
                       </div>
                     </div>

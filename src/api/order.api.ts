@@ -63,6 +63,11 @@ const orderApi = {
     return await apiClient.put(`/order/v1/complete-order/${orderId}`);
   },
 
+  // Charge a single service item (admin per-item payment)
+  chargeOrderItem: async (orderId: string, serviceIndex: number) => {
+    return await apiClient.put(`/order/v1/charge-order-item/${orderId}`, { serviceIndex });
+  },
+
   // Get order details
   getOrderDetails: async (orderId: string) => {
     return await apiClient.get(`/order/v1/order-details/${orderId}`);

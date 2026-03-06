@@ -21,14 +21,20 @@ import {
   Phone,
   Clock,
   Truck,
-  FileText
+  FileText,
+  CheckCircle,
+  Loader2,
+  CreditCard
 } from "lucide-react";
 import ReceiptModal from "@/components/admin/ReceiptModal";
+import { orderApi } from "@/api";
+import toast from "react-hot-toast";
 
 interface OrderViewModalProps {
   isOpen: boolean;
   onClose: () => void;
   order: MockOrder | null;
+  onOrderUpdated?: () => void;
 }
 
 const getStatusVariant = (status: string) => {
@@ -51,8 +57,28 @@ export default function OrderViewModal({
   isOpen,
   onClose,
   order,
+  onOrderUpdated,
 }: OrderViewModalProps) {
   const [showReceipt, setShowReceipt] = useState(false);
+  const [chargingIndex, setChargingIndex] = useState<number | null>(null);
+
+  const handleChargeItem = async (serviceIndex: number, service: any) => {
+    if (!order) return;
+    setChargingIndex(serviceIndex);
+    try {
+      const res: any = await orderApi.chargeOrderItem(order._id, serviceIndex);
+      toast.success(res?.message || `Payment charged for ${service.service_name || service.subcategory}`);
+      if (res?.data?.allPaid) {
+        toast.success('All items charged — order marked complete!');
+      }
+      if (onOrderUpdated) onOrderUpdated();
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to charge item');
+    } finally {
+      setChargingIndex(null);
+    }
+  };
+
   if (!order) return null;
 
   return (
@@ -125,25 +151,77 @@ export default function OrderViewModal({
 
           {/* Services */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3">Services</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-1">Services</h3>
+            <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+              <CreditCard className="h-3 w-3" /> Click "Charge" to deduct payment for each item individually
+            </p>
             <div className="space-y-2">
-            {(order?.services?.length ? order.services : (order?.selected_services || [])).map((service: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-3">
-                    <Package className="h-5 w-5 text-purple-600" />
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">
+            {(order?.services?.length ? order.services : (order?.selected_services || [])).map((service: any, index: number) => {
+              const unitPrice = parseFloat(String(service.price || 0));
+              const qty = service.quantity || 1;
+              const itemTotal = unitPrice * qty;
+              const isPaid = !!service.payment_done;
+              return (
+                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 gap-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Package className="h-5 w-5 text-purple-600 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">
                         {service.service_name || service.subcategory || service.title || service.name || 'Service'}
                       </p>
-                      <p className="text-xs text-muted-foreground">Quantity: {service.quantity || 1}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {service.category || service.categoryTitle || ''} &bull; Qty: {qty} &bull; £{unitPrice.toFixed(2)} each
+                      </p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-foreground">
-                    £{(parseFloat(String(service.price || 0)) || 0).toFixed(2)}
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-sm font-bold text-foreground">£{itemTotal.toFixed(2)}</span>
+                    {isPaid ? (
+                      <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs">
+                        <CheckCircle className="h-3 w-3 mr-1" /> Paid
+                      </Badge>
+                    ) : order.status === 'completed' ? (
+                      <Badge variant="secondary" className="text-xs">Done</Badge>
+                    ) : (
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs px-2"
+                        disabled={chargingIndex !== null}
+                        onClick={() => handleChargeItem(index, service)}
+                      >
+                        {chargingIndex === index ? (
+                          <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Charging...</>
+                        ) : (
+                          `Charge £${itemTotal.toFixed(2)}`
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
+
+            {/* Per-item payment summary */}
+            {(() => {
+              const allServices = order?.services?.length ? order.services : (order?.selected_services || []);
+              const paidItems = allServices.filter((s: any) => s.payment_done);
+              const paidTotal = paidItems.reduce((sum: number, s: any) => sum + (parseFloat(String(s.price || 0)) * (s.quantity || 1)), 0);
+              const remainingTotal = allServices.reduce((sum: number, s: any) => sum + (s.payment_done ? 0 : parseFloat(String(s.price || 0)) * (s.quantity || 1)), 0);
+              if (allServices.length === 0) return null;
+              return (
+                <div className="mt-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 text-sm space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Collected so far</span>
+                    <span className="font-semibold text-green-600">£{paidTotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Remaining to charge</span>
+                    <span className="font-semibold text-orange-600">£{remainingTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Address & Schedule */}

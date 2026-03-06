@@ -108,7 +108,7 @@ apiClient.interceptors.response.use(
           return Promise.reject({ message: errorMessage || 'Authentication failed' });
         }
         
-        if (token && refreshToken && !isRefreshing) {
+        if (refreshToken && !isRefreshing) {
           isRefreshing = true;
           
           // Try to refresh the token

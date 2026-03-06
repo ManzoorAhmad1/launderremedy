@@ -141,8 +141,9 @@ export default function PlaceOrderPage() {
           setState(parsedData.orderDetail);
         }
         
-        // Restore selected services if present
-        if (parsedData.selectedServicesList && parsedData.selectedServicesList.length > 0) {
+        // Restore selected services from localStorage ONLY if Redux store is currently empty
+        // (preserves selections made from the pricing page before navigating here)
+        if (parsedData.selectedServicesList && parsedData.selectedServicesList.length > 0 && selectedServicesList.length === 0) {
           dispatch(setSelectedServicesListFull(parsedData.selectedServicesList));
         }
         

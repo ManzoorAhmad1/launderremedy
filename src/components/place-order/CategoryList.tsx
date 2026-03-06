@@ -557,7 +557,7 @@ const CategoryList = ({ state, setState }: any) => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6">
-                    {selectedCategory.subcategories?.map((subcategory: any) => {
+                    {[...(selectedCategory.subcategories || [])].sort((a: any, b: any) => parseFloat(a.price) - parseFloat(b.price)).map((subcategory: any) => {
                       const isSelected = isServiceSelected(subcategory._id);
                       const quantity = getSelectedServiceQuantity(subcategory._id);
 

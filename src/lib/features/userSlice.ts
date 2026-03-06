@@ -134,6 +134,9 @@ const userSlice = createSlice({
       clearCookie('user_token');
       clearCookie('refresh_token');
       clearCookie('user');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('admin_refresh_token');
+      }
     },
     clearError: (state) => {
       state.error = null;

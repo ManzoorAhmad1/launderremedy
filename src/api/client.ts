@@ -92,7 +92,9 @@ apiClient.interceptors.response.use(
       // Handle 401 Unauthorized - Session expired
       if (status === 401) {
         const token = getCookie('user_token');
-        const refreshToken = getCookie('refresh_token');
+        // Fall back to localStorage for admin refresh token if cookie is missing
+        const refreshToken = getCookie('refresh_token') || 
+          (typeof window !== 'undefined' ? localStorage.getItem('admin_refresh_token') : null);
         const isAuthEndpoint = error.config?.url?.includes('/log-in') || 
                                error.config?.url?.includes('/sign-up') ||
                                error.config?.url?.includes('/forgot-password') ||
@@ -112,14 +114,16 @@ apiClient.interceptors.response.use(
           // Try to refresh the token
           return axios.post(`${BASE_URL}/user/v1/refresh-token`, { refreshToken })
             .then((response: any) => {
-              const newToken = response.data.token;
+              const newToken = response.data?.token || response.token;
+              if (!newToken) throw new Error('No token in refresh response');
+              // Persist the new access token (keep same expiry as original cookie)
               setCookie('user_token', newToken, 7);
               isRefreshing = false;
               processQueue(null, newToken);
               
-              // Retry the original request
+              // Retry the original request with the NEW token
               if (error.config && error.config.headers) {
-                error.config.headers.Authorization = `Bearer ${token}`;
+                error.config.headers.Authorization = `Bearer ${newToken}`;
               }
               return apiClient(error.config!);
             })
@@ -131,6 +135,9 @@ apiClient.interceptors.response.use(
               clearCookie('user_token');
               clearCookie('refresh_token');
               clearCookie('user');
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem('admin_refresh_token');
+              }
               
               // Dispatch logout event for Redux to update state
               if (typeof window !== 'undefined') {
@@ -151,9 +158,9 @@ apiClient.interceptors.response.use(
           // Queue the request while token is being refreshed
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
-          }).then(token => {
+          }).then(newToken => {
             if (error.config && error.config.headers) {
-              error.config.headers.Authorization = `Bearer ${token}`;
+              error.config.headers.Authorization = `Bearer ${newToken}`;
             }
             return apiClient(error.config!);
           }).catch(err => {

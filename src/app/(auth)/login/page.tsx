@@ -63,13 +63,23 @@ const LoginPage = () => {
 
       if (response.success && response.token) {
         setSuccessMessage('Login successful! Redirecting...');
-        
+
+        const isAdmin = response.user.type === 'admin' || response.user.type === 'subadmin';
+        // Admins always get 30-day cookie so refresh token survives across sessions
+        const cookieDays = isAdmin ? 30 : (formData.rememberMe ? 30 : 1);
+        const refreshDays = isAdmin ? 30 : (formData.rememberMe ? 30 : 7);
+
         // Store tokens in cookies
-        setCookie('user_token', response.token, formData.rememberMe ? 30 : 1);
-        setCookie('refresh_token', response.refreshToken, formData.rememberMe ? 30 : 7);
+        setCookie('user_token', response.token, cookieDays);
+        setCookie('refresh_token', response.refreshToken, refreshDays);
+        
+        // Admin: also persist refresh token in localStorage as backup
+        if (isAdmin && typeof window !== 'undefined') {
+          localStorage.setItem('admin_refresh_token', response.refreshToken);
+        }
         
         // Store user data in cookie
-        setCookie('user', JSON.stringify(response.user), formData.rememberMe ? 30 : 1);
+        setCookie('user', JSON.stringify(response.user), cookieDays);
         
         // Store user in Redux
         dispatch(setUser({ 

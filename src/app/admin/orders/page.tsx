@@ -66,18 +66,27 @@ export default function OrdersPage() {
         status: statusFilter,
       });
       
+      const mapOrder = (o: any) => ({
+        ...o,
+        order_number: o.orderId || o.order_number || o._id?.slice(-6) || 'N/A',
+        user_name: `${o.first_name || ''} ${o.last_name || ''}`.trim() || o.user_name || 'N/A',
+        user_email: o.email || o.user_email || '',
+        total_amount: parseFloat(String(o.totalPrice || '0')) || 0,
+        payment_status: o.payment_done ? 'paid' : 'pending',
+        created_at: o.createdAt || o.created_at,
+        updated_at: o.updatedAt || o.updated_at,
+        services: (o.selected_services || []).map((s: any) => ({
+          service_id: s._id || s.id || '',
+          service_name: s.subcategory || s.title || s.name || s.categoryTitle || 'Service',
+          quantity: s.quantity || 1,
+          price: parseFloat(String(s.price || 0)),
+        })),
+      });
+
       if (response?.data?.items) {
-        const ordersData = response.data.items.map((o: any) => ({
-          ...o,
-          order_number: o.orderId || o.order_number || o._id?.slice(-6) || 'N/A',
-        }));
-        setOrders(ordersData);
+        setOrders(response.data.items.map(mapOrder));
       } else if (Array.isArray(response?.data)) {
-        const ordersData = response.data.map((o: any) => ({
-          ...o,
-          order_number: o.orderId || o.order_number || o._id?.slice(-6) || 'N/A',
-        }));
-        setOrders(ordersData);
+        setOrders(response.data.map(mapOrder));
       }
     } catch (error: any) {
       toast.error(error?.message || "Failed to load orders");
@@ -99,6 +108,13 @@ export default function OrdersPage() {
 
   const handleStatusSubmit = async (newStatus: "pending" | "collected" | "processing" | "out_for_delivery" | "completed" | "cancelled") => {
     if (!selectedOrder) return;
+
+    // Block if already completed — backend also enforces this
+    if (selectedOrder.status === 'completed') {
+      toast.error('Order is already completed. Status cannot be changed.');
+      setShowStatusModal(false);
+      return;
+    }
 
     try {
       if (newStatus === "cancelled") {
@@ -139,7 +155,7 @@ export default function OrdersPage() {
     completed: orders.filter((o) => o.status === "completed").length,
     revenue: orders
       .filter((o) => o.payment_done === true)
-      .reduce((sum, o) => sum + (o.totalPrice || 0), 0),
+      .reduce((sum, o) => sum + (parseFloat(String(o.totalPrice || '0')) || 0), 0),
   };
 
   return (

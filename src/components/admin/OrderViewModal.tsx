@@ -86,14 +86,12 @@ export default function OrderViewModal({
             </Badge>
             <Badge
               variant={
-                order.payment_status === "paid"
+                (order.payment_status || (order.payment_done ? 'paid' : 'pending')) === "paid"
                   ? "default"
-                  : order.payment_status === "pending"
-                  ? "secondary"
-                  : "destructive"
+                  : "secondary"
               }
             >
-              Payment: {order?.payment_status?.toUpperCase()}
+              Payment: {(order.payment_status || (order.payment_done ? 'paid' : 'pending')).toUpperCase()}
             </Badge>
           </div>
 
@@ -129,88 +127,100 @@ export default function OrderViewModal({
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-3">Services</h3>
             <div className="space-y-2">
-              {order?.services?.map((service, index) => (
+            {(order?.services?.length ? order.services : (order?.selected_services || [])).map((service: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
                     <Package className="h-5 w-5 text-purple-600" />
                     <div>
-                      <p className="text-sm font-semibold text-foreground">{service.service_name}</p>
-                      <p className="text-xs text-muted-foreground">Quantity: {service.quantity}</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {service.service_name || service.subcategory || service.title || service.name || 'Service'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Quantity: {service.quantity || 1}</p>
                     </div>
                   </div>
                   <span className="text-sm font-bold text-foreground">
-                    £{Number(service.price).toFixed(2)}
+                    £{(parseFloat(String(service.price || 0)) || 0).toFixed(2)}
                   </span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Addresses */}
-          {order.collection_address && order.delivery_address && (
-            <div className="grid grid-cols-2 gap-4">
-              {/* Collection Address */}
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-2">Collection Address</h3>
-                <div className="p-3 rounded-lg bg-muted/50">
-                  <div className="flex items-start gap-2">
-                    <MapPin className="h-4 w-4 text-blue-600 mt-1" />
-                    <div className="text-sm text-foreground">
-                      {order.collection_address.street}<br />
-                      {order.collection_address.city}, {order.collection_address.postcode}
-                    </div>
-                  </div>
-                  {order.collection_time && (
-                    <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {new Date(order.collection_time).toLocaleString()}
-                    </div>
-                  )}
+          {/* Address & Schedule */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Collection */}
+            <div>
+              <h3 className="text-sm font-semibold text-foreground mb-2">Collection</h3>
+              <div className="p-3 rounded-lg bg-muted/50 space-y-2">
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
+                  <p className="text-sm text-foreground">
+                    {order.address?.formatted_address || order.address?.street || order.address?.line1 || 'N/A'}
+                  </p>
                 </div>
-              </div>
-
-              {/* Delivery Address */}
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-2">Delivery Address</h3>
-                <div className="p-3 rounded-lg bg-muted/50">
-                  <div className="flex items-start gap-2">
-                    <Truck className="h-4 w-4 text-green-600 mt-1" />
-                    <div className="text-sm text-foreground">
-                      {order.delivery_address.street}<br />
-                      {order.delivery_address.city}, {order.delivery_address.postcode}
-                    </div>
+                {(order.collection_date || order.collection_time) && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    {order.collection_date}{order.collection_time ? ` • ${order.collection_time}` : ''}
                   </div>
-                  {order.delivery_time && (
-                    <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {new Date(order.delivery_time).toLocaleString()}
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </div>
-          )}
+
+            {/* Delivery */}
+            <div>
+              <h3 className="text-sm font-semibold text-foreground mb-2">Delivery</h3>
+              <div className="p-3 rounded-lg bg-muted/50 space-y-2">
+                <div className="flex items-start gap-2">
+                  <Truck className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                  <p className="text-sm text-foreground">
+                    {order.address?.formatted_address || order.address?.street || order.address?.line1 || 'N/A'}
+                  </p>
+                </div>
+                {(order.delivery_date || order.delivery_time) && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    {order.delivery_date}{order.delivery_time ? ` • ${order.delivery_time}` : ''}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
           {/* Payment Summary */}
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-3">Payment Summary</h3>
             <div className="space-y-2 p-4 rounded-lg bg-muted/50">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-medium">£{(parseFloat(String(order.total_amount || 0)) - parseFloat(String(order.delivery_fee || 0))).toFixed(2)}</span>
+                <span className="text-muted-foreground">Order Price</span>
+                <span className="font-medium">£{(parseFloat(String(order.orderPrice || '0')) || 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Delivery Fee</span>
-                <span className="font-medium">£{(parseFloat(String(order.delivery_fee || 0)) || 0).toFixed(2)}</span>
+                <span className="text-muted-foreground">Service Fee</span>
+                <span className="font-medium">£{(parseFloat(String(order.serviceFee || '0')) || 0).toFixed(2)}</span>
               </div>
+              {parseFloat(String(order.discount || '0')) > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    Discount {order.isFirstOrder ? '(First Order 25%)' : order.discountPercentage ? `(${order.discountPercentage}%)` : ''}
+                  </span>
+                  <span className="font-medium text-green-600">−£{(parseFloat(String(order.discount || '0')) || 0).toFixed(2)}</span>
+                </div>
+              )}
               <div className="border-t border-border pt-2 mt-2">
                 <div className="flex justify-between">
-                  <span className="font-semibold text-foreground">Total Amount</span>
+                  <span className="font-semibold text-foreground">Total Charged</span>
                   <span className="text-xl font-bold text-primary-600">
-                    £{(parseFloat(String(order?.total_amount || 0)) || 0).toFixed(2)}
+                    £{(parseFloat(String(order.totalPrice || order.total_amount || '0')) || 0).toFixed(2)}
                   </span>
                 </div>
               </div>
+              {order.card_last4 && (
+                <div className="flex justify-between text-sm pt-1">
+                  <span className="text-muted-foreground">Card</span>
+                  <span className="font-medium">•••• {order.card_last4}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -232,14 +242,18 @@ export default function OrderViewModal({
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Created:</span>
                 <span className="font-medium text-foreground">
-                  {new Date(order.created_at).toLocaleString('en-GB')}
+                  {order.createdAt || order.created_at
+                    ? new Date((order.createdAt || order.created_at)!).toLocaleString('en-GB')
+                    : 'N/A'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Last Updated:</span>
                 <span className="font-medium text-foreground">
-                  {new Date(order.updated_at).toLocaleString('en-GB')}
+                  {order.updatedAt || order.updated_at
+                    ? new Date((order.updatedAt || order.updated_at)!).toLocaleString('en-GB')
+                    : 'N/A'}
                 </span>
               </div>
             </div>

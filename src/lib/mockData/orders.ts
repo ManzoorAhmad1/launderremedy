@@ -2,17 +2,29 @@
 export interface MockOrder {
   _id: string;
   order_number: string;
-  user_id: string;
+  // DB: orderId field
+  orderId?: string;
+  // Mapped: assembled from first_name + last_name
   user_name: string;
+  // DB: actual first/last name fields
+  first_name?: string;
+  last_name?: string;
+  user_id?: string;
   user_email: string;
+  // DB: email field
+  email?: string;
   phone_number?: string;
+  // Mapped: built from selected_services
   services: {
     service_id: string;
     service_name: string;
     quantity: number;
     price: number;
   }[];
-  collection: {
+  // DB: raw services array
+  selected_services?: any[];
+  // Mapped address sections (mock shape)
+  collection?: {
     date: string;
     time: string;
     address: string;
@@ -22,8 +34,9 @@ export interface MockOrder {
     city: string;
     postcode: string;
   };
+  collection_date?: string;
   collection_time?: string;
-  delivery: {
+  delivery?: {
     date: string;
     time: string;
     address: string;
@@ -33,14 +46,44 @@ export interface MockOrder {
     city: string;
     postcode: string;
   };
+  delivery_date?: string;
   delivery_time?: string;
   delivery_fee?: number;
-  status: 'pending' | 'collected' | 'processing' | 'out_for_delivery' | 'completed' | 'cancelled';
+  // DB: single address object
+  address?: {
+    formatted_address?: string;
+    street?: string;
+    line1?: string;
+    city?: string;
+    postcode?: string;
+    [key: string]: any;
+  };
+  status: 'pending' | 'collected' | 'processing' | 'out_for_delivery' | 'completed' | 'cancelled' | 'delivered';
+  // Mapped: from payment_done boolean
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+  // DB: payment fields
+  payment_done?: boolean;
+  payment_id?: string;
+  payment_method_id?: string;
+  stripe_customer_id?: string;
+  card_last4?: string;
+  // Mapped: numeric total
   total_amount: number;
+  // DB: price fields (stored as strings in MongoDB)
+  totalPrice?: string | number;
+  orderPrice?: string | number;
+  serviceFee?: string | number;
+  discount?: string | number;
+  discountPercentage?: number;
+  isFirstOrder?: boolean;
   special_instructions?: string;
-  created_at: string;
-  updated_at: string;
+  // Mapped dates
+  created_at?: string;
+  updated_at?: string;
+  // DB: Mongoose timestamps
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: any;
 }
 
 export const mockOrders: MockOrder[] = [

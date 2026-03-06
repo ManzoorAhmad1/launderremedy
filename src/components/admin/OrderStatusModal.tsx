@@ -81,66 +81,76 @@ export default function OrderStatusModal({
             </Badge>
           </div>
 
-          {/* Status Options */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-3">
-              Select New Status
-            </label>
-            <div className="space-y-2">
-              {statusOptions.map((option) => {
-                const Icon = option.icon;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setSelectedStatus(option.value)}
-                    className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
-                      selectedStatus === option.value
-                        ? "border-primary-500 bg-primary-50 dark:bg-primary-950/30"
-                        : "border-border bg-card hover:border-primary-300 hover:bg-muted/50"
-                    }`}
-                  >
-                    <div
-                      className={`flex items-center justify-center w-10 h-10 rounded-full ${
+          {/* Status Options — locked when already completed */}
+          {order.status === 'completed' ? (
+            <div className="p-5 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-center">
+              <CheckCircle className="h-10 w-10 text-green-600 mx-auto mb-3" />
+              <p className="font-semibold text-green-700 dark:text-green-400 text-base">Order Completed &amp; Payment Charged</p>
+              <p className="text-sm text-green-600 dark:text-green-500 mt-2">
+                This order has been completed and the payment has been processed. Status cannot be changed.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-3">
+                Select New Status
+              </label>
+              <div className="space-y-2">
+                {statusOptions.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setSelectedStatus(option.value)}
+                      className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                         selectedStatus === option.value
-                          ? "bg-primary-100 dark:bg-primary-900"
-                          : "bg-muted"
+                          ? "border-primary-500 bg-primary-50 dark:bg-primary-950/30"
+                          : "border-border bg-card hover:border-primary-300 hover:bg-muted/50"
                       }`}
                     >
-                      <Icon
-                        className={`h-5 w-5 ${
+                      <div
+                        className={`flex items-center justify-center w-10 h-10 rounded-full ${
                           selectedStatus === option.value
-                            ? "text-primary-600"
-                            : option.color
-                        }`}
-                      />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p
-                        className={`font-semibold ${
-                          selectedStatus === option.value
-                            ? "text-primary-600"
-                            : "text-foreground"
+                            ? "bg-primary-100 dark:bg-primary-900"
+                            : "bg-muted"
                         }`}
                       >
-                        {option.label}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {option.value === "pending" && "Order placed, awaiting collection"}
-                        {option.value === "processing" && "Order is being processed"}
-                        {option.value === "out_for_delivery" && "Order is on the way"}
-                        {option.value === "completed" && "Order delivered successfully"}
-                        {option.value === "cancelled" && "Order has been cancelled"}
-                      </p>
-                    </div>
-                    {selectedStatus === option.value && (
-                      <CheckCircle className="h-5 w-5 text-primary-600" />
-                    )}
-                  </button>
-                );
-              })}
+                        <Icon
+                          className={`h-5 w-5 ${
+                            selectedStatus === option.value
+                              ? "text-primary-600"
+                              : option.color
+                          }`}
+                        />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p
+                          className={`font-semibold ${
+                            selectedStatus === option.value
+                              ? "text-primary-600"
+                              : "text-foreground"
+                          }`}
+                        >
+                          {option.label}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {option.value === "pending" && "Order placed, awaiting collection"}
+                          {option.value === "processing" && "Order is being processed"}
+                          {option.value === "out_for_delivery" && "Order is on the way"}
+                          {option.value === "completed" && "Card will be charged on completion"}
+                          {option.value === "cancelled" && "Order has been cancelled"}
+                        </p>
+                      </div>
+                      {selectedStatus === option.value && (
+                        <CheckCircle className="h-5 w-5 text-primary-600" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Order Details Summary */}
           <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
@@ -187,7 +197,7 @@ export default function OrderStatusModal({
             </Button>
             <Button
               type="submit"
-              disabled={loading || !selectedStatus || selectedStatus === order.status}
+              disabled={loading || !selectedStatus || selectedStatus === order.status || order.status === 'completed'}
             >
               {loading ? (
                 <>

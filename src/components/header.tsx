@@ -149,7 +149,7 @@ export default function Header() {
             {NavData
               .filter(item => {
                 if (item.protected) {
-                  return isLogin && (user?.type === 'admin' || user?.type === 'subadmin');
+                  return mounted && isLogin && (user?.type === 'admin' || user?.type === 'subadmin');
                 }
                 return true;
               })
@@ -297,7 +297,7 @@ export default function Header() {
               {NavData
                 .filter(item => {
                   if (item.protected) {
-                    return isLogin && (user?.type === 'admin' || user?.type === 'subadmin');
+                    return mounted && isLogin && (user?.type === 'admin' || user?.type === 'subadmin');
                   }
                   return true;
                 })

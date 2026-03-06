@@ -122,7 +122,7 @@ export default function AdminDashboard() {
         />
         <StatCard
           title="Total Revenue"
-          value={`£${stats?.totalRevenue.toFixed(2) || 0}`}
+          value={`£${(parseFloat(String(stats?.totalRevenue)) || 0).toFixed(2)}`}
           icon={DollarSign}
           description="Total earnings"
           trend={{ value: 15, isPositive: true }}
@@ -214,7 +214,7 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td className="py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-foreground whitespace-nowrap">
-                        £{(order.totalPrice || 0).toFixed(2)}
+                        £{(parseFloat(order.totalPrice) || 0).toFixed(2)}
                       </td>
                       <td className="py-3 px-3 sm:px-4 text-xs sm:text-sm text-muted-foreground hidden md:table-cell">
                         {new Date(order.createdAt || order.created_at).toLocaleDateString()}

@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 const BASE_URL ='https://plum-cat-226610.hostingersite.com/api'
 
 // Create axios instance
-const apiClient: AxiosInstance = axios.create({
+const apiClient:     AxiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',

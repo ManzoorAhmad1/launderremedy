@@ -383,7 +383,7 @@ export default function IroningServicePage() {
                 ))}
               </div>
               
-              {services.length > 0 && (
+              {services?.length > 0 && (
                 <motion.div
                   className="mt-8 p-6 bg-primary-50 dark:bg-primary-900/20 rounded-xl max-w-3xl mx-auto"
                   initial={{ opacity: 0, y: 20 }}

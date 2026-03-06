@@ -68,8 +68,8 @@ export const getUserColumns = (
     accessorKey: "total_spent",
     header: "Total Spent",
     cell: ({ row }) => {
-      const amount = row.getValue("total_spent") as number;
-      return <span className="font-medium">£{amount.toFixed(2)}</span>;
+      const amount = row.getValue("total_spent");
+      return <span className="font-medium">£{(parseFloat(String(amount || 0)) || 0).toFixed(2)}</span>;
     },
   },
   {

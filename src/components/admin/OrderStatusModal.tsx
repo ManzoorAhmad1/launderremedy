@@ -147,15 +147,15 @@ export default function OrderStatusModal({
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Customer</p>
-                <p className="font-medium text-foreground">{order.user_name}</p>
+                <p className="font-medium text-foreground">{order?.user_name}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Amount</p>
-                <p className="font-medium text-foreground">£{order.total_amount.toFixed(2)}</p>
+                <p className="font-medium text-foreground">£{(parseFloat(String(order?.total_amount || 0)) || 0).toFixed(2)}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Services</p>
-                <p className="font-medium text-foreground">{order.services.length} items</p>
+                <p className="font-medium text-foreground">{order?.services?.length} items</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Payment</p>
@@ -169,7 +169,7 @@ export default function OrderStatusModal({
                   }
                   className="text-xs"
                 >
-                  {order.payment_status.toUpperCase()}
+                  {order?.payment_status?.toUpperCase()}
                 </Badge>
               </div>
             </div>

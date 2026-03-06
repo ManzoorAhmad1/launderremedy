@@ -72,7 +72,7 @@ export default function PaymentViewModal({
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
                 <p className="text-4xl font-bold text-primary-600 dark:text-primary-300">
-                  {payment.currency === "gbp" ? "£" : "$"}{payment.amount.toFixed(2)}
+                  {payment.currency === "gbp" ? "£" : "$"}{(parseFloat(String(payment.amount || 0)) || 0).toFixed(2)}
                 </p>
               </div>
               <DollarSign className="h-16 w-16 text-primary-300 dark:text-primary-700" />

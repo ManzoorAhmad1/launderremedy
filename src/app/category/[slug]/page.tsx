@@ -53,8 +53,8 @@ const LaundryServicesLayout = ({ category }: { category: typeof categoryData['la
         <div className="grid md:grid-cols-2 gap-8">
           {category.sections.map((section, idx) => (
             <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-gradient-to-br from-primary-50 to-blue-50 dark:from-neutral-800 dark:to-neutral-700 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300">
-              <div className="relative h-48 rounded-2xl overflow-hidden mb-6">
-                <Image src={section.image} alt={section.title} fill className="object-cover" />
+              <div className="relative h-48 rounded-2xl overflow-hidden mb-6 bg-gray-100 dark:bg-neutral-700">
+                <Image src={section.image} alt={section.title} fill className="object-contain" />
               </div>
               <h3 className="text-2xl font-bold mb-3 text-neutral-900 dark:text-white">{section.title}</h3>
               <p className="text-neutral-600 dark:text-neutral-300 mb-6">{section.description}</p>
@@ -102,9 +102,9 @@ const ShirtsAndTopsLayout = ({ category }: { category: typeof categoryData['shir
         {category.sections.map((section, idx) => (
           <motion.div key={idx} initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className={`grid lg:grid-cols-2 gap-12 items-center ${idx % 2 === 1 ? 'lg:grid-flow-dense' : ''}`}>
             <div className={idx % 2 === 1 ? 'lg:col-start-2' : ''}>
-              <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-                <Image src={section.image} alt={section.title} fill className="object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent" />
+              <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl bg-gray-100 dark:bg-neutral-700">
+                <Image src={section.image} alt={section.title} fill className="object-contain" />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent" />
               </div>
             </div>
             <div className={idx % 2 === 1 ? 'lg:col-start-1' : ''}>
@@ -158,8 +158,8 @@ const ElegantSuitsLayout = ({ category }: { category: typeof categoryData['elega
         <div className="grid md:grid-cols-2 gap-8">
           {category.sections.map((section, idx) => (
             <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.1 }} className="group">
-              <div className="relative h-80 rounded-2xl overflow-hidden mb-6">
-                <Image src={section.image} alt={section.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div className="relative h-80 rounded-2xl overflow-hidden mb-6 bg-neutral-800">
+                <Image src={section.image} alt={section.title} fill className="object-contain group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/50 to-transparent" />
                 <div className="absolute bottom-6 left-6">
                   <h3 className="text-3xl font-bold text-white mb-2">{section.title}</h3>
@@ -211,8 +211,8 @@ const DressesAndSkirtsLayout = ({ category }: { category: typeof categoryData['d
         <div className="columns-1 md:columns-2 gap-8 space-y-8">
           {category.sections.map((section, idx) => (
             <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="break-inside-avoid bg-gradient-to-br from-primary-50 to-primary-100 dark:from-neutral-700 dark:to-primary-900/20 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="relative h-64 rounded-2xl overflow-hidden mb-6">
-                <Image src={section.image} alt={section.title} fill className="object-cover" />
+              <div className="relative h-64 rounded-2xl overflow-hidden mb-6 bg-gray-50 dark:bg-neutral-700">
+                <Image src={section.image} alt={section.title} fill className="object-contain" />
               </div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-10 h-10 rounded-full bg-primary-200 dark:bg-primary-900/50 flex items-center justify-center">
@@ -270,8 +270,8 @@ const TrousersLayout = ({ category }: { category: typeof categoryData['trousers'
                 </div>
               </div>
               <div className="flex-1">
-                <div className="relative h-64 rounded-2xl overflow-hidden mb-6 shadow-xl">
-                  <Image src={section.image} alt={section.title} fill className="object-cover" />
+                <div className="relative h-64 rounded-2xl overflow-hidden mb-6 shadow-xl bg-gray-100 dark:bg-neutral-700">
+                  <Image src={section.image} alt={section.title} fill className="object-contain" />
                 </div>
                 <h3 className="text-3xl font-bold mb-4 text-neutral-900 dark:text-white">{section.title}</h3>
                 <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-6">{section.description}</p>
@@ -322,8 +322,8 @@ const OutdoorClothingLayout = ({ category }: { category: typeof categoryData['ou
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {category.sections.map((section, idx) => (
             <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.1 }} className="group cursor-pointer">
-              <div className="relative h-80 rounded-3xl overflow-hidden mb-4 shadow-lg group-hover:shadow-2xl transition-shadow">
-                <Image src={section.image} alt={section.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div className="relative h-80 rounded-3xl overflow-hidden mb-4 shadow-lg group-hover:shadow-2xl transition-shadow bg-gray-100 dark:bg-neutral-700">
+                <Image src={section.image} alt={section.title} fill className="object-contain group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
                   <h3 className="text-xl font-bold text-white mb-2">{section.title}</h3>
@@ -373,8 +373,8 @@ const HomeTextilesLayout = ({ category }: { category: typeof categoryData['home-
           {category.sections.map((section, idx) => (
             <motion.div key={idx} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className={`${idx === 0 ? 'md:col-span-2' : ''} bg-white dark:bg-neutral-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow`}>
               <div className={`grid ${idx === 0 ? 'md:grid-cols-2' : ''} gap-6`}>
-                <div className="relative h-64">
-                  <Image src={section.image} alt={section.title} fill className="object-cover" />
+                <div className="relative h-64 bg-gray-100 dark:bg-neutral-700">
+                  <Image src={section.image} alt={section.title} fill className="object-contain" />
                 </div>
                 <div className="p-8">
                   <h3 className="text-3xl font-bold mb-4 text-neutral-900 dark:text-white">{section.title}</h3>
@@ -432,8 +432,8 @@ const IroningLayout = ({ category }: { category: typeof categoryData['ironing'] 
         <div className="grid md:grid-cols-4 gap-6">
           {category.sections.map((section, idx) => (
             <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.1 }} className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="relative h-48 rounded-xl overflow-hidden mb-4">
-                <Image src={section.image} alt={section.title} fill className="object-cover" />
+              <div className="relative h-48 rounded-xl overflow-hidden mb-4 bg-gray-100 dark:bg-neutral-700">
+                <Image src={section.image} alt={section.title} fill className="object-contain" />
               </div>
               <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
                 <span className="text-purple-700 dark:text-purple-300 font-bold text-xl">{idx + 1}</span>
@@ -486,8 +486,8 @@ const AlterationsLayout = ({ category }: { category: typeof categoryData['altera
             <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="group relative bg-gradient-to-br from-red-50 to-rose-50 dark:from-neutral-800 dark:to-red-900/20 rounded-3xl p-8 overflow-hidden hover:shadow-2xl transition-all">
               <div className="absolute top-0 right-0 w-32 h-32 bg-red-200 dark:bg-red-900/30 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
               <div className="relative">
-                <div className="relative h-56 rounded-2xl overflow-hidden mb-6">
-                  <Image src={section.image} alt={section.title} fill className="object-cover" />
+                <div className="relative h-56 rounded-2xl overflow-hidden mb-6 bg-gray-50 dark:bg-neutral-700">
+                  <Image src={section.image} alt={section.title} fill className="object-contain" />
                 </div>
                 <h3 className="text-2xl font-bold mb-4 text-neutral-900 dark:text-white">{section.title}</h3>
                 <p className="text-neutral-600 dark:text-neutral-300 mb-6">{section.description}</p>
@@ -534,9 +534,9 @@ const ShoeRepairLayout = ({ category }: { category: typeof categoryData['shoe-re
         <div className="grid lg:grid-cols-2 gap-16">
           {category.sections.map((section, idx) => (
             <motion.div key={idx} initial={{ opacity: 0, x: idx % 2 === 0 ? -30 : 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-white dark:bg-neutral-900 rounded-2xl overflow-hidden shadow-xl">
-              <div className="relative h-72">
-                <Image src={section.image} alt={section.title} fill className="object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="relative h-72 bg-neutral-200 dark:bg-neutral-700">
+                <Image src={section.image} alt={section.title} fill className="object-contain" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute bottom-6 left-6">
                   <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center mb-3">
                     <span className="text-2xl font-bold text-neutral-900">{idx + 1}</span>

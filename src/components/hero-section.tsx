@@ -138,7 +138,7 @@ export default function HeroSection() {
                                     <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
                                     <span className="font-semibold text-sm sm:text-base">
                                         Schedule collection in{' '}
-                                        <span className="font-bold text-primary">London City</span>
+                                        <span className="font-bold text-primary">London</span>
                                     </span>
                                 </div>
                                 <div className="flex items-center space-x-2 text-xs sm:text-sm text-neutral-500">

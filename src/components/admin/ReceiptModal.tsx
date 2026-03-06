@@ -161,7 +161,7 @@ export default function ReceiptModal({ isOpen, onClose, order }: ReceiptModalPro
                   </tr>
                 </thead>
                 <tbody>
-                  {services.length > 0 ? services.map((svc: any, i: number) => {
+                  {services?.length > 0 ? services.map((svc: any, i: number) => {
                     const qty = svc.quantity || 1;
                     const price = parseFloat(svc.price || 0);
                     const lineTotal = qty * price;

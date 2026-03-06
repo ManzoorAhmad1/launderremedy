@@ -44,16 +44,16 @@ export const getServiceColumns = (
     accessorKey: "price",
     header: "Price",
     cell: ({ row }) => {
-      const price = row.getValue("price") as number;
-      return <span className="font-medium">£{price.toFixed(2)}</span>;
+      const price = row.getValue("price");
+      return <span className="font-medium">£{(parseFloat(String(price || 0)) || 0).toFixed(2)}</span>;
     },
   },
   {
     accessorKey: "perItemPrice",
     header: "Per Item",
     cell: ({ row }) => {
-      const price = row.getValue("perItemPrice") as number;
-      return <span className="text-muted-foreground">£{price.toFixed(2)}</span>;
+      const price = row.getValue("perItemPrice");
+      return <span className="text-muted-foreground">£{(parseFloat(String(price || 0)) || 0).toFixed(2)}</span>;
     },
   },
   {

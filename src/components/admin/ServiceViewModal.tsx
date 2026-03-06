@@ -247,7 +247,7 @@ export default function ServiceViewModal({
                 <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950/30">
                   <span className="text-sm text-muted-foreground">Revenue</span>
                   <span className="text-lg font-bold text-green-600">
-                    £{((service.price || 0) * (service.total_orders || 0)).toFixed(2)}
+                    £{(parseFloat(String(service.price || 0)) * (service.total_orders || 0)).toFixed(2)}
                   </span>
                 </div>
               </div>

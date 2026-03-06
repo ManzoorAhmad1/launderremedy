@@ -163,7 +163,7 @@ export default function ServicesPage() {
   const totalOrders = services.reduce((sum, s) => sum + (s.total_orders || 0), 0);
   const totalRevenue = services.reduce(
     (sum, s) => {
-      const price = s.price || s.perItemPrice || s.priceList?.[0]?.price || 0;
+      const price = parseFloat(String(s.price || s.perItemPrice || s.priceList?.[0]?.price || 0)) || 0;
       return sum + price * (s.total_orders || 0);
     },
     0
@@ -190,7 +190,7 @@ export default function ServicesPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-card rounded-lg border border-border p-4">
           <p className="text-sm text-muted-foreground">Total Services</p>
-          <p className="text-2xl font-bold text-foreground">{services.length}</p>
+          <p className="text-2xl font-bold text-foreground">{services?.length}</p>
         </div>
         <div className="bg-card rounded-lg border border-border p-4">
           <p className="text-sm text-muted-foreground">Active</p>

@@ -93,7 +93,7 @@ export default function OrderViewModal({
                   : "destructive"
               }
             >
-              Payment: {order.payment_status.toUpperCase()}
+              Payment: {order?.payment_status?.toUpperCase()}
             </Badge>
           </div>
 
@@ -129,7 +129,7 @@ export default function OrderViewModal({
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-3">Services</h3>
             <div className="space-y-2">
-              {order.services.map((service, index) => (
+              {order?.services?.map((service, index) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
                     <Package className="h-5 w-5 text-purple-600" />
@@ -197,17 +197,17 @@ export default function OrderViewModal({
             <div className="space-y-2 p-4 rounded-lg bg-muted/50">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-medium">£{(order.total_amount - (order.delivery_fee || 0)).toFixed(2)}</span>
+                <span className="font-medium">£{(parseFloat(String(order.total_amount || 0)) - parseFloat(String(order.delivery_fee || 0))).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Delivery Fee</span>
-                <span className="font-medium">£{(order.delivery_fee || 0).toFixed(2)}</span>
+                <span className="font-medium">£{(parseFloat(String(order.delivery_fee || 0)) || 0).toFixed(2)}</span>
               </div>
               <div className="border-t border-border pt-2 mt-2">
                 <div className="flex justify-between">
                   <span className="font-semibold text-foreground">Total Amount</span>
                   <span className="text-xl font-bold text-primary-600">
-                    £{order.total_amount.toFixed(2)}
+                    £{(parseFloat(String(order?.total_amount || 0)) || 0).toFixed(2)}
                   </span>
                 </div>
               </div>

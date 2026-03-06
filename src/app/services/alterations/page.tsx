@@ -271,7 +271,7 @@ export default function AlterationsPage() {
                 ))}
               </div>
 
-              {services.length === 0 && (
+              {services?.length === 0 && (
                 <div className="text-center py-12">
                   <Package className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                   <p className="text-muted-foreground">No services available at the moment.</p>

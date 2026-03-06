@@ -62,11 +62,11 @@ export const getPaymentColumns = (
     accessorKey: "amount",
     header: "Amount",
     cell: ({ row }) => {
-      const amount = row.getValue("amount") as number;
+      const amount = row.getValue("amount");
       const currency = row.original.currency;
       return (
         <span className="font-semibold text-base">
-          £{amount.toFixed(2)}
+          £{(parseFloat(String(amount || 0)) || 0).toFixed(2)}
         </span>
       );
     },
@@ -88,7 +88,7 @@ export const getPaymentColumns = (
               : "secondary"
           }
         >
-          {status.toUpperCase()}
+          {status?.toUpperCase()}
         </Badge>
       );
     },

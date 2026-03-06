@@ -115,7 +115,7 @@ export default function UserViewModal({
                   <span className="text-sm text-muted-foreground">Total Spent</span>
                 </div>
                 <span className="text-lg font-bold text-green-600">
-                  £{user.total_spent.toFixed(2)}
+                  £{(parseFloat(String(user.total_spent || 0)) || 0).toFixed(2)}
                 </span>
               </div>
             </div>

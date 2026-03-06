@@ -17,22 +17,26 @@ export default function RoleGuard({ children, requiredRole }: RoleGuardProps) {
 
   useEffect(() => {
     if (!isLogin) {
-      return; // Let other guards handle login redirect
+      return;
     }
 
-    const isAdmin = user?.type === 'admin' || user?.role === 'admin' || user?.email === 'admin@launderremedy.com';
+    const isAdmin = user?.type === 'admin' || user?.type === 'subadmin' || user?.role === 'admin';
 
-    // If user is admin and trying to access user-only pages (not login/signup)
-    if (isAdmin && requiredRole === 'user' && !pathname.startsWith('/admin')) {
-      // Allow only auth pages for admin
-      const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/forgot-password');
-      
-      if (!isAuthPage && pathname !== '/') {
+    // Admin on any user-side page → redirect to admin dashboard
+    // (auth pages are allowed so they can logout and come back as a user)
+    if (isAdmin && !pathname.startsWith('/admin')) {
+      const isAuthPage =
+        pathname.startsWith('/login') ||
+        pathname.startsWith('/signup') ||
+        pathname.startsWith('/forgot-password') ||
+        pathname.startsWith('/reset-password');
+
+      if (!isAuthPage) {
         router.replace('/admin/dashboard');
       }
     }
 
-    // If user is regular user and trying to access admin pages
+    // Regular user on admin pages → back to home
     if (!isAdmin && requiredRole === 'admin') {
       router.replace('/');
     }

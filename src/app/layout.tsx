@@ -60,7 +60,7 @@ export default function RootLayout({
               // Public routes: with header/footer and role guard
               <div className="min-h-screen flex flex-col">
                 <Header />
-                <RoleGuard requiredRole={isAuthRoute || pathname === '/' ? undefined : 'user'}>
+                <RoleGuard requiredRole={isAuthRoute ? undefined : 'user'}>
                   <main className="flex-1">{children}</main>
                 </RoleGuard>
                 <Footer />

@@ -773,7 +773,7 @@ export default function PlaceOrderPage() {
                 >
                   {step > 1 ? (
                     <button
-                      onClick={() => dispatch(setStepByValue(step - 1))}
+                      onClick={() => dispatch(setStepByValue(step === 5 && user && user._id ? 3 : step - 1))}
                       className="inline-flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-4 md:py-2.5 lg:px-6 lg:py-3 rounded-lg md:rounded-xl border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors text-sm md:text-base"
                     >
                       <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />

@@ -18,6 +18,7 @@ import {
   ShoppingBag,
   Loader2,
   Eye,
+  X,
   ChevronRight,
   DollarSign,
   Award,
@@ -41,7 +42,7 @@ interface Order {
   discount?: number;
   collection_day: string;
   delivery_day: string;
-  address: string;
+  address: string | { formatted_address?: string; value?: string; latlng?: any };
   createdAt: string;
   services?: any[];
   payment_status?: string;
@@ -54,6 +55,7 @@ export default function UserDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showOrderModal, setShowOrderModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [stats, setStats] = useState({
     totalOrders: 0,
@@ -143,7 +145,7 @@ export default function UserDashboard() {
     });
   };
 
-  const formatPrice = (price: number) => `£${price.toFixed(2)}`;
+  const formatPrice = (price: number) => `£${parseFloat(String(price || 0)).toFixed(2)}`;
 
   if (loading) {
     return (
@@ -389,7 +391,7 @@ export default function UserDashboard() {
                           </div>
                           <div className="flex items-center gap-2">
                             <MapPin className="w-4 h-4" />
-                            <span className="truncate">{order.address}</span>
+                            <span className="truncate">{typeof order.address === 'object' && order.address !== null ? (order.address.formatted_address || order.address.value || '') : (order.address || '')}</span>
                           </div>
                         </div>
 
@@ -411,7 +413,14 @@ export default function UserDashboard() {
                           </p>
                         </div>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setShowOrderModal(true);
+                            }}
+                          >
                             <Eye className="w-4 h-4" />
                           </Button>
                           {order.status.toLowerCase() === 'completed' && (
@@ -438,6 +447,112 @@ export default function UserDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Order Detail Modal */}
+      {showOrderModal && selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => { setShowOrderModal(false); setSelectedOrder(null); }}>
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b dark:border-neutral-700">
+              <div>
+                <h2 className="text-lg font-bold">Order Details</h2>
+                {selectedOrder.order_number && <p className="text-sm text-muted-foreground">#{selectedOrder.order_number}</p>}
+              </div>
+              <button onClick={() => { setShowOrderModal(false); setSelectedOrder(null); }} className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            {/* Body */}
+            <div className="p-5 space-y-5">
+              {/* Status */}
+              <div className="flex items-center gap-2">
+                <Badge className={getStatusColor(selectedOrder.status)}>
+                  {getStatusIcon(selectedOrder.status)}
+                  <span className="ml-1 capitalize">{selectedOrder.status}</span>
+                </Badge>
+              </div>
+
+              {/* Dates */}
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Order Date</p>
+                  <p className="font-medium">{formatDate(selectedOrder.createdAt)}</p>
+                </div>
+                {selectedOrder.collection_day && (
+                  <div>
+                    <p className="text-muted-foreground mb-1">Collection</p>
+                    <p className="font-medium">{typeof selectedOrder.collection_day === 'string' ? selectedOrder.collection_day : formatDate(selectedOrder.collection_day)}</p>
+                  </div>
+                )}
+                {selectedOrder.delivery_day && (
+                  <div>
+                    <p className="text-muted-foreground mb-1">Delivery</p>
+                    <p className="font-medium">{typeof selectedOrder.delivery_day === 'string' ? selectedOrder.delivery_day : formatDate(selectedOrder.delivery_day)}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Address */}
+              {selectedOrder.address && (
+                <div className="text-sm">
+                  <p className="text-muted-foreground mb-1 flex items-center gap-1"><MapPin className="w-3 h-3" /> Address</p>
+                  <p className="font-medium">{typeof selectedOrder.address === 'object' && selectedOrder.address !== null ? (selectedOrder.address.formatted_address || selectedOrder.address.value || '') : selectedOrder.address}</p>
+                </div>
+              )}
+
+              {/* Services */}
+              {(selectedOrder as any).selected_services?.length > 0 && (
+                <div className="text-sm">
+                  <p className="text-muted-foreground mb-2">Services</p>
+                  <div className="space-y-2">
+                    {(selectedOrder as any).selected_services.map((svc: any, i: number) => (
+                      <div key={i} className="flex justify-between items-center bg-neutral-50 dark:bg-neutral-800 rounded-lg px-3 py-2">
+                        <div>
+                          <p className="font-medium">{svc.subcategory || svc.name}</p>
+                          <p className="text-xs text-muted-foreground">{svc.category} &mdash; Qty: {svc.quantity}</p>
+                        </div>
+                        <p className="font-semibold">{formatPrice(parseFloat(String(svc.price || 0)) * (svc.quantity || 1))}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Summary */}
+              <div className="border-t dark:border-neutral-700 pt-4 text-sm space-y-2">
+                {(selectedOrder as any).orderPrice != null && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>{formatPrice(parseFloat(String((selectedOrder as any).orderPrice || 0)))}</span>
+                  </div>
+                )}
+                {selectedOrder.discount && selectedOrder.discount > 0 ? (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount ({(selectedOrder as any).discountPercentage || 25}%)</span>
+                    <span>-{formatPrice(selectedOrder.discount)}</span>
+                  </div>
+                ) : null}
+                {(selectedOrder as any).serviceFee != null && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Service Fee</span>
+                    <span>{formatPrice(parseFloat(String((selectedOrder as any).serviceFee || 0)))}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-bold text-base border-t dark:border-neutral-700 pt-2 mt-2">
+                  <span>Total</span>
+                  <span className="text-primary">{formatPrice(parseFloat(String(selectedOrder.totalPrice || 0)))}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Payment</span>
+                  <span className={(selectedOrder as any).payment_done ? 'text-green-600 font-medium' : 'text-yellow-600 font-medium'}>
+                    {(selectedOrder as any).payment_done ? `Paid${(selectedOrder as any).card_last4 ? ` (****${(selectedOrder as any).card_last4})` : ''}` : 'Pending'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Feedback Modal */}
       {selectedOrder && (

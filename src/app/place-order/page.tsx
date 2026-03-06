@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Elements } from "@stripe/react-stripe-js";
@@ -61,6 +61,7 @@ export default function PlaceOrderPage() {
   const [showMobileStepper, setShowMobileStepper] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [mobileTermsChecked, setMobileTermsChecked] = useState(false);
+  const isProcessingPayment = useRef(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -70,6 +71,13 @@ export default function PlaceOrderPage() {
   const orderDetail = useSelector((state: any) => state.order.orderDetail);
 
   const CART_STORAGE_KEY = 'launderremedy-cart';
+
+  // Auto-skip contact info step if user is already logged in
+  useEffect(() => {
+    if (step === 4 && user && user._id) {
+      dispatch(setStepByValue(5));
+    }
+  }, [step, user]);
 
   // Check device type
   useEffect(() => {
@@ -254,6 +262,8 @@ export default function PlaceOrderPage() {
   };
 
   const handlePaymentAndCreateOrder = async () => {
+    if (isProcessingPayment.current) return;
+    isProcessingPayment.current = true;
     try {
       // Recheck user login
       if (!user || !user._id) {
@@ -461,6 +471,8 @@ export default function PlaceOrderPage() {
       const errorMsg = error?.message || 'Failed to place order';
       toast.error(errorMsg);
       console.error('Order creation error:', error);
+    } finally {
+      isProcessingPayment.current = false;
     }
   };
 
@@ -522,11 +534,6 @@ export default function PlaceOrderPage() {
       case 3:
         return <CategoryList state={state} setState={setState} />;
       case 4:
-        // If user is logged in, auto-skip to payment
-        if (user && user._id) {
-          dispatch(setStepByValue(5));
-          return null;
-        }
         return <ContactInfoForm state={state} setState={setState} />;
       case 5:
         return stripePromise ? (

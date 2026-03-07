@@ -324,7 +324,7 @@ export const mockOrderAPI = {
     }
     
     // Sort by created date (newest first)
-    filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    filtered.sort((a, b) => new Date(b?.created_at || '').getTime() - new Date(a.created_at || '').getTime());
     
     // Pagination
     const startIndex = (page - 1) * pageSize;

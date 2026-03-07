@@ -395,7 +395,7 @@ const LoginPage = () => {
                           By logging in, you agree to our{' '}
                           <Link href="/terms" className="underline hover:text-primary-600">Terms</Link>{' '}
                           and{' '}
-                          <Link href="/privacy" className="underline hover:text-primary-600">Privacy Policy</Link>
+                          <Link href="/privacy-policy" className="underline hover:text-primary-600">Privacy Policy</Link>
                         </p>
                       </div>
                     </div>

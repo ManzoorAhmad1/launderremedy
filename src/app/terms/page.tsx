@@ -189,7 +189,7 @@ export default function TermsPage() {
               <h3 className="text-lg font-semibold text-foreground mb-4">Related Documents</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Link 
-                  href="/contact" 
+                  href="/privacy-policy" 
                   className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg hover:border-primary-500 transition-colors"
                 >
                   <Shield className="w-5 h-5 text-primary-600" />

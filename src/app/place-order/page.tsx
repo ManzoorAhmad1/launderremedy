@@ -882,7 +882,7 @@ export default function PlaceOrderPage() {
                 </div>
                 <div className="text-left">
                   <h4 className="font-semibold text-neutral-900 dark:text-white text-sm md:text-base">
-                    Free Collection & Delivery
+                    Complimentary Collection &amp; Delivery
                   </h4>
                   <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-400">
                     Professional service at your doorstep

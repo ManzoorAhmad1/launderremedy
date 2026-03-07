@@ -20,7 +20,7 @@ const footerLinks = {
     support: [
         { name: "FAQ", href: "/faq" },
         { name: "Contact Us", href: "/contact" },
-        { name: "Privacy Policy", href: "/contact" },
+        { name: "Privacy Policy", href: "/privacy-policy" },
         { name: "Terms of Service", href: "/terms" },
     ],
 }
@@ -181,7 +181,7 @@ export default function Footer() {
 
                         <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
                             <Link
-                                href="/contact"
+                                href="/privacy-policy"
                                 className="text-sm text-neutral-500 hover:text-white transition-colors whitespace-nowrap"
                             >
                                 Privacy Policy

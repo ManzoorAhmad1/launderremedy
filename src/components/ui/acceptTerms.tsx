@@ -30,7 +30,7 @@ const CheckboxWithTerms: React.FC<CheckboxWithTermsProps> = ({
       case 'terms':
         return '/terms';
       case 'privacy':
-        return '/privacy';
+        return '/privacy-policy';
       case 'marketing':
         return '/marketing';
       default:

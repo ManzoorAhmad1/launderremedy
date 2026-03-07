@@ -53,8 +53,8 @@ const AboutPage = () => {
     },
     {
       icon: Truck,
-      title: "Free collection & delivery",
-      description: "We pick up and deliver at your doorstep",
+      title: "Complimentary Collection & Delivery",
+      description: "Scheduled collection and delivery at your convenience",
       color: "text-secondary-600",
       bg: "bg-secondary-50 dark:bg-secondary-900/20",
       image: "/website imagesv/PickUp-Laundry-and-Delivery-Service-1024x683.jpg"

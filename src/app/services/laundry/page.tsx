@@ -106,8 +106,8 @@ export default function LaundryServicePage() {
     },
     {
       icon: Truck,
-      title: "Free Collection & Delivery",
-      description: "We pick up and deliver at your convenience",
+      title: "Complimentary Collection & Delivery",
+      description: "Scheduled collection and delivery at your convenience",
       color: "text-purple-600",
       bg: "bg-purple-50 dark:bg-purple-900/20"
     }

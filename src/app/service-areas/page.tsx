@@ -67,7 +67,7 @@ export default function ServiceAreasPage() {
             Where We Operate
           </h1>
           <p className="text-lg text-white/80 max-w-xl mx-auto mb-8">
-            Find your area below. We offer free collection & delivery across all
+            Find your area below. We provide complimentary collection &amp; delivery across all
             listed locations.
           </p>
 

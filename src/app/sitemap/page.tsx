@@ -61,7 +61,7 @@ export default function SitemapPage() {
       icon: FileText,
       links: [
         { name: "Terms of Service", href: "/terms", icon: FileText },
-        { name: "Privacy Policy", href: "/contact", icon: FileText },
+        { name: "Privacy Policy", href: "/privacy-policy", icon: FileText },
         { name: "Cookie Policy", href: "/cookies", icon: FileText }
       ]
     }

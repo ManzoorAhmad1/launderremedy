@@ -245,7 +245,7 @@ export default function CookiesPage() {
                 <Link href="/terms">
                   <Button variant="outline">Terms of Service</Button>
                 </Link>
-                <Link href="/contact">
+                <Link href="/privacy-policy">
                   <Button variant="outline">Privacy Policy</Button>
                 </Link>
               </div>

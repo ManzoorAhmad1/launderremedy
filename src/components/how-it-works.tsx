@@ -25,7 +25,7 @@ const steps = [
     icon: Package,
     color: "bg-green-500",
     details: [
-      "Free collection from your location",
+      "Complimentary collection from your premises",
       "Professional handling of all items",
       "Digital receipt and inventory",
     ],

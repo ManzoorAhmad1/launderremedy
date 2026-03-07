@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { 
-  Clock, 
-  Calendar, 
-  Truck, 
-  Package, 
+import {
+  Clock,
+  Calendar,
+  Truck,
+  Package,
   RefreshCw,
   Info,
   AlertCircle,
@@ -117,7 +117,7 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
     if (formState.collectionDay && formState.deliveryDay) {
       const collectionDate = formState.collectionDay.timestamp || formState.collectionDay.value;
       const deliveryDate = formState.deliveryDay.timestamp || formState.deliveryDay.value;
-      
+
       if (collectionDate === deliveryDate) {
         toast.error('Collection and delivery dates cannot be the same', {
           duration: 3000,
@@ -131,11 +131,11 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
         }));
         return;
       }
-      
+
       // Check if delivery date is before collection date
       const collectionDateObj = new Date(collectionDate);
       const deliveryDateObj = new Date(deliveryDate);
-      
+
       if (deliveryDateObj < collectionDateObj) {
         toast.error('Delivery date cannot be earlier than collection date', {
           duration: 3000,
@@ -151,7 +151,7 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
       }
     }
 
-    const isValid = 
+    const isValid =
       formState.collectionDay !== null &&
       formState.collectionTime !== null &&
       formState.collectionInstruction !== "" &&
@@ -205,7 +205,7 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
     // Check if dates are same
     const collectionDate = formState.collectionDay.timestamp || formState.collectionDay.value;
     const deliveryDate = day?.timestamp || day?.value;
-    
+
     if (collectionDate === deliveryDate) {
       toast.error('Collection and delivery dates cannot be the same', {
         duration: 3000,
@@ -213,11 +213,11 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
       });
       return;
     }
-    
+
     // Check if delivery date is before collection date
     const collectionDateObj = new Date(collectionDate);
     const deliveryDateObj = new Date(deliveryDate);
-    
+
     if (deliveryDateObj < collectionDateObj) {
       toast.error('Delivery date cannot be earlier than collection date', {
         duration: 3000,
@@ -234,9 +234,7 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
     }));
   }, [formState.collectionDay]);
 
-  const handleSpecialInstructionsChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFormState(prev => ({ ...prev, specialInstructions: e.target.value }));
-  }, []);
+
 
   const frequencyOptions = [
     {
@@ -329,7 +327,7 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
           </div>
           {/* Progress bar */}
           <div className="h-1 bg-accent-yellow/20">
-            <div 
+            <div
               className="h-full bg-accent-yellow transition-all duration-1000 ease-linear"
               style={{ width: `${((1800 - timer) / 1800) * 100}%` }}
             />
@@ -446,30 +444,7 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
           </motion.div>
         )}
 
-        {/* Special Instructions */}
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden">
-          <div className="p-6">
-            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">
-              Special Instructions for Driver
-              <span className="text-neutral-400 dark:text-neutral-500 text-sm font-normal ml-1">(Optional)</span>
-            </label>
-            <textarea
-              value={formState.specialInstructions}
-              onChange={handleSpecialInstructionsChange}
-              placeholder="Add any special instructions for the driver (e.g., leave with neighbor, call before arrival, specific access codes, etc.)"
-              rows={4}
-              className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none transition-all"
-            />
-            <div className="flex justify-between items-center mt-2">
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                Maximum 500 characters
-              </p>
-              <span className={`text-xs ${formState.specialInstructions.length > 500 ? 'text-red-500' : 'text-neutral-500'}`}>
-                {formState.specialInstructions.length}/500
-              </span>
-            </div>
-          </div>
-        </div>
+
 
         {/* Frequency Selection */}
         <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden">
@@ -487,7 +462,7 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
               {frequencyOptions.map((option) => {
                 const Icon = option.icon;
                 const isSelected = formState.frequency === option.value;
-                
+
                 return (
                   <button
                     key={option.value}
@@ -503,8 +478,8 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
                   >
                     <div className={`
                       p-3 rounded-xl mb-4 transition-all duration-300
-                      ${isSelected 
-                        ? `${option.color} scale-110` 
+                      ${isSelected
+                        ? `${option.color} scale-110`
                         : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400'
                       }
                     `}>
@@ -547,8 +522,8 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-lg text-neutral-900 dark:text-white mb-2">
-                  {!formState.frequency || formState.frequency === "Just Once" 
-                    ? "Single Order Booking" 
+                  {!formState.frequency || formState.frequency === "Just Once"
+                    ? "Single Order Booking"
                     : "Regular Service Schedule"}
                 </h4>
                 <p className="text-neutral-600 dark:text-neutral-400">
@@ -698,19 +673,17 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className={`p-4 rounded-xl border ${
-            isFormValid
+          className={`p-4 rounded-xl border ${isFormValid
               ? 'border-accent-green/20 bg-accent-green/5'
               : 'border-accent-yellow/20 bg-accent-yellow/5'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${
-                isFormValid
+              <div className={`p-2 rounded-lg ${isFormValid
                   ? 'bg-accent-green/20 text-accent-green'
                   : 'bg-accent-yellow/20 text-accent-yellow'
-              }`}>
+                }`}>
                 {isFormValid ? (
                   <Shield className="w-5 h-5" />
                 ) : (
@@ -732,7 +705,7 @@ const CollectionDelivery: React.FC<CollectionDeliveryProps> = ({ state, setState
               <button
                 type="button"
                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-medium hover:opacity-90 transition-opacity shadow-lg"
-                onClick={() => {/* Handle next step */}}
+                onClick={() => {/* Handle next step */ }}
               >
                 Continue to Payment
               </button>

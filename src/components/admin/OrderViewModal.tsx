@@ -24,11 +24,61 @@ import {
   FileText,
   CheckCircle,
   Loader2,
-  CreditCard
+  CreditCard,
+  Printer
 } from "lucide-react";
 import ReceiptModal from "@/components/admin/ReceiptModal";
 import { orderApi } from "@/api";
 import toast from "react-hot-toast";
+
+function printSingleItem(order: any, service: any) {
+  const unitPrice = parseFloat(String(service.price || 0));
+  const qty = service.quantity || 1;
+  const itemTotal = unitPrice * qty;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const timeStr = now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  const w = window.open('', '_blank', 'width=340,height=600');
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>Receipt</title><style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Courier New',Courier,monospace;font-size:13px;color:#000;background:#fff;width:300px;margin:0 auto;padding:10px;}
+    .center{text-align:center;}
+    .bold{font-weight:bold;}
+    .line{border-top:1px dashed #000;margin:6px 0;}
+    .row{display:flex;justify-content:space-between;margin:3px 0;}
+    .small{font-size:11px;}
+    @media print{body{width:72mm;}}
+  </style></head><body>
+    <div class='center bold' style='font-size:16px;margin-bottom:4px;'>Launder Remedy</div>
+    <div class='center small'>Laundry &amp; Dry Cleaning</div>
+    <div class='center small'>support@launderremedy.com</div>
+    <div class='line'></div>
+    <div class='center small'>Order #${order.order_number || order._id?.slice(-6)?.toUpperCase() || 'N/A'}</div>
+    <div class='center small'>${dateStr} ${timeStr}</div>
+    <div class='line'></div>
+    <div class='bold small'>Customer:</div>
+    <div class='small'>${order.user_name || ((order.first_name || '') + ' ' + (order.last_name || '')).trim() || 'N/A'}</div>
+    ${order.phone_number ? `<div class='small'>${order.phone_number}</div>` : ''}
+    <div class='line'></div>
+    <div class='bold small'>Item:</div>
+    <div style='margin:4px 0;'>
+      <div class='bold'>${service.service_name || service.subcategory || service.name || 'Service'}</div>
+      <div class='row small'><span>Qty x Price</span><span>${qty} x £${unitPrice.toFixed(2)}</span></div>
+      <div class='row bold'><span>Item Total</span><span>£${itemTotal.toFixed(2)}</span></div>
+    </div>
+    <div class='line'></div>
+    <div class='row small'><span>Payment</span><span>${service.payment_done ? 'PAID' : 'PENDING'}</span></div>
+    ${order.card_last4 ? `<div class='row small'><span>Card</span><span>**** ${order.card_last4}</span></div>` : ''}
+    <div class='line'></div>
+    <div class='center small' style='margin-top:8px;'>Thank you for choosing</div>
+    <div class='center small bold'>Launder Remedy!</div>
+    <div class='center small' style='margin-top:4px;'>launderremedy.com</div>
+  </body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); w.close(); }, 300);
+}
 
 interface OrderViewModalProps {
   isOpen: boolean;
@@ -174,14 +224,20 @@ export default function OrderViewModal({
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-sm font-bold text-foreground">£{itemTotal.toFixed(2)}</span>
                     {isPaid ? (
-                      <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs">
-                        <CheckCircle className="h-3 w-3 mr-1" /> Paid
-                      </Badge>
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs px-2 bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed line-through"
+                        disabled
+                      >
+                        <CheckCircle className="h-3 w-3 mr-1 text-green-500" /> Paid
+                      </Button>
                     ) : order.status === 'completed' ? (
-                      <Badge variant="secondary" className="text-xs">Done</Badge>
+                      <Button size="sm" className="h-7 text-xs px-2 bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed" disabled>
+                        Done
+                      </Button>
                     ) : (
                       <Button
                         size="sm"
@@ -196,6 +252,15 @@ export default function OrderViewModal({
                         )}
                       </Button>
                     )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 w-7 p-0 shrink-0"
+                      title="Print receipt for this item"
+                      onClick={() => printSingleItem(order, { ...service, payment_done: isPaid })}
+                    >
+                      <Printer className="h-3 w-3" />
+                    </Button>
                   </div>
                 </div>
               );

@@ -87,6 +87,7 @@ const orderService = {
       const res = await Fetch.post(
         `${this._PREFIX}/get-all-orders?itemPerPage=${pageSize}&page=${page}&status=${status}&searchText=${searchText}`
       );
+      console.log(res,'res')
       if (res.success) {
         return {
           orders: res.data.items,

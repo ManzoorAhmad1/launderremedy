@@ -3,7 +3,8 @@ import { getCookie, clearCookie, setCookie } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 // Backend base URL
-const BASE_URL ='https://plum-cat-226610.hostingersite.com/api'
+const BASE_URL ='https://launderremedy.techtaaha.com/api'
+// const BASE_URL ='http://localhost:5000/api'
 
 // Create axios instance
 const apiClient:     AxiosInstance = axios.create({
@@ -33,14 +34,6 @@ const processQueue = (error: any, token: string | null = null) => {
 // Request interceptor - Add auth token to every request
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Debug logging
-    console.log('API Request:', {
-      method: config.method?.toUpperCase(),
-      url: config.url,
-      baseURL: config.baseURL,
-      fullURL: `${config.baseURL}${config.url}`,
-    });
-
     const token = getCookie('user_token');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;

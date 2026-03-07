@@ -80,6 +80,8 @@ export default function OrdersPage() {
           service_name: s.subcategory || s.title || s.name || s.categoryTitle || 'Service',
           quantity: s.quantity || 1,
           price: parseFloat(String(s.price || 0)),
+          payment_done: !!s.payment_done,
+          payment_id: s.payment_id || '',
         })),
       });
 

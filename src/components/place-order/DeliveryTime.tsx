@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Select from "react-select";
 import { Calendar, Clock, Package, AlertCircle, Home } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -12,7 +12,7 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
   const [selectedTime, setSelectedTime] = useState<any>(null);
   const [deliveryTimeOptions, setDeliveryTimeOptions] = useState<any[]>([]);
   const [selectedInstruction, setSelectedInstruction] = useState<string>("");
-  
+
   const isDeliveryLoading = useSelector((state: any) => state.order.isDeliveryLoading);
   const delivery = useSelector((state: any) => state.order.delivery);
   const delivery_day = useSelector((state: any) => state.order.delivery_day);
@@ -54,14 +54,14 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
         label: defaultDay.label,
         original: defaultDay
       };
-      
+
       console.log('Setting default delivery day:', dayOption);
       setSelectedDay(dayOption);
-      
+
       const times = getTimeListOfDay(defaultDay, delivery);
       console.log('Generated delivery times for default day:', times);
       setDeliveryTimeOptions(times);
-      
+
       if (times.length > 0) {
         const timeOption = {
           value: times[0].value,
@@ -78,11 +78,11 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
   const handleDayChange = (selectedOption: any) => {
     console.log('Delivery day changed to:', selectedOption);
     setSelectedDay(selectedOption);
-    
+
     const times = getTimeListOfDay(selectedOption.original, delivery);
     console.log('Delivery times for selected day:', times);
     setDeliveryTimeOptions(times);
-    
+
     if (times.length > 0) {
       const timeOption = {
         value: times[0].value,
@@ -117,11 +117,11 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
       ...base,
       padding: "8px 4px",
       borderRadius: "12px",
-      borderColor: state.isFocused 
-        ? "#10b981" 
+      borderColor: state.isFocused
+        ? "#10b981"
         : "#e5e7eb",
-      boxShadow: state.isFocused 
-        ? "0 0 0 3px rgba(16, 185, 129, 0.1)" 
+      boxShadow: state.isFocused
+        ? "0 0 0 3px rgba(16, 185, 129, 0.1)"
         : "none",
       backgroundColor: "#ffffff",
       "&:hover": {
@@ -141,8 +141,8 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
       backgroundColor: state.isSelected
         ? "#10b981"
         : state.isFocused
-        ? "#f3f4f6"
-        : "#ffffff",
+          ? "#f3f4f6"
+          : "#ffffff",
       color: state.isSelected ? "#ffffff" : "#111827",
       padding: "12px 16px",
       "&:active": {
@@ -164,12 +164,12 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
       ...base,
       padding: "8px 4px",
       borderRadius: "12px",
-      borderColor: state.isFocused 
-        ? "#10b981" 
+      borderColor: state.isFocused
+        ? "#10b981"
         : "#374151",
       backgroundColor: "#1f2937",
-      boxShadow: state.isFocused 
-        ? "0 0 0 3px rgba(16, 185, 129, 0.2)" 
+      boxShadow: state.isFocused
+        ? "0 0 0 3px rgba(16, 185, 129, 0.2)"
         : "none",
       "&:hover": {
         borderColor: "#4b5563"
@@ -189,8 +189,8 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
       backgroundColor: state.isSelected
         ? "#10b981"
         : state.isFocused
-        ? "#374151"
-        : "#1f2937",
+          ? "#374151"
+          : "#1f2937",
       color: state.isSelected ? "#ffffff" : "#f3f4f6",
       padding: "12px 16px",
       "&:active": {
@@ -206,7 +206,29 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
       color: "#f3f4f6"
     })
   };
-
+  interface FormState {
+    collectionDay: any;
+    collectionTime: any;
+    collectionInstruction: string;
+    deliveryDay: any;
+    deliveryTime: any;
+    deliveryInstruction: string;
+    frequency: string;
+    specialInstructions: string;
+  }
+  const [formState, setFormState] = useState<FormState>({
+    collectionDay: null,
+    collectionTime: null,
+    collectionInstruction: "",
+    deliveryDay: null,
+    deliveryTime: null,
+    deliveryInstruction: "",
+    frequency: "Just Once",
+    specialInstructions: ""
+  });
+  const handleSpecialInstructionsChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFormState(prev => ({ ...prev, specialInstructions: e.target.value }));
+  }, []);
   return (
     <div className="space-y-6">
       <div className="grid md:grid-cols-2 gap-6">
@@ -303,7 +325,7 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
           ].map((instruction) => {
             const Icon = instruction.icon;
             const isSelected = selectedInstruction === instruction.value;
-            
+
             return (
               <button
                 key={instruction.value}
@@ -318,27 +340,24 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
                 `}
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <div className={`p-2 rounded-lg ${
-                    isSelected
+                  <div className={`p-2 rounded-lg ${isSelected
                       ? 'bg-accent-green/20 text-accent-green'
                       : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500'
-                  }`}>
+                    }`}>
                     <Icon className="w-4 h-4" />
                   </div>
                 </div>
                 <div className="text-left">
-                  <span className={`font-medium text-sm ${
-                    isSelected
+                  <span className={`font-medium text-sm ${isSelected
                       ? 'text-accent-green dark:text-accent-green'
                       : 'text-neutral-900 dark:text-white'
-                  }`}>
+                    }`}>
                     {instruction.label}
                   </span>
-                  <p className={`text-xs mt-1 ${
-                    isSelected
+                  <p className={`text-xs mt-1 ${isSelected
                       ? 'text-accent-green dark:text-accent-green'
                       : 'text-neutral-500 dark:text-neutral-400'
-                  }`}>
+                    }`}>
                     {instruction.description}
                   </p>
                 </div>
@@ -347,7 +366,30 @@ const DeliveryTime = ({ onDeliveryChange }: { onDeliveryChange: (day: any, time:
           })}
         </div>
       </div>
-
+      {/* Special Instructions */}
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden">
+        <div className="p-6">
+          <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">
+            Special Instructions for Driver
+            <span className="text-neutral-400 dark:text-neutral-500 text-sm font-normal ml-1">(Optional)</span>
+          </label>
+          <textarea
+            value={formState.specialInstructions}
+            onChange={handleSpecialInstructionsChange}
+            placeholder="Add any special instructions for the driver (e.g., leave with neighbor, call before arrival, specific access codes, etc.)"
+            rows={4}
+            className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none transition-all"
+          />
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              Maximum 500 characters
+            </p>
+            <span className={`text-xs ${formState.specialInstructions.length > 500 ? 'text-red-500' : 'text-neutral-500'}`}>
+              {formState.specialInstructions.length}/500
+            </span>
+          </div>
+        </div>
+      </div>
       {/* Delivery Notes */}
       <div className="p-4 rounded-xl bg-gradient-to-r from-accent-green/5 to-accent-green/10 border border-accent-green/20">
         <div className="flex items-start gap-3">

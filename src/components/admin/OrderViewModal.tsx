@@ -31,49 +31,75 @@ import ReceiptModal from "@/components/admin/ReceiptModal";
 import { orderApi } from "@/api";
 import toast from "react-hot-toast";
 
-function printSingleItem(order: any, service: any) {
+function printSingleItem(order: any, service: any, itemIndex: number, totalItems: number) {
   const unitPrice = parseFloat(String(service.price || 0));
   const qty = service.quantity || 1;
   const itemTotal = unitPrice * qty;
   const now = new Date();
-  const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-  const timeStr = now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
-  const w = window.open('', '_blank', 'width=340,height=600');
+  // Format: Sat 13/12/25
+  const dayName = now.toLocaleDateString('en-GB', { weekday: 'short' });
+  const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  const dateFormatted = `${dayName} ${dateStr}`;
+  // Order number — last 4 digits or order_number
+  const orderNum = order.order_number || order._id?.slice(-4)?.toUpperCase() || 'N/A';
+  // Item counter: e.g. 1/3
+  const itemCounter = `${itemIndex + 1}/${totalItems}`;
+  // Service name + qty
+  const serviceName = service.service_name || service.subcategory || service.title || service.name || 'Service';
+  const itemLine = `${serviceName} x ${qty}`;
+  // Customer name — last name first like the label photo
+  const fullName = order.user_name || `${order.first_name || ''} ${order.last_name || ''}`.trim() || 'N/A';
+  const nameParts = fullName.trim().split(' ');
+  const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+  const firstName = nameParts.length > 1 ? nameParts.slice(0, -1).join(' ') : nameParts[0];
+  const nameFormatted = lastName ? `${lastName} ${firstName}` : firstName;
+  // Status short code
+  const statusMap: Record<string, string> = {
+    pending: 'Pending', processing: 'In Progress', completed: 'Done',
+    cancelled: 'Cancelled', out_for_delivery: 'Delivery',
+  };
+  const statusShort = statusMap[order.status] || order.status || 'N/A';
+
+  const w = window.open('', '_blank', 'width=380,height=260');
   if (!w) return;
-  w.document.write(`<!DOCTYPE html><html><head><title>Receipt</title><style>
+  w.document.write(`<!DOCTYPE html><html><head><title>Label</title><style>
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'Courier New',Courier,monospace;font-size:13px;color:#000;background:#fff;width:300px;margin:0 auto;padding:10px;}
-    .center{text-align:center;}
-    .bold{font-weight:bold;}
-    .line{border-top:1px dashed #000;margin:6px 0;}
-    .row{display:flex;justify-content:space-between;margin:3px 0;}
-    .small{font-size:11px;}
-    @media print{body{width:72mm;}}
+    body{
+      font-family:'Courier New',Courier,monospace;
+      background:#f87171;
+      color:#000;
+      width:340px;
+      min-height:120px;
+      padding:14px 16px;
+      margin:0 auto;
+    }
+    .row1{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+    .order-num{font-size:28px;font-weight:900;letter-spacing:1px;}
+    .date{font-size:15px;font-weight:bold;}
+    .row2{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;}
+    .counter{font-size:18px;font-weight:900;}
+    .item{font-size:15px;font-weight:bold;}
+    .row3{display:flex;justify-content:space-between;align-items:baseline;}
+    .customer{font-size:15px;font-weight:bold;}
+    .status{font-size:13px;font-weight:bold;}
+    .price{font-size:12px;margin-top:6px;text-align:right;opacity:0.8;}
+    @media print{
+      body{width:72mm;background:#f87171 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    }
   </style></head><body>
-    <div class='center bold' style='font-size:16px;margin-bottom:4px;'>Launder Remedy</div>
-    <div class='center small'>Laundry &amp; Dry Cleaning</div>
-    <div class='center small'>support@launderremedy.com</div>
-    <div class='line'></div>
-    <div class='center small'>Order #${order.order_number || order._id?.slice(-6)?.toUpperCase() || 'N/A'}</div>
-    <div class='center small'>${dateStr} ${timeStr}</div>
-    <div class='line'></div>
-    <div class='bold small'>Customer:</div>
-    <div class='small'>${order.user_name || ((order.first_name || '') + ' ' + (order.last_name || '')).trim() || 'N/A'}</div>
-    ${order.phone_number ? `<div class='small'>${order.phone_number}</div>` : ''}
-    <div class='line'></div>
-    <div class='bold small'>Item:</div>
-    <div style='margin:4px 0;'>
-      <div class='bold'>${service.service_name || service.subcategory || service.name || 'Service'}</div>
-      <div class='row small'><span>Qty x Price</span><span>${qty} x £${unitPrice.toFixed(2)}</span></div>
-      <div class='row bold'><span>Item Total</span><span>£${itemTotal.toFixed(2)}</span></div>
+    <div class='row1'>
+      <span class='order-num'>${orderNum}</span>
+      <span class='date'>${dateFormatted}</span>
     </div>
-    <div class='line'></div>
-    <div class='row small'><span>Payment</span><span>${service.payment_done ? 'PAID' : 'PENDING'}</span></div>
-    ${order.card_last4 ? `<div class='row small'><span>Card</span><span>**** ${order.card_last4}</span></div>` : ''}
-    <div class='line'></div>
-    <div class='center small' style='margin-top:8px;'>Thank you for choosing</div>
-    <div class='center small bold'>Launder Remedy!</div>
-    <div class='center small' style='margin-top:4px;'>launderremedy.com</div>
+    <div class='row2'>
+      <span class='counter'>${itemCounter}</span>
+      <span class='item'>${itemLine}</span>
+    </div>
+    <div class='row3'>
+      <span class='customer'>${nameFormatted}</span>
+      <span class='status'>St: ${statusShort}</span>
+    </div>
+    <div class='price'>£${itemTotal.toFixed(2)} ${service.payment_done ? '✓ Paid' : '· Pending'}</div>
   </body></html>`);
   w.document.close();
   w.focus();
@@ -207,6 +233,8 @@ export default function OrderViewModal({
             </p>
             <div className="space-y-2">
             {(order?.services?.length ? order.services : (order?.selected_services || [])).map((service: any, index: number) => {
+              const allServices = order?.services?.length ? order.services : (order?.selected_services || []);
+              const totalItems = allServices.length;
               const unitPrice = parseFloat(String(service.price || 0));
               const qty = service.quantity || 1;
               const itemTotal = unitPrice * qty;
@@ -256,8 +284,8 @@ export default function OrderViewModal({
                       size="sm"
                       variant="outline"
                       className="h-7 w-7 p-0 shrink-0"
-                      title="Print receipt for this item"
-                      onClick={() => printSingleItem(order, { ...service, payment_done: isPaid })}
+                      title="Print label for this item"
+                      onClick={() => printSingleItem(order, { ...service, payment_done: isPaid }, index, totalItems)}
                     >
                       <Printer className="h-3 w-3" />
                     </Button>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { authApi } from "@/api";
 import toast from "react-hot-toast";
 import { 
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 
 const ForgotPasswordPage = () => {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -47,9 +49,8 @@ const ForgotPasswordPage = () => {
       const response:any = await authApi.forgotPassword({ email });
 
       if (response.success) {
-        setSuccessMessage(`Password reset instructions have been sent to ${email}. Please check your inbox.`);
-        toast.success('Reset link sent! Check your email.');
-        setEmail(''); // Clear email field
+        toast.success('Reset code sent! Check your email.');
+        router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
       }
     } catch (error: any) {
       console.error('Forgot password error:', error);

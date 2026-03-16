@@ -865,17 +865,13 @@ export default function PricingPage() {
                       <span className="font-medium">{formatPrice(cartTotal)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-primary-600 dark:text-primary-400">Service Fee</span>
-                      <span>{formatPrice(2.50)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
                       <span className="text-primary-600 dark:text-primary-400">Delivery</span>
                       <span className="font-semibold text-accent-green">FREE</span>
                     </div>
                     <div className="border-t border-primary-200 dark:border-primary-800 pt-3">
                       <div className="flex justify-between font-bold text-lg">
                         <span>Total</span>
-                        <span>{formatPrice(cartTotal + 2.5)}</span>
+                        <span>{formatPrice(cartTotal)}</span>
                       </div>
                       <p className="text-xs text-primary-600 dark:text-primary-400 mt-1">
                         Including VAT

@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
-import { logOutUser } from "@/lib/features/userSlice";
+import { logOutUser, logout } from "@/lib/features/userSlice";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import logo from "../../../public/logo-02.png";
@@ -25,9 +25,11 @@ export default function AdminHeader() {
     }, []);
 
     const handleLogout = () => {
+        // Clear Redux state + cookies synchronously
+        dispatch(logout());
         localStorage.removeItem("user");
-        window.location.href = "/";
         toast.success("Logged out successfully");
+        router.push("/login");
     };
 
     if (!mounted) {

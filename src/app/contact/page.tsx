@@ -48,16 +48,29 @@ const ContactPage = () => {
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    console.log("Form submitted:", data);
-    setIsSubmitting(false);
-    setSubmitted(true);
-    reset();
-    
-    toast.success("Message sent successfully! We'll get back to you soon.");
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://launderremedy.techtaaha.com/api'}/common/v1/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        setSubmitted(true);
+        reset();
+        toast.success("Message sent successfully! We'll get back to you soon.");
+      } else {
+        toast.error(result.message || 'Something went wrong. Please try again.');
+      }
+    } catch (err) {
+      console.error('Contact form error:', err);
+      toast.error('Failed to send message. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
     
     // Reset success state after 5 seconds
     setTimeout(() => setSubmitted(false), 5000);

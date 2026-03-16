@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
-import { logOutUser } from "@/lib/features/userSlice";
+import { logout } from "@/lib/features/userSlice";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import logo from "../../../public/logo-02.png";
@@ -132,11 +132,10 @@ export default function AdminSidebar() {
     }, []);
 
     const handleLogout = () => {
-        if (user?._id) {
-            dispatch(logOutUser(user._id) as any);
-            toast.success("Logged out successfully");
-            router.push("/");
-        }
+        dispatch(logout());
+        localStorage.removeItem("user");
+        toast.success("Logged out successfully");
+        router.push("/login");
     };
 
     const toggleMobileMenu = () => {

@@ -125,7 +125,7 @@ const FindAddress: React.FC<FindAddressProps> = ({ state, setState }) => {
         {
           params: {
             access_token: MAPBOX_TOKEN,
-            types: 'address,poi,place,locality,neighborhood',
+            types: 'address,poi,place,locality,neighborhood,postcode',
             limit: 5,
             language: 'en',
           },

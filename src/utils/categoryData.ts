@@ -31,7 +31,7 @@ export const categoryData: Record<string, {
       {
         title: 'Expert Drying & Folding',
         description: 'Every garment is carefully dried at optimal temperatures and professionally folded to maintain quality and prevent wrinkles. Our expert team ensures your clothes look pristine and ready to wear.',
-        image: '/website imagesv/folding-clothes.png',
+        image: '/launderremendy_image/Premium Finishing.png',
         features: [
           'Low-heat drying to prevent shrinkage',
           'Meticulous folding techniques',
@@ -55,7 +55,7 @@ export const categoryData: Record<string, {
       {
         title: 'Sustainable Practices',
         description: 'We\'re committed to environmental responsibility with eco-friendly detergents and efficient water management systems. Our green approach doesn\'t compromise on cleaning quality.',
-        image: '/website imagesv/Eco-5.png',
+        image: '/launderremendy_image/Designer Garment Specialists.jpg',
         features: [
           'Biodegradable cleaning products',
           'Water-saving washing technology',
@@ -67,7 +67,7 @@ export const categoryData: Record<string, {
       {
         title: 'Fabric Care Specialists',
         description: 'Our trained specialists understand different fabric types and their unique care requirements. From cotton to synthetic blends, we provide expert treatment for all materials.',
-        image: '/website imagesv/Header-clean-fabric.jpg',
+        image: '/launderremendy_image/Alterations.webp',
         features: [
           'Cotton and linen expertise',
           'Synthetic blend handling',
@@ -79,7 +79,7 @@ export const categoryData: Record<string, {
       {
         title: 'Quality Inspection Process',
         description: 'Every item undergoes thorough inspection before and after cleaning. We check for stains, damage, and ensure perfect results before delivery to your doorstep.',
-        image: '/website imagesv/services-Dry-Cleaning.jpg',
+        image: '/launderremendy_image/Express Suit Service.jpg',
         features: [
           'Pre-wash inspection and tagging',
           'Post-wash quality verification',
@@ -91,7 +91,7 @@ export const categoryData: Record<string, {
       {
         title: 'Convenient Collection & Delivery',
         description: 'Enjoy hassle-free service with our complimentary collection and delivery across London. Schedule pickups at your convenience and receive your fresh laundry at your doorstep.',
-        image: '/website imagesv/laundry_service_cerritos_ca.webp',
+        image: '/website imagesv/For-Wedding-Dress-Dry-Cleaning-Orange-County-Seek-Out-The-Best.jpg',
         features: [
           'Free pickup and delivery service',
           'Flexible scheduling options',
@@ -135,7 +135,7 @@ export const categoryData: Record<string, {
       {
         title: 'Stain & Spot Treatment',
         description: 'Expert removal of common shirt stains including collar rings, underarm marks, and food stains without fabric damage. Our advanced stain removal techniques ensure pristine results.',
-        image: '/website imagesv/wool-garment-care-strategies-different-fabrics-pressing.webp',
+        image: '/website imagesv/what-are-the-5-stages-of-laundry-process.jpg',
         features: [
           'Pre-treatment of stubborn stains',
           'Oil and grease stain removal',
@@ -159,7 +159,7 @@ export const categoryData: Record<string, {
       {
         title: 'Business Shirt Packages',
         description: 'Exclusive packages for professionals who need regular shirt cleaning. Save time and money with our subscription services designed for busy executives.',
-        image: '/launderremendy_image/Business Shirt Packages.png',
+        image: '/website imagesv/shutterstock_730137010.jpg',
         features: [
           'Weekly and monthly packages available',
           'Priority service for members',
@@ -367,7 +367,7 @@ export const categoryData: Record<string, {
       {
         title: 'Designer Dress Care',
         description: 'High-end designer dresses deserve exceptional care. Our specialists are trained in handling luxury brands and understand their specific care requirements.',
-        image: '/launderremendy_image/Designer Garment Specialists.jpg',
+        image: '/launderremendy_image/Alterations.webp',
         features: [
           'Luxury brand expertise',
           'Hand-finished care',
@@ -423,7 +423,7 @@ export const categoryData: Record<string, {
       {
         title: 'Minor Repairs Included',
         description: 'We fix loose hems, replace missing buttons, and perform minor repairs at no extra charge. Keeping your trousers in perfect condition is our priority.',
-        image: '/website imagesv/Sewing-and-Tailoring.jpg',
+        image: '/website imagesv/shutterstock_730137010.jpg',
         features: [
           'Button replacement',
           'Hem repair service',
@@ -447,7 +447,7 @@ export const categoryData: Record<string, {
       {
         title: 'Dress Pants Perfection',
         description: 'Formal dress pants demand perfection. Our specialists ensure razor-sharp creases and impeccable presentation for business and formal occasions.',
-        image: '/launderremendy_image/Dress Pants Perfection.webp',
+        image: '/website imagesv/unrecognizable-man-ironing-shirts-laundry-home.webp',
         features: [
           'Professional business finish',
           'Sharp front creases',
@@ -459,7 +459,7 @@ export const categoryData: Record<string, {
       {
         title: 'Trouser Care Packages',
         description: 'Regular trouser wearers benefit from our package deals. Save money and ensure your pants always look their best with our subscription services.',
-        image: '/launderremendy_image/Trouser Care Packages.webp',
+        image: '/website imagesv/175590-2_1.webp',
         features: [
           'Monthly package discounts',
           'Priority service access',
@@ -755,7 +755,7 @@ export const categoryData: Record<string, {
       {
         title: 'Basic Alterations',
         description: 'Common alterations including hemming, taking in, and letting out garments for a better fit. Fast turnaround and precise workmanship guaranteed.',
-        image: '/launderremendy_image/Basic Alterations.webp',
+        image: '/website imagesv/istockphoto-1410284251-612x612.jpg',
         features: [
           'Trouser hemming',
           'Waist adjustments',
@@ -827,7 +827,7 @@ export const categoryData: Record<string, {
       {
         title: 'Designer Garment Specialists',
         description: 'Trusted with high-end designer pieces, our master tailors understand luxury garment construction and preserve brand integrity.',
-        image: '/launderremendy_image/Designer Garment Specialists.jpg',
+        image: '/website imagesv/Alice-Archer-slide-7KKC-articleLarge.webp',
         features: [
           'Luxury brand expertise',
           'Original label preservation',
@@ -842,12 +842,12 @@ export const categoryData: Record<string, {
     title: 'Shoe Repair & Care',
     subtitle: 'Expert Cobbler Services',
     description: 'Professional shoe repair and restoration services to extend the life of your favorite footwear. From designer heels to everyday boots.',
-    heroImage: '/website imagesv/db023ba5e6-cobblers-1-5c0af.avif',
+    heroImage: '/website imagesv/image.png',
     sections: [
       {
         title: 'Sole Replacement',
         description: 'Complete sole replacement for all types of footwear using quality materials that match original specifications. Restore worn soles to like-new condition.',
-        image: '/website imagesv/saphir-shoe-polish-overview.jpg',
+        image: '/website imagesv/shoes.avif',
         features: [
           'Leather sole replacement',
           'Rubber sole options',
@@ -859,7 +859,7 @@ export const categoryData: Record<string, {
       {
         title: 'Heel Repairs',
         description: 'Expert heel replacement and repair for stilettos, block heels, and dress shoes. Quick turnaround and quality materials ensure lasting results.',
-        image: '/website imagesv/how-does-self-service-laundry-work-4.jpg',
+        image: '/website imagesv/heals.webp',
         features: [
           'Heel cap replacement',
           'Heel height adjustments',
@@ -871,7 +871,7 @@ export const categoryData: Record<string, {
       {
         title: 'Cleaning & Conditioning',
         description: 'Professional shoe cleaning and leather conditioning services to maintain appearance and extend life. Specialized treatments for different materials.',
-        image: '/website imagesv/what-are-the-5-stages-of-laundry-process.jpg',
+        image: '/website imagesv/saphir-shoe-polish-overview.jpg',
         features: [
           'Deep leather cleaning',
           'Conditioning treatment',
@@ -883,7 +883,7 @@ export const categoryData: Record<string, {
       {
         title: 'Specialized Repairs',
         description: 'Expert repairs for zippers, buckles, straps, and other shoe components. Preserve your favorite footwear with professional restoration.',
-        image: '/website imagesv/dwr2024-2.webp',
+        image: '/website imagesv/hq720.jpg',
         features: [
           'Boot zipper replacement',
           'Stitching and seam repair',
@@ -895,7 +895,7 @@ export const categoryData: Record<string, {
       {
         title: 'Boot Services',
         description: 'Comprehensive boot repair and maintenance including resoling, zipper replacement, and leather restoration. Keep your boots in top condition.',
-        image: '/website imagesv/MicrosoftTeams-image-14.jpg',
+        image: '/website imagesv/istockphoto-673596392-612x612.jpg',
         features: [
           'Boot resoling',
           'Zipper replacement',
@@ -907,7 +907,7 @@ export const categoryData: Record<string, {
       {
         title: 'Designer Shoe Care',
         description: 'Specialized care for luxury and designer footwear. Our experts understand high-end shoe construction and use premium materials.',
-        image: '/website imagesv/download.jpg',
+        image: '/website imagesv/images (13).jpg',
         features: [
           'Luxury brand expertise',
           'Premium materials only',
@@ -919,7 +919,7 @@ export const categoryData: Record<string, {
       {
         title: 'Shoe Maintenance Programs',
         description: 'Regular maintenance packages to keep your shoe collection in pristine condition. Preventive care extends shoe life significantly.',
-        image: '/website imagesv/Curtain-Cleaning-Services-in-Dubai.webp',
+        image: '/website imagesv/Deluxe_wortel2.webp',
         features: [
           'Seasonal care packages',
           'Monthly maintenance plans',

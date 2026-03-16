@@ -49,7 +49,7 @@ const AboutPage = () => {
       description: "Get your clothes back within 24 hours",
       color: "text-primary-600",
       bg: "bg-primary-50 dark:bg-primary-900/20",
-      image: "/website imagesv/how-often-to-dry-clean-suit.webp"
+      image: "/website imagesv/services-Dry-Cleaning.jpg"
     },
     {
       icon: Truck,
@@ -65,7 +65,7 @@ const AboutPage = () => {
       description: "Round-the-clock customer service",
       color: "text-accent-yellow",
       bg: "bg-accent-yellow/10 dark:bg-accent-yellow/20",
-      image: "/website imagesv/Curtain-Cleaning-Services-in-Dubai.webp"
+      image: "/website imagesv/suit-dry-cleaning.jpg"
     },
   ];
 
@@ -433,7 +433,7 @@ const AboutPage = () => {
               <div className="aspect-video rounded-2xl overflow-hidden shadow-primary-lg border border-neutral-200 dark:border-neutral-700">
                 <div className="relative w-full h-full">
                   <Image
-                    src="/website imagesv/suit-dry-cleaning.jpg"
+                    src="/website imagesv/Screen-Shot-2018-02-22-at-4.webp"
                     alt="Premium laundry care process"
                     fill
                     className="object-cover"

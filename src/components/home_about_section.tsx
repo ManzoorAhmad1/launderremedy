@@ -22,7 +22,7 @@ export default function HomeAboutSection() {
                     >
                         <div className="relative aspect-[4/5] lg:aspect-square rounded-2xl overflow-hidden shadow-xl border border-neutral-200 dark:border-neutral-800">
                             <Image
-                                src="/website imagesv/PickUp-Laundry-and-Delivery-Service-1024x683.jpg"
+                                src="/website imagesv/Header-clean-fabric.jpg"
                                 alt="Professional laundry team providing expert garment care services"
                                 fill
                                 className="object-cover"
